@@ -9,9 +9,13 @@
 #' @param legend.text.size Specify Legend Text size
 #' @param title.size Specify Title Text size
 #' @export
-theme_om <- function(legend_position = c(.55, .93), axis_text_size = 20, axis_title_size = 20, legend_text_size = 24, title_size = 26){
+theme_om <- function(legend_position = c(.55, .93),
+                     axis_text_size = 20,
+                     axis_title_size = 20,
+                     legend_text_size = 24,
+                     title_size = 26,
+                     overall_text_size = 24){
   theme(panel.background = element_rect(fill="white"),
-        text = element_text(family="Poppins",size=24),
         legend.text = element_text(size=legend_text_size),
         legend.position = legend_position,
         legend.title=element_blank(),
@@ -21,7 +25,8 @@ theme_om <- function(legend_position = c(.55, .93), axis_text_size = 20, axis_ti
         axis.text.x = element_text(color = "grey20", size = axis_text_size),
         axis.text.y = element_text(color = "grey20", size = axis_text_size),
         axis.title.x = element_text(color = "grey20", size = axis_title_size),
-        axis.title.y = element_text(color = "grey20", size = axis_title_size))
+        axis.title.y = element_text(color = "grey20", size = axis_title_size),
+        text = element_text(family="Poppins",size=24))
 }
 
 

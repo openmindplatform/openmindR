@@ -54,15 +54,30 @@ titanic_dat %>%
 
 **Adapt `theme_om`**
 
-```{r}
+```{r fig.width=8, fig.height=5, message=F}
 titanic_dat %>% 
   ggplot(aes(Class, n, fill = Class)) +
   geom_col() +
   theme_om(legend_position = "bottom",
-           axis_text = 10, axis_title = 15) +
+           axis_text_size = 10,
+           axis_title_size = 15, 
+           legend_text_size = 10,
+           title_size = 20) +
   scale_fill_om() +
-  facet_wrap(~Survived)
+  facet_wrap(~Survived) +
+  labs(title = "Titanic Survival by Age and Class") 
 ```
 
 
+
+```{r fig.width=8, fig.height=5, message=F}
+titanic_dat %>% 
+  ggplot(aes(Class, n, fill = Class)) +
+  geom_col() +
+  theme_om(legend_position = "top",
+           overall_text_size = 15) +
+  scale_fill_om() +
+  facet_wrap(~Survived) +
+  labs(title = "Titanic Survival by Age and Class") 
+```
 
