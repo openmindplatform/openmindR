@@ -6,7 +6,7 @@
 \usage{
 theme_om(legend_position = c(0.55, 0.93), axis_text_size = 20,
   axis_title_size = 20, legend_text_size = 24, title_size = 26,
-  overall_text_size = 24)
+  overall_text_size = 24, ...)
 }
 \arguments{
 \item{legend_position}{Specify Legend position c(x, y)}

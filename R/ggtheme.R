@@ -14,7 +14,7 @@ theme_om <- function(legend_position = c(.55, .93),
                      axis_title_size = 20,
                      legend_text_size = 24,
                      title_size = 26,
-                     overall_text_size = 24){
+                     overall_text_size = 24, ...){
   theme(panel.background = element_rect(fill="white"),
         legend.text = element_text(size=legend_text_size),
         legend.position = legend_position,
@@ -26,7 +26,7 @@ theme_om <- function(legend_position = c(.55, .93),
         axis.text.y = element_text(color = "grey20", size = axis_text_size),
         axis.title.x = element_text(color = "grey20", size = axis_title_size),
         axis.title.y = element_text(color = "grey20", size = axis_title_size),
-        text = element_text(family="Poppins",size=24))
+        text = element_text(family="Poppins",size=24, ...))
 }
 
 
