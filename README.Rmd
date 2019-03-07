@@ -32,11 +32,11 @@ windowsFonts(`Poppins` = windowsFont("Poppins"))
 ```
 
 
-[Good tutorial on how install custom fonts in R](https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/)
+[Good tutorial on how to install custom fonts in R](https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/)
 
 **Example**
 
-```{r fig.width=8, fig.height=5, message=F}
+```{r fig.width=8, fig.height=5, message=F, warning=F}
 ## Load tidyverse
 library(tidyverse)
 
@@ -54,6 +54,12 @@ titanic_dat %>%
 
 **Adapt `theme_om`**
 
++ `legend_position`
++ `axis_text_size`
++ `axis_title_size`
++ `legend_text_size`
++ `title_size`
+
 ```{r fig.width=8, fig.height=5, message=F}
 titanic_dat %>% 
   ggplot(aes(Class, n, fill = Class)) +
@@ -65,10 +71,12 @@ titanic_dat %>%
            title_size = 20) +
   scale_fill_om() +
   facet_wrap(~Survived) +
-  labs(title = "Titanic Survival by Age and Class") 
+  labs(title = "Titanic Survival by Class") 
 ```
 
+Or all text sizes at once
 
++ `overall_text_size`
 
 ```{r fig.width=8, fig.height=5, message=F}
 titanic_dat %>% 
@@ -78,6 +86,6 @@ titanic_dat %>%
            overall_text_size = 15) +
   scale_fill_om() +
   facet_wrap(~Survived) +
-  labs(title = "Titanic Survival by Age and Class") 
+  labs(title = "Titanic Survival by Class") 
 ```
 
