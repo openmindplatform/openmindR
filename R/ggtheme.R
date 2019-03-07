@@ -1,30 +1,28 @@
+
+
 #' A ggplot2 theme
 #'
 #' This function can be added to a ggplot2 call and creates the official OpenMind ggplot theme
 #' @param legend_position Specify Legend position c(x, y)
+#' @param axis.text Specify Axis Text size
+#' @param axis.title Specify Title Text size
+#' @param legend.text.size Specify Legend Text size
+#' @param title.size Specify Title Text size
 #' @export
-theme_om <- function(legend_position = c(.55, .93)){
+theme_om <- function(legend_position = c(.55, .93), axis_text_size = 20, axis_title_size = 20, legend_text_size = 24, title_size = 26){
   theme(panel.background = element_rect(fill="white"),
         text = element_text(family="Poppins",size=24),
-        legend.text = element_text(size=18),
+        legend.text = element_text(size=legend_text_size),
         legend.position = legend_position,
         legend.title=element_blank(),
-        plot.title = element_text(hjust = 0.5, size=26),
+        plot.title = element_text(hjust = 0.5, size=title_size),
         axis.line.x = element_line(),
         axis.line.y = element_line(),
-        axis.text.x = element_text(color = "grey20", size = 20),
-        axis.text.y = element_text(color = "grey20", size = 20),
-        axis.title.x = element_text(color = "grey20", size = 20),
-        axis.title.y = element_text(color = "grey20", size = 20))
+        axis.text.x = element_text(color = "grey20", size = axis_text_size),
+        axis.text.y = element_text(color = "grey20", size = axis_text_size),
+        axis.title.x = element_text(color = "grey20", size = axis_title_size),
+        axis.title.y = element_text(color = "grey20", size = axis_title_size))
 }
-
-# Blue : #2a98db
-# Purple : #3d4fa1
-# Yellow : #e8df15
-# Turquoise : #65c6c3
-# Pink : #ec145b
-# Green : #94cfa1
-# Black : #414042
 
 
 #' A ggplot2 palette
@@ -66,3 +64,5 @@ scale_color_om <- function(...) { discrete_scale("colour", "om", pal_om, ...) }
 #' This object contains a palette with the official OpenMind colors
 #' @export
 scale_fill_om <- function(...) { discrete_scale("fill", "om", pal_om, ...) }
+
+

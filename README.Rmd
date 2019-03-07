@@ -1,0 +1,68 @@
+---
+title: "openmindR"
+output: github_document
+---
+
+Install package like this:
+
+```{r setup, eval=FALSE}
+devtools::install_github("favstats/openmindR")
+```
+
+Load package:
+
+```{r}
+library(openmindR)
+```
+
+
+## Openmind ggplot2 theme
+
+There are three functions for the ggplot2 theme:
+
++ `theme_om`
++ `scale_fill_om`
++ `scale_color_om`
+
+Make sure you have the Poppins font installed!
+
+```{r}
+windowsFonts(`Poppins` = windowsFont("Poppins"))
+
+```
+
+
+[Good tutorial on how install custom fonts in R](https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/)
+
+**Example**
+
+```{r fig.width=8, fig.height=5, message=F}
+## Load tidyverse
+library(tidyverse)
+
+titanic_dat <- Titanic %>% as_tibble()
+
+titanic_dat %>% 
+  ggplot(aes(Sex, n)) +
+  geom_col(aes(fill = Class), position = position_dodge()) +
+  theme_om(legend_position = c(0.9, 0.75)) +
+  scale_fill_om("Class") +
+  facet_wrap(~Survived) +
+  labs(title = "Titanic Survival by Age and Class") 
+  
+```
+
+**Adapt `theme_om`**
+
+```{r}
+titanic_dat %>% 
+  ggplot(aes(Class, n, fill = Class)) +
+  geom_col() +
+  theme_om(legend_position = "bottom",
+           axis_text = 10, axis_title = 15) +
+  scale_fill_om() +
+  facet_wrap(~Survived)
+```
+
+
+

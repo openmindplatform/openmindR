@@ -4,10 +4,19 @@
 \alias{theme_om}
 \title{A ggplot2 theme}
 \usage{
-theme_om(legend_position = c(0.55, 0.93))
+theme_om(legend_position = c(0.55, 0.93), axis_text_size = 20,
+  axis_title_size = 20, legend_text_size = 24, title_size = 26)
 }
 \arguments{
 \item{legend_position}{Specify Legend position c(x, y)}
+
+\item{axis.text}{Specify Axis Text size}
+
+\item{axis.title}{Specify Title Text size}
+
+\item{legend.text.size}{Specify Legend Text size}
+
+\item{title.size}{Specify Title Text size}
 }
 \description{
 This function can be added to a ggplot2 call and creates the official OpenMind ggplot theme
