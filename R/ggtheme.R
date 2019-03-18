@@ -33,12 +33,19 @@ theme_om <- function(legend_position = c(.55, .93),
 #' A ggplot2 palette
 #'
 #'  Blue : #2a98db
+#'
 #'  Purple : #3d4fa1
+#'
 #'  Yellow : #e8df15
+#'
 #'  Turquoise : #65c6c3
+#'
 #'  Pink : #ec145b
+#'
 #'  Green : #94cfa1
+#'
 #'  Black : #414042
+#'
 #' This object contains a palette with the official OpenMind colors
 #' @export
 pal_om <- scales::manual_pal(c("#2a98db","#3d4fa1","#e8df15","#65c6c3","#ec145b","#94cfa1", "#414042"))
@@ -46,12 +53,19 @@ pal_om <- scales::manual_pal(c("#2a98db","#3d4fa1","#e8df15","#65c6c3","#ec145b"
 #' A ggplot2 color palette
 #'
 #'  Blue : #2a98db
+#'
 #'  Purple : #3d4fa1
+#'
 #'  Yellow : #e8df15
+#'
 #'  Turquoise : #65c6c3
+#'
 #'  Pink : #ec145b
+#'
 #'  Green : #94cfa1
+#'
 #'  Black : #414042
+#'
 #' This object contains a palette with the official OpenMind colors
 #' @export
 scale_color_om <- function(...) { discrete_scale("colour", "om", pal_om, ...) }
@@ -60,14 +74,109 @@ scale_color_om <- function(...) { discrete_scale("colour", "om", pal_om, ...) }
 #' A ggplot2 fill palette
 #'
 #'  Blue : #2a98db
+#'
 #'  Purple : #3d4fa1
+#'
 #'  Yellow : #e8df15
+#'
 #'  Turquoise : #65c6c3
+#'
 #'  Pink : #ec145b
+#'
 #'  Green : #94cfa1
+#'
 #'  Black : #414042
+#'
 #' This object contains a palette with the official OpenMind colors
 #' @export
 scale_fill_om <- function(...) { discrete_scale("fill", "om", pal_om, ...) }
 
+#' A highcharter theme
+#'
+#'  Blue : #2a98db
+#'
+#'  Purple : #3d4fa1
+#'
+#'  Yellow : #e8df15
+#'
+#'  Turquoise : #65c6c3
+#'
+#'  Pink : #ec145b
+#'
+#'  Green : #94cfa1
+#'
+#'  Black : #414042
+#'
+#' This object contains a palette with the official OpenMind colors
+#' @export
+#'
+get_hc_theme_om <- function() {
+  theme_hc_om <- highcharter::hc_theme_merge(
+    hc_theme_smpl(),
+    hc_theme(
+      chart = list(
+        colors = openmindR::pal_om(7),
+        dstyle = list(
+          fontFamily = "Poppins", color = "black"
+        )
+      ),
+      title = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      subtitle = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      subtitle = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      tooltip = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      toolbar = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      credits = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      labels = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      yAxis = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      ),
+      xAxis = list(
+        style = list(
+          color = 'black',
+          fontFamily = "Poppins"
+        )
+      )
+    )
+  )
+
+  return(theme_hc_om)
+}
 

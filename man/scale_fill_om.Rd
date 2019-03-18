@@ -8,11 +8,19 @@ scale_fill_om(...)
 }
 \description{
 Blue : #2a98db
- Purple : #3d4fa1
- Yellow : #e8df15
- Turquoise : #65c6c3
- Pink : #ec145b
- Green : #94cfa1
- Black : #414042
+}
+\details{
+Purple : #3d4fa1
+
+Yellow : #e8df15
+
+Turquoise : #65c6c3
+
+Pink : #ec145b
+
+Green : #94cfa1
+
+Black : #414042
+
 This object contains a palette with the official OpenMind colors
 }
