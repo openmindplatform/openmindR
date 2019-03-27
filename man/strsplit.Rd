@@ -6,9 +6,6 @@
 \usage{
 strsplit(x, split, type = "remove", perl = FALSE, ...)
 }
-\arguments{
-\item{x}{String}
-}
 \description{
 This function allows you to split a string and keep the delimeter
 }
