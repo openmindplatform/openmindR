@@ -11,4 +11,5 @@ RoxygenNote: 6.1.1
 Imports:
     tidyverse,
     highcharter,
-    janitor
+    janitor,
+    tidyr
