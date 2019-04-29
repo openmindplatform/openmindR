@@ -26,7 +26,7 @@ pipe_print <- function(data, message) {print(message); data}
 #'
 #' @param x
 #' @export
-strsplit <- function(x,
+om_strsplit <- function(x,
                      split,
                      type = "remove",
                      perl = FALSE,
@@ -478,3 +478,66 @@ parse_lifehacks <- function(x, var) {
     set_names(var_names)
 }
 
+
+#' This function parses feedback from AirTable (dat.par)
+#'
+#'@param raw_input AirTable data: column FeedbackAnswers
+#'@export
+parse_feedback_at <- function(raw_input) {
+
+  # raw_input <- "[1, (not asked), 10, (not asked), ||, ||], [2, (not asked), 10, (not asked), ||, ||], [3, (not asked), 10, (not asked), ||, ||], [4, (not asked), 10, (not asked), ||, ||], [5, (not asked), 10, (not asked), ||, ||]"
+
+  # if (is.na(raw_input)) return(tibble(Step1 = NA))
+
+  if (is.na(raw_input)) {
+    return(tibble(no_data = 1))
+  }
+
+  raw_input %>%
+    om_strsplit("],", type = "after") %>%
+    map(~str_split(.x, ",")) %>%
+    extract2(1) %>%
+    map(~{
+      fixed_answers <- .x[1:4]
+      open_answers <- .x[5:length(.x)] %>%
+        glue_collapse(",") %>%
+        str_split(", \\|", n = 2)
+      # str_split("\\.,|\\b , \\b")
+
+      return(list(fixed_answers = fixed_answers,
+                  open_answers = open_answers))
+    }) -> split_string
+
+  clean_fix <- split_string %>%
+    map("fixed_answers") %>%
+    bind_cols()
+
+
+  clean_open <- split_string %>%
+    map("open_answers") %>%
+    flatten() %>%
+    bind_cols()
+
+  row_dat <- bind_rows(clean_fix, clean_open) %>%
+    mutate_all(function(x) ifelse(nchar(x) == 0, NA, x)) %>%
+    mutate_all(function(x) str_remove_all(x, "\\[\\[|\\[")) %>%
+    set_names(.[1,] %>% .[1:ncol(.)]) %>%
+    janitor::clean_names() %>%
+    mutate(colnames = c("Step", paste0("X", 1:5))) %>%
+    mutate_all(str_trim)
+
+  ## Remove duplicate steps
+  row_dat <- row_dat[,!(row_dat[1, ] %>% transpose() %>% duplicated())]
+
+  ## Remove steps outside of 1 to 5 and Step
+  # row_dat <- row_dat[, row_dat[1, ] %>% transpose() %>% .[,1] %>% is_in(c(1:5, "Step"))]
+
+  final_dat <- row_dat %>%
+    colnames() %>%
+    discard(. == "colnames") %>%
+    map_dfc(~spread_it(.x, row_dat)) %>%
+    as_tibble()
+
+  return(final_dat)
+
+}

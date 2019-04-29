@@ -16,7 +16,59 @@ library(openmindR)
 ```
 
 
-## Openmind ggplot2 theme
+
+## OpenMind Cleaning Functions
+
+```{r, echo = F}
+db_get_data <- function(tbl_dat) {
+  con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
+
+  out <- con %>%
+    tbl(tbl_dat) %>%
+    collect()
+
+  dbDisconnect(con)
+
+  return(out)
+}
+
+
+# Read in data
+dat.acc <- db_get_data("dat.acc")
+dat.par <- db_get_data("dat.par")
+dat.ass4 <- db_get_data("dat.ass4")
+dat.ass5 <- db_get_data("dat.ass5")
+
+```
+
+
+## `om_filter_data`
+
+Filter down Assessment data from Airtable by `AssessmentsDone`, `AssessmentVersion` and `AccessCodes`-
+
+```{r}
+dat.ass %>% 
+  # specify which number of assessment you want to have
+  om_filter_data(n_assessments = 1:3,
+             # assessment version?
+             version = 4,
+             # select Accesscode(s) to produce report for
+             accesscode = "Wilkes"
+             # "Wilkes" #try this out :)
+  )
+```
+
+## `om_clean_par`
+
+Cleans up ParticipantProgress data and creates several measures
+
+```{r}
+dat.par %>% 
+  om_clean_par()
+```
+
+
+## OpenMind ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 
@@ -88,4 +140,5 @@ titanic_dat %>%
   facet_wrap(~Survived) +
   labs(title = "Titanic Survival by Class") 
 ```
+
 
