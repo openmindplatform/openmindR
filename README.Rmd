@@ -32,6 +32,7 @@ library(DBI)
 library(magrittr)
 library(glue)
 library(lubridate)
+library(sjmisc)
 
 db_get_data <- function(tbl_dat) {
   con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
@@ -224,11 +225,15 @@ dat.ass %>%
 
 ## `om_summarize_comparisons`
 
+This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
+
 ```{r}
 gathered_dat <- dat.ass %>% 
+  om_construct_measures() %>%
+  remove_dups() %>%  
   om_gather(q_c_strings) 
 
-gathered_dat %>% 
+gathered_dat %>% #count(variable_code)
   om_summarize_comparisons()
 ```
 
