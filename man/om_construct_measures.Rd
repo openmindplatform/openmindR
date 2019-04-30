@@ -10,7 +10,7 @@ om_construct_measures(x)
 \item{x}{Assessment data from AirTable}
 }
 \description{
-This is a higher-level function that uses both "polar_measures" and "calc_ih" to constuct various measures.
+This is a higher-level function that uses both "polar_measures" and "calc_ih" to construct various measures.
 Creates the following variables:
 \itemize{
   \item Q14: Affective Polarization

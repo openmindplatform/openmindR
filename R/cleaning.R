@@ -266,7 +266,7 @@ calc_ih <- function(final_dat, wave) {
 
 #' Constructs measures
 #'
-#' This is a higher-level function that uses both "polar_measures" and "calc_ih" to constuct various measures.
+#' This is a higher-level function that uses both "polar_measures" and "calc_ih" to construct various measures.
 #' Creates the following variables:
 #' \itemize{
 #'   \item Q14: Affective Polarization

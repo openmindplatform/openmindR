@@ -84,7 +84,7 @@ bind_questions <- function(.data, ...) {
 
 #' Conduct t-tests and calculate Cohen's d
 #'
-#' This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to constuct various measures.
+#' This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's on Assessment data.
 #' @param gathered_dat Assessment data as long format
 #' @export
 om_summarize_comparisons <- function(gathered_dat) {

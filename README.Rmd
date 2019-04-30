@@ -222,6 +222,16 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
+## `om_summarize_comparisons`
+
+```{r}
+gathered_dat <- dat.ass %>% 
+  om_gather(q_c_strings) 
+
+gathered_dat %>% 
+  om_summarize_comparisons()
+```
+
 
 ## OpenMind ggplot2 theme
 
