@@ -31,6 +31,7 @@ library(tidyverse)
 library(DBI)
 library(magrittr)
 library(glue)
+library(lubridate)
 
 db_get_data <- function(tbl_dat) {
   con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")

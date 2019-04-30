@@ -201,8 +201,8 @@ dat.par %>%
 
 ## `om_construct_measures`
 
-This is a higher-level function that uses both “polar\_measures” and
-“calc\_ih” to constuct various measures.
+This is a higher-level function that uses both `polar_measures` and
+`calc_ih` to constuct various measures.
 
 Creates the following variables:
 
@@ -213,6 +213,165 @@ Creates the following variables:
   - **Q18:** Intellectual Humility
 
 Function automatically accounts for Assessment Version 4 and 5/5.1.
+
+``` r
+dat.ass %>% 
+  om_construct_measures()
+```
+
+> Error in polar\_measures(., Q1Pre, Q2Pre) : Input data is missing
+> column `ppol_cat`. Please make sure to run om\_clean\_ppol before you
+> run om\_construct\_measures.
+
+Uh oh\! That didn’t work\! `om_construct_measures` needs the column
+`ppol_cat` to run which can be created with the function
+`om_clean_ppol`.
+
+## `om_clean_ppol`
+
+Creates the following measures of Political Orientation
+
+  - **ppol\_raw:** a variable that merges Assessment V4 and V5.1
+    spelling of Political Orientation (D4)
+  - **ppol:** a factor variable ordered from “Very Progressive/left” to
+    “Very Conservative/right”. Excludes all other categories as NA
+    (classical liberal etc.)
+  - **ppol\_num:** numeric variable ranging from 1 “Very
+    Progressive/left” to 7 “Very Conservative/right”
+  - **ppol\_cat:** a factor variable which has two categories
+    “Progressive” and “Conservative”. The rest is NA.
+
+<!-- end list -->
+
+``` r
+dat.ass <- dat.ass %>% 
+  om_clean_ppol()
+
+dat.ass
+```
+
+    ## # A tibble: 16,805 x 82
+    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
+    ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
+    ##  2 rec0~ 4001~ PotterYCI~ 4                1                  NA    NA
+    ##  3 rec0~ 3465~ LittleUGA~ 4                2                  30    36
+    ##  4 rec0~ 8406~ Jayawickr~ 4                2                  50    50
+    ##  5 rec0~ 8721~ BurmanCha~ 4                2                  NA    NA
+    ##  6 rec0~ 7194~ Jayawickr~ 4                2                  80    45
+    ##  7 rec0~ 5743~ ZipayUOre~ 4                2                  78    34
+    ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
+    ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
+    ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
+    ## # ... with 16,795 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
+    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
+    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
+    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
+    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
+    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
+    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
+    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
+    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>,
+    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
+    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
+    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
+    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
+    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>
+
+Now `om_construct_measures` will work\!
+
+``` r
+dat.ass %>% 
+  om_construct_measures()
+```
+
+    ## # A tibble: 16,805 x 97
+    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
+    ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
+    ##  2 rec0~ 4001~ PotterYCI~                4 1                  NA    NA
+    ##  3 rec0~ 3465~ LittleUGA~                4 2                  30    36
+    ##  4 rec0~ 8406~ Jayawickr~                4 2                  50    50
+    ##  5 rec0~ 8721~ BurmanCha~                4 2                  NA    NA
+    ##  6 rec0~ 7194~ Jayawickr~                4 2                  80    45
+    ##  7 rec0~ 5743~ ZipayUOre~                4 2                  78    34
+    ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
+    ##  9 rec0~ 5370~ Individua~                4 2                  50    37
+    ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
+    ## # ... with 16,795 more rows, and 90 more variables: Q3Pre <dbl>,
+    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
+    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
+    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
+    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
+    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
+    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
+    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
+    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
+    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>,
+    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
+    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
+    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
+    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
+    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
+    ## #   Q14Pre <dbl>, Q15Pre <dbl>, Q16Pre <dbl>, Q17Pre <dbl>, Q18Pre <dbl>,
+    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
+    ## #   Q18Post <dbl>, Q14FollowUp <dbl>, Q15FollowUp <dbl>,
+    ## #   Q16FollowUp <dbl>, Q17FollowUp <dbl>, Q18FollowUp <dbl>
+
+## `remove_dups`
+
+This function is really important to clean up duplicated OMIDs that
+occasionally occur within AirTable.
+
+``` r
+dat.ass %>% 
+  remove_dups()
+```
+
+    ## Removing 256 duplicates...
+
+    ## # A tibble: 16,293 x 83
+    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
+    ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
+    ##  2 rec0~ 4001~ PotterYCI~                4 1                  NA    NA
+    ##  3 rec0~ 3465~ LittleUGA~                4 2                  30    36
+    ##  4 rec0~ 8406~ Jayawickr~                4 2                  50    50
+    ##  5 rec0~ 8721~ BurmanCha~                4 2                  NA    NA
+    ##  6 rec0~ 7194~ Jayawickr~                4 2                  80    45
+    ##  7 rec0~ 5743~ ZipayUOre~                4 2                  78    34
+    ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
+    ##  9 rec0~ 5370~ Individua~                4 2                  50    37
+    ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
+    ## # ... with 16,283 more rows, and 76 more variables: Q3Pre <dbl>,
+    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
+    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
+    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
+    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
+    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
+    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
+    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
+    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
+    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <dttm>, S1Pre <chr>,
+    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
+    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
+    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
+    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
+    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
+    ## #   count_na <dbl>
 
 ## OpenMind ggplot2 theme
 
@@ -248,7 +407,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -274,7 +433,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -293,4 +452,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
