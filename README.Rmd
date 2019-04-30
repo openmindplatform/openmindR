@@ -133,10 +133,12 @@ Creates the following variables:
 Function automatically accounts for Assessment Version 4 and 5/5.1.
 
 
-```{r}
+```{r, eval=F}
 dat.ass %>% 
   om_construct_measures()
 ```
+
+> Error in polar_measures(., Q1Pre, Q2Pre) : Input data is missing column `ppol_cat`. Please make sure to run om_clean_ppol before you run om_construct_measures.
 
 Uh oh! That didn't work! `om_construct_measures` needs the column `ppol_cat` to run which can be created with the function `om_clean_ppol`.
 
