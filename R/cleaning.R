@@ -77,7 +77,7 @@ om_clean_par <- function(dat.par, ...) {
     mutate_at(vars(StepTimes1:StepTimes5), ~str_remove_all(.x, "[^[:digit:]. ]") %>% parse_number) %>%
     mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
-    mutate_at(vars(StepsComplete1:StepQuestionTotals5), as.numeric)  %>%
+    mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), as.numeric)  %>%
     # ## Steps Complete
     ## Now calculating scores
     ## percent correct for each step
