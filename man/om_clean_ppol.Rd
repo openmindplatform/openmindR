@@ -13,7 +13,7 @@ om_clean_ppol(app.dat)
 Creates the following measures of Political Orientation
 \itemize{
   \item ppol_raw: a variable that merges Assessment V4 and V5.1 spelling of Political Orientation (D4)
-  \item ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
+  \item ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 }

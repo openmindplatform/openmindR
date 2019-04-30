@@ -9,7 +9,14 @@ Install package like this:
 devtools::install_github("favstats/openmindR")
 ```
 
-Load package:
+```{r, echo=F}
+knitr::opts_chunk$set(message = F, 
+                      warning = F)
+
+```
+
+
+Load package(s):
 
 ```{r}
 library(openmindR)
@@ -22,6 +29,8 @@ library(tidyverse)
 
 ```{r, echo = F}
 library(DBI)
+library(magrittr)
+library(glue)
 
 db_get_data <- function(tbl_dat) {
   con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
@@ -96,11 +105,72 @@ dat.ass %>%
 
 ## `om_clean_par`
 
-Cleans up ParticipantProgress data and creates several measures
+Cleans up ParticipantProgress data and creates several measures:
+
++ **StepTimes1 to StepTimes5:** Duration in minutes to complete a step
+
++ **StepCorrect1 to StepCorrect5:** Percentage of correct answers for each step
+
++ **FeedbackAnswers:** Q1 to Q5 for each individual step
 
 ```{r}
 dat.par %>% 
   om_clean_par()
+```
+
+## `om_construct_measures`
+
+This is a higher-level function that uses both `polar_measures` and `calc_ih` to constuct various measures.
+
+Creates the following variables:
+
++ **Q14:** Affective Polarization
++ **Q15:** Ingroup
++ **Q16:** Outgroup
++ **Q17:** Ingroup vs. Outgroup Affective Polarization
++ **Q18:** Intellectual Humility
+
+Function automatically accounts for Assessment Version 4 and 5/5.1.
+
+
+```{r}
+dat.ass %>% 
+  om_construct_measures()
+```
+
+Uh oh! That didn't work! `om_construct_measures` needs the column `ppol_cat` to run which can be created with the function `om_clean_ppol`.
+
+
+## `om_clean_ppol`
+
+Creates the following measures of Political Orientation
+
++ **ppol_raw:** a variable that merges Assessment V4 and V5.1 spelling of Political Orientation (D4)
++ **ppol:** a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
++ **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
++ **ppol_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
+
+```{r}
+dat.ass <- dat.ass %>% 
+  om_clean_ppol()
+
+dat.ass
+```
+
+Now `om_construct_measures` will work!
+
+```{r}
+dat.ass %>% 
+  om_construct_measures()
+```
+
+## `remove_dups`
+
+This function is really important to clean up duplicated OMIDs that occasionally occur within AirTable. 
+
+```{r, message = T}
+dat.ass %>% 
+  remove_dups()
 ```
 
 
