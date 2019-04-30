@@ -117,7 +117,7 @@ om_clean_ppol <- function(app.dat) {
   app.dat %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
-    mutate_at(vars(matches(openmindR::var_strings)), as.numeric) %>%
+    mutate_at(vars(matches(var_strings)), as.numeric) %>%
     ## construct raw ppol variable
     mutate(ppol_raw = D4) %>%
     ## fix the names of categories
