@@ -400,6 +400,36 @@ coalesce_join <- function(x, y,
   dplyr::bind_cols(joined, coalesced)[cols]
 }
 
+
+#' Gather OpenMind data
+#'
+#' This function will turn Assessment data into long format and
+#' creates the following variables:
+#' \itemize{
+#'   \item Question: Q1Pre, Q2Pre, Q3Pre etc.
+#'   \item Type: Pre, Post, or FollowUp
+#'   \item Response: Values of the Question
+#'   \item variable_code: Q1, Q2, Q3 etc.
+#' }
+#' @param .data Assessment data
+#' @param which_strings a string indicating which variables should be parsed out
+#' @export
+om_gather <- function(.data, which_strings) {
+
+  gathered_dat <- .data %>%
+    gather(Question, Response, matches(which_strings)) %>%
+    ## filter out pre-post and follow as a variable "Type"
+    mutate(Type = case_when(
+      str_detect(Question, "Pre") ~ "Pre",
+      str_detect(Question, "Post") ~ "Post",
+      str_detect(Question, "FollowUp") ~ "FollowUp"
+    ))  %>%
+    mutate(variable_code = str_remove(Question, Type)) %>%
+    mutate(Response = as.numeric(Response))
+
+  return(gathered_dat)
+}
+
 #' String count (because it will be deprecated from dplyr)
 #'
 #' This is just a helper function because it will be deprecated from dplyr at some point and we would like to keep it.
@@ -413,4 +443,20 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
   dplyr::count(x, !!!vars, wt = !!wt, sort = sort)
 }
 
+#' SQL Database Append
+#'
+#' This is a helper function that will write a dataframe to a SQL database
+#'
+#'
+#' @export
+db_append <- function(path, tbl, data) {
+  con <- dbConnect(RSQLite::SQLite(), path)
 
+  if(!is.null(dbListTables(con))) {
+    dbWriteTable(con, tbl, data, append = T)
+  } else {
+    dbWriteTable(con, tbl, data)
+  }
+  dbDisconnect(con)
+
+}

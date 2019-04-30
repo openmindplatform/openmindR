@@ -198,6 +198,30 @@ dat.ass %>%
 ```
 
 
+## `om_gather`
+
+ This function will turn Assessment data into long format.
+ 
+ Creates the following variables:
+ 
+  + **Question:** Q1Pre, Q2Pre, Q3Pre etc.
+  + **Type:** Pre, Post, or FollowUp
+  + **Response:** Values of the Question
+  + **variable_code:** Q1, Q2, Q3 etc.
+ 
+  Takes the following arguments:
+  + **.data** Assessment data
+  + **which_strings** a string indicating which variables should be parsed out (`q_c_strings` indicates all Q and C questions)
+
+
+```{r}
+dat.ass %>% 
+  om_gather(q_c_strings) %>% 
+  ## select just the relevant vars
+  select(Question, Response, Type, variable_code)
+```
+
+
 ## OpenMind ggplot2 theme
 
 There are three functions for the ggplot2 theme:
