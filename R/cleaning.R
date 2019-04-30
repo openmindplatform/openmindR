@@ -67,10 +67,13 @@ calc_correct <- function(StepsComplete, StepsScores, StepQuestionTotals) {
 om_clean_par <- function(dat.par, ...) {
 
   dat.par %>%
-    ## seperating brackets and cleaning up
+    ## seperating StepsComplete brackets
     separate(StepsComplete, into = paste("StepsComplete", 1:5, sep = ""), remove = F) %>%
+    ## seperating StepsScores brackets
     separate(StepScores, into = paste("StepsScores", 1:5, sep = "")) %>%
+    ## seperating StepsQuestionTotals brackets
     separate(StepQuestionTotals, into = paste("StepQuestionTotals", 1:5, sep = "")) %>%
+    ## seperating StepTines brackets
     separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
