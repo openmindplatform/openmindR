@@ -10,5 +10,5 @@ om_summarize_comparisons(gathered_dat)
 \item{gathered_dat}{Assessment data as long format}
 }
 \description{
-This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's on Assessment data.
+This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
 }
