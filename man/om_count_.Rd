@@ -7,5 +7,5 @@
 om_count_(x, vars, wt = NULL, sort = FALSE)
 }
 \description{
-String count (because it will be deprecated from dplyr)
+This is just a helper function because it will be deprecated from dplyr at some point and we would like to keep it.
 }

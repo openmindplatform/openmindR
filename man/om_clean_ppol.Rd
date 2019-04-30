@@ -7,7 +7,7 @@
 om_clean_ppol(app.dat)
 }
 \arguments{
-\item{app.dat}{(0/1) Assessment data from AirTable}
+\item{app.dat}{Assessment data from AirTable}
 }
 \description{
 Creates the following measures of Political Orientation

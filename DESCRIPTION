@@ -12,4 +12,6 @@ Imports:
     tidyverse,
     highcharter,
     janitor,
-    tidyr
+    tidyr,
+    magrittr,
+    lazyeval

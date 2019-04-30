@@ -7,7 +7,7 @@
 om_clean_par(dat.par, ...)
 }
 \arguments{
-\item{dat.par}{(0/1) ParticipantProgress data from AirTable}
+\item{dat.par}{ParticipantProgress data from AirTable}
 
 \item{...}{Arguments for select to get more from ParticipantProgress}
 }
