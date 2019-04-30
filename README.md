@@ -175,7 +175,7 @@ dat.par %>%
   om_clean_par()
 ```
 
-    ## # A tibble: 16,896 x 36
+    ## # A tibble: 16,974 x 36
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
     ##  1 7806~ <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
@@ -188,7 +188,7 @@ dat.par %>%
     ##  8 1000~ <NA>      1, 1, 1, 1, 1        0.625        1            0.667
     ##  9 2458~ <NA>      1, 1, 1, 1, 0        1            1            1    
     ## 10 9406~ <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # ... with 16,886 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ## # ... with 16,964 more rows, and 30 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
@@ -196,7 +196,7 @@ dat.par %>%
     ## #   Step2_Q3 <chr>, Step2_Q4 <chr>, Step2_Q5 <chr>, Step5 <chr>,
     ## #   Step5_Q1 <chr>, Step5_Q2 <chr>, Step5_Q3 <chr>, Step5_Q4 <chr>,
     ## #   Step5_Q5 <chr>, FeedbackAnswers <chr>,
-    ## #   FeedbackAnswersVariableNames <chr>, AppRating <chr>,
+    ## #   FeedbackAnswersVariableNames <chr>, AppRating <dbl>,
     ## #   AppRecommend <chr>, at_date <chr>
 
 ## `om_construct_measures`
@@ -250,7 +250,7 @@ dat.ass <- dat.ass %>%
 dat.ass
 ```
 
-    ## # A tibble: 16,805 x 82
+    ## # A tibble: 16,895 x 82
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
@@ -263,7 +263,7 @@ dat.ass
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
     ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
-    ## # ... with 16,795 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## # ... with 16,885 more rows, and 75 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -290,7 +290,7 @@ dat.ass %>%
   om_construct_measures()
 ```
 
-    ## # A tibble: 16,805 x 97
+    ## # A tibble: 16,895 x 97
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -303,7 +303,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,795 more rows, and 90 more variables: Q3Pre <dbl>,
+    ## # ... with 16,885 more rows, and 90 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -337,9 +337,9 @@ dat.ass %>%
   remove_dups()
 ```
 
-    ## Removing 256 duplicates...
+    ## Removing 258 duplicates...
 
-    ## # A tibble: 16,293 x 83
+    ## # A tibble: 16,380 x 83
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -352,7 +352,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,283 more rows, and 76 more variables: Q3Pre <dbl>,
+    ## # ... with 16,370 more rows, and 76 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -372,6 +372,47 @@ dat.ass %>%
     ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
     ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
     ## #   count_na <dbl>
+
+## `om_gather`
+
+This function will turn Assessment data into long format.
+
+Creates the following variables:
+
+  - **Question:** Q1Pre, Q2Pre, Q3Pre etc.
+  - **Type:** Pre, Post, or FollowUp
+  - **Response:** Values of the Question
+  - **variable\_code:** Q1, Q2, Q3 etc.
+
+Takes the following arguments:
+
+  - **.data** Assessment data
+  - **which\_strings** a string indicating which variables should be
+    parsed out (`q_c_strings` indicates all Q and C questions)
+
+<!-- end list -->
+
+``` r
+dat.ass %>% 
+  om_gather(q_c_strings) %>% 
+  ## select just the relevant vars
+  select(Question, Response, Type, variable_code)
+```
+
+    ## # A tibble: 760,275 x 4
+    ##    Question Response Type  variable_code
+    ##    <chr>       <dbl> <chr> <chr>        
+    ##  1 Q1Pre          40 Pre   Q1           
+    ##  2 Q1Pre          NA Pre   Q1           
+    ##  3 Q1Pre          30 Pre   Q1           
+    ##  4 Q1Pre          50 Pre   Q1           
+    ##  5 Q1Pre          NA Pre   Q1           
+    ##  6 Q1Pre          80 Pre   Q1           
+    ##  7 Q1Pre          78 Pre   Q1           
+    ##  8 Q1Pre          56 Pre   Q1           
+    ##  9 Q1Pre          50 Pre   Q1           
+    ## 10 Q1Pre          50 Pre   Q1           
+    ## # ... with 760,265 more rows
 
 ## OpenMind ggplot2 theme
 
@@ -407,7 +448,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -433,7 +474,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -452,4 +493,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
