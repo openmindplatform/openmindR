@@ -395,7 +395,7 @@ Takes the following arguments:
 ``` r
 dat.ass %>% 
   om_gather(q_c_strings) %>% 
-  ## select just the relevant vars
+  ## select just the relevant vars as showcase
   select(Question, Response, Type, variable_code)
 ```
 
@@ -413,6 +413,40 @@ dat.ass %>%
     ##  9 Q1Pre          50 Pre   Q1           
     ## 10 Q1Pre          50 Pre   Q1           
     ## # ... with 760,265 more rows
+
+## `om_summarize_comparisons`
+
+This is a higher-level function that uses both “bind\_questions” and
+“summarize\_comparison” to calculate t-tests and Cohen’s d using
+long-format Assessment data.
+
+``` r
+## Prepare gathered_dat
+gathered_dat <- dat.ass %>% 
+  om_construct_measures() %>%
+  remove_dups() %>%  
+  om_gather(q_c_strings) 
+
+gathered_dat %>% 
+  om_summarize_comparisons() %>% 
+  arrange(desc(percentimproved))
+```
+
+    ## # A tibble: 40 x 10
+    ##    variable_code cohend cohendCIlow cohendCIhi tstat    pvalue    df
+    ##    <chr>          <dbl>       <dbl>      <dbl> <dbl>     <dbl> <dbl>
+    ##  1 Q17            0.521       0.386      0.656 10.9  1.35e- 24   436
+    ##  2 Q17            0.535       0.496      0.574 38.6  1.53e-286  5195
+    ##  3 Q16            0.418      -0.552     -0.283  8.73 5.47e- 17   436
+    ##  4 Q16            0.470      -0.509     -0.431 33.9  1.05e-227  5195
+    ##  5 Q18            0.337      -0.366     -0.307 31.4  9.65e-206  8731
+    ##  6 Q14            0.367       0.261      0.472  9.72 4.90e- 21   702
+    ##  7 Q14            0.424       0.394      0.455 39.3  3.33e-311  8591
+    ##  8 Q18            0.237      -0.325     -0.149  7.50 1.38e- 13  1003
+    ##  9 Q2             0.210      -0.314     -0.105  5.55 3.94e-  8   702
+    ## 10 Q2             0.240      -0.270     -0.210 22.2  1.50e-106  8591
+    ## # ... with 30 more rows, and 3 more variables: percentimproved <dbl>,
+    ## #   Comparison <chr>, moderates <chr>
 
 ## OpenMind ggplot2 theme
 
@@ -448,7 +482,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -474,7 +508,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -493,4 +527,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
