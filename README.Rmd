@@ -6,7 +6,7 @@ output: github_document
 Install package like this:
 
 ```{r setup, eval=FALSE}
-devtools::install_github("favstats/openmindR")
+devtools::install_github("openmindplatform/openmindR")
 ```
 
 ```{r, echo=F}

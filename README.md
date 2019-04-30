@@ -4,7 +4,7 @@ openmindR
 Install package like this:
 
 ``` r
-devtools::install_github("favstats/openmindR")
+devtools::install_github("openmindplatform/openmindR")
 ```
 
 Load package(s):
