@@ -98,7 +98,7 @@ om_summarize_comparisons <- function(gathered_dat) {
   ## PrePost Data
   compare_dat_prepost <- gathered_dat %>%
     dplyr::filter(Type %in% c("Pre", "Post")) %>%
-    dplyr::drop_na(Response) %>%
+    tidyr::drop_na(Response) %>%
     dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
     ## count OMIDs and PrePost Type
     dplyr::add_count(OMID, variable_code) %>%
@@ -108,7 +108,7 @@ om_summarize_comparisons <- function(gathered_dat) {
   ## PreFollow Data
   compare_dat_prefollow <- gathered_dat %>%
     dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
-    dplyr::drop_na(Response) %>%
+    tidyr::drop_na(Response) %>%
     dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
     ## count OMIDs and PreFollow Type
     dplyr::add_count(OMID, variable_code) %>%
@@ -138,7 +138,7 @@ om_summarize_comparisons <- function(gathered_dat) {
   ## Calculate scores where Moderates need to be excluded
   no_moderate_dat <- compare_dat_prepost %>%
     dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
-    dplyr::drop_na(ppol_cat) %>%
+    tidyr::drop_na(ppol_cat) %>%
     ## PrePost
     openmindR::bind_questions(#nrows = nrow_prepost,
       waves = "PrePost") %>%
@@ -146,7 +146,7 @@ om_summarize_comparisons <- function(gathered_dat) {
     ## PreFollow
     dplyr::bind_rows(compare_dat_prefollow  %>%
                 dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
-                dplyr::drop_na(ppol_cat) %>%
+                tidyr::drop_na(ppol_cat) %>%
                 openmindR::bind_questions(#nrows = nrow_prefollow,
                   waves = "PreFollow") %>%
                 dplyr::mutate(Comparison = "PreFollow")) %>%
