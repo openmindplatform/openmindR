@@ -20,7 +20,7 @@ Load package(s):
 
 ```{r}
 library(openmindR)
-library(dplyr)
+# library(dplyr)
 ```
 
 
@@ -69,8 +69,8 @@ dat.ass4 <- db_get_data("dat.ass4")
 dat.ass5 <- db_get_data("dat.ass5")
 
 dat.ass <- dat.ass4 %>% 
-  rename_at(vars(matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
-  bind_rows(dat.ass5)
+  dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
+  dplyr::bind_rows(dat.ass5)
 
 
 ```

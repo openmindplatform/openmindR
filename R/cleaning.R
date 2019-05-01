@@ -62,7 +62,7 @@ om_filter_data <- function(app.dat, n_assessments = NULL,
 
   }
 
-  return(as_tibble(app.dat))
+  return(dplyr::as_tibble(app.dat))
 
 }
 
@@ -104,11 +104,11 @@ om_clean_par <- function(dat.par, ...) {
     tidyr::separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]")) %>%
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), readr::parse_number) %>%
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]")) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), readr::parse_number) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
+    dplyr::mutate_at(dplyr::vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
     # ## Steps Complete
     ## Now calculating scores
     ## percent correct for each step
@@ -122,7 +122,7 @@ om_clean_par <- function(dat.par, ...) {
              purrr::map(~parse_feedback_at(.x))) %>%
     tidyr::unnest(data)  %>%
     ## Make Step variables to characters (for merging)
-    dplyr::mutate_at(vars(Step1:Step5_Q5), as.character) %>%
+    dplyr::mutate_at(dplyr::vars(Step1:Step5_Q5), as.character) %>%
     dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
            FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, at_date, ...)
 }
@@ -148,7 +148,7 @@ om_clean_ppol <- function(app.dat) {
   app.dat %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(vars(matches(openmindR::var_strings)), as.numeric) %>%
+    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), as.numeric) %>%
     ## construct raw ppol variable
     dplyr::mutate(ppol_raw = D4) %>%
     ## fix the names of categories
@@ -221,7 +221,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
 
   final_dat <- final_dat %>%
     # make sure vars are numeric
-    dplyr::mutate_at(vars(!!Q1, !!Q2), as.numeric) %>%
+    dplyr::mutate_at(dplyr::vars(!!Q1, !!Q2), as.numeric) %>%
     # compute affective polarization
     dplyr::mutate(Q14 = abs(!!Q1 - !!Q2)) %>%
     # compute liking for ingroup vs. disliking for outgroup
@@ -231,7 +231,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
     dplyr::mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
     # compute ingroup v outgroup affective polarization
     dplyr::mutate(Q17 = abs(Q15 - Q16)) %>%
-    rename_at(vars(Q14:Q17), ~paste0(.x, wave))
+    rename_at(dplyr::vars(Q14:Q17), ~paste0(.x, wave))
 
   return(final_dat)
 }
@@ -445,7 +445,7 @@ coalesce_join <- function(x, y,
 om_gather <- function(.data, which_strings) {
 
   gathered_dat <- .data %>%
-    tidyr::gather(Question, Response, matches(which_strings)) %>%
+    tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
     ## filter out pre-post and follow as a variable "Type"
     dplyr::mutate(Type = case_when(
       stringr::str_detect(Question, "Pre") ~ "Pre",
