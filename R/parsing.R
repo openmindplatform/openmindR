@@ -500,7 +500,7 @@ parse_feedback_at <- function(raw_input) {
     map(~{
       fixed_answers <- .x[1:4]
       open_answers <- .x[5:length(.x)] %>%
-        glue_collapse(",") %>%
+        glue::glue_collapse(",") %>%
         stringr::str_split(", \\|", n = 2)
       # stringr::str_split("\\.,|\\b , \\b")
 
