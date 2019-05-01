@@ -216,7 +216,7 @@ Takes the following arguments:
 dat.ass %>% 
   om_gather(q_c_strings) %>% 
   ## select just the relevant vars as showcase
-  select(Question, Response, Type, variable_code)
+  dplyr::select(Question, Response, Type, variable_code)
 ```
 
 ## `om_summarize_comparisons`

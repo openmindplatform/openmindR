@@ -375,7 +375,7 @@ remove_dups <- function(cleaned_dat) {
     dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
     dplyr::mutate(count_na = rowSums(is.na(.))) %>%
     dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
-    dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, everything()) %>%
+    dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, dplyr::everything()) %>%
     dplyr::group_by(OMID) %>%
     dplyr::slice(1)
 
