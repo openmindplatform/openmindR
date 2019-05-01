@@ -152,7 +152,7 @@ om_clean_ppol <- function(app.dat) {
     ## construct raw ppol variable
     dplyr::mutate(ppol_raw = D4) %>%
     ## fix the names of categories
-    dplyr::mutate(ppol_raw = case_when(
+    dplyr::mutate(ppol_raw = dplyr::case_when(
       stringr::str_detect(ppol_raw, "Moderate") ~ "Moderate/Middle-of-the-road",
       stringr::str_detect(ppol_raw, "Slightly progressive") ~ "Slightly Progressive/left",
       stringr::str_detect(ppol_raw, "not political") ~ "Don't know/Not political",
@@ -208,7 +208,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
   }
 
   ## check which wave
-  wave <- case_when(
+  wave <- dplyr::ase_when(
     stringr::str_detect(lazyeval::expr_find(Q1), "Pre") ~ "Pre",
     stringr::str_detect(lazyeval::expr_find(Q1), "Post") ~ "Post",
     stringr::str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
@@ -447,7 +447,7 @@ om_gather <- function(.data, which_strings) {
   gathered_dat <- .data %>%
     tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
     ## filter out pre-post and follow as a variable "Type"
-    dplyr::mutate(Type = case_when(
+    dplyr::mutate(Type = dplyr::case_when(
       stringr::str_detect(Question, "Pre") ~ "Pre",
       stringr::str_detect(Question, "Post") ~ "Post",
       stringr::str_detect(Question, "FollowUp") ~ "FollowUp"
