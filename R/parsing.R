@@ -518,7 +518,7 @@ parse_feedback_at <- function(raw_input) {
     purrr::flatten() %>%
     dplyr::bind_cols()
 
-  row_dat <- bind_rows(clean_fix, clean_open) %>%
+  row_dat <- dplyr::bind_rows(clean_fix, clean_open) %>%
     dplyr::mutate_all(function(x) ifelse(nchar(x) == 0, NA, x)) %>%
     dplyr::mutate_all(function(x) stringr::str_remove_all(x, "\\[\\[|\\[")) %>%
     purrr::set_names(.[1,] %>% .[1:ncol(.)]) %>%
