@@ -35,7 +35,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
   }
 
   ## This is the other direction
-  if (not(q14_q17)) {
+  if (magrittr::not(q14_q17)) {
 
     final_dat <- x %>% dplyr::summarize(
       cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
