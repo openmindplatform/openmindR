@@ -417,7 +417,7 @@ spread_it <- function(x, row_dat) {
 
   selected_dat <- dplyr::select(row_dat, "colnames", x)
 
-  check_it <- selected_dat %>% .[1,2] %>% pull(1)
+  check_it <- selected_dat %>% .[1,2] %>% dplyr::pull(1)
 
   is_one <- check_it %>% magrittr::equals("1")
   is_two <- check_it %>% magrittr::equals("2")
