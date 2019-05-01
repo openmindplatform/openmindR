@@ -65,18 +65,18 @@ bind_questions <- function(.data, ...) {
 
   ## this function is necessary because some variables are coded in different direction
 
-  bind_rows(
+  dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
     .data %>%
-      filter(variable_code %nin% c("Q14", "Q17")) %>%
+      dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      summarize_comparison(...,
+      openmindR::summarize_comparison(...,
                            q14_q17 = F),
     ## Just Q14 and Q17
     .data %>%
-      filter(variable_code %in% c("Q14", "Q17")) %>%
+      dplyr::filter(variable_code %in% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      summarize_comparison(...,
+      openmindR::summarize_comparison(...,
                            q14_q17 = T)
   )
 }
@@ -97,63 +97,63 @@ om_summarize_comparisons <- function(gathered_dat) {
 
   ## PrePost Data
   compare_dat_prepost <- gathered_dat %>%
-    filter(Type %in% c("Pre", "Post")) %>%
-    drop_na(Response) %>%
-    mutate(Type = fct_relevel(Type, c("Pre", "Post"))) %>%
+    dplyr::filter(Type %in% c("Pre", "Post")) %>%
+    dplyr::drop_na(Response) %>%
+    dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
     ## count OMIDs and PrePost Type
-    add_count(OMID, variable_code) %>%
+    dplyr::add_count(OMID, variable_code) %>%
     ## only keep cases where Pre and Post exist
-    filter(n == 2)
+    dplyr::filter(n == 2)
 
   ## PreFollow Data
   compare_dat_prefollow <- gathered_dat %>%
-    filter(Type %in% c("Pre", "FollowUp")) %>%
-    drop_na(Response) %>%
-    mutate(Type = fct_relevel(Type, c("Pre", "FollowUp"))) %>%
+    dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+    dplyr::drop_na(Response) %>%
+    dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
     ## count OMIDs and PreFollow Type
-    add_count(OMID, variable_code) %>%
+    dplyr::add_count(OMID, variable_code) %>%
     ## only keep cases where Pre and Post exist
-    filter(n == 2)
+    dplyr::filter(n == 2)
 
   ## Calculate Scores for all data
   moderate_dat <- compare_dat_prepost %>%
-    filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+    dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
     ## PrePost
-    bind_questions(#nrows = nrow_prepost,
+    openmindR::bind_questions(#nrows = nrow_prepost,
       waves = "PrePost") %>%
-    mutate(Comparison = "PrePost") %>%
+    dplyr::mutate(Comparison = "PrePost") %>%
     ## PreFollow
-    bind_rows(compare_dat_prefollow %>%
-                filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
-                bind_questions(#nrows = nrow_prefollow,
+    dplyr::bind_rows(compare_dat_prefollow %>%
+                dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+                openmindR::bind_questions(#nrows = nrow_prefollow,
                   waves = "PreFollow") %>%
-                mutate(Comparison = "PreFollow")) %>%
+                 dplyr::mutate(Comparison = "PreFollow")) %>%
     ## add indicator
-    mutate(moderates = "WithModerates") %>%
+    dplyr::mutate(moderates = "WithModerates") %>%
     ## Deal with Culture Vars
-    filter(!is.nan(cohend)) %>%
-    mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
+    dplyr::filter(!is.nan(cohend)) %>%
+    dplyr::mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
 
 
   ## Calculate scores where Moderates need to be excluded
   no_moderate_dat <- compare_dat_prepost %>%
-    filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
-    drop_na(ppol_cat) %>%
+    dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+    dplyr::drop_na(ppol_cat) %>%
     ## PrePost
-    bind_questions(#nrows = nrow_prepost,
+    openmindR::bind_questions(#nrows = nrow_prepost,
       waves = "PrePost") %>%
-    mutate(Comparison = "PrePost") %>%
+    dplyr::mutate(Comparison = "PrePost") %>%
     ## PreFollow
-    bind_rows(compare_dat_prefollow  %>%
-                filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
-                drop_na(ppol_cat) %>%
-                bind_questions(#nrows = nrow_prefollow,
+    dplyr::bind_rows(compare_dat_prefollow  %>%
+                dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+                dplyr::drop_na(ppol_cat) %>%
+                openmindR::bind_questions(#nrows = nrow_prefollow,
                   waves = "PreFollow") %>%
-                mutate(Comparison = "PreFollow")) %>%
+                dplyr::mutate(Comparison = "PreFollow")) %>%
     ## add indicator
-    mutate(moderates = "WithoutModerates")
+    dplyr::mutate(moderates = "WithoutModerates")
 
-  final_compared <- moderate_dat %>% bind_rows(no_moderate_dat)
+  final_compared <- moderate_dat %>% dplyr::bind_rows(no_moderate_dat)
 
   return(final_compared)
 }
