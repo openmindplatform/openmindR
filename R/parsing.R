@@ -415,7 +415,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
 #'@export
 spread_it <- function(x, row_dat) {
 
-  selected_dat <- select(row_dat, "colnames", x)
+  selected_dat <- dplyr::select(row_dat, "colnames", x)
 
   check_it <- selected_dat %>% .[1,2] %>% pull(1)
 
