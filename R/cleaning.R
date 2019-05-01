@@ -174,12 +174,12 @@ om_clean_ppol <- function(app.dat) {
     ## clean politics variable / make it numeric / only use valid cases
     dplyr::mutate(ppol_num = as.numeric(ppol)) %>%
     # dplyr::select(ppol, ppol_num, D4) %>%
-    dplyr::mutate(ppol_cat = case_when(
+    dplyr::mutate(ppol_cat = dplyr::case_when(
       ppol_num %in% c(1:3) ~ "Progressives",
       ppol_num %in% c(5:7) ~ "Conservatives",
       T ~ NA_character_
     )) %>%
-    dplyr::mutate(ppol_cat = fct_relevel(ppol_cat, c("Progressives",
+    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
                                               "Conservatives")))
   # TODO: For future make more ppol variants
 }
@@ -215,8 +215,8 @@ polar_measures <- function(final_dat, Q1, Q2) {
   )
 
   ## lazy evaluation
-  Q1 <- enquo(Q1)
-  Q2 <- enquo(Q2)
+  Q1 <- dplyr::enquo(Q1)
+  Q2 <- dplyr::enquo(Q2)
 
 
   final_dat <- final_dat %>%
@@ -262,7 +262,7 @@ calc_ih <- function(final_dat, wave) {
   ## intellectual humility for pre
   if (wave == "Pre") {
     final_dat <- final_dat %>%
-      dplyr::mutate(Q18Pre = case_when(
+      dplyr::mutate(Q18Pre = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3Pre + Q6Pre + Q7Pre + Q8Pre)/4,
         AssessmentVersion >= 5 ~ (Q5Pre + Q7Pre + Q8Pre + Q9Pre)/4,
         T ~ NA_real_
@@ -272,7 +272,7 @@ calc_ih <- function(final_dat, wave) {
   ## intellectual humility for post
   if (wave == "Post") {
     final_dat <- final_dat %>%
-      dplyr::mutate(Q18Post = case_when(
+      dplyr::mutate(Q18Post = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3Post + Q6Post + Q7Post + Q8Post)/4,
         AssessmentVersion >= 5 ~ (Q5Post + Q7Post + Q8Post + Q9Post)/4,
         T ~ NA_real_
@@ -282,7 +282,7 @@ calc_ih <- function(final_dat, wave) {
   ## intellectual humility for followup
   if (wave == "FollowUp") {
     final_dat <- final_dat %>%
-      dplyr::mutate(Q18FollowUp = case_when(
+      dplyr::mutate(Q18FollowUp = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3FollowUp + Q6FollowUp + Q7FollowUp + Q8FollowUp)/4,
         AssessmentVersion >= 5 ~ (Q5FollowUp + Q7FollowUp + Q8FollowUp + Q9FollowUp)/4,
         T ~ NA_real_
@@ -326,27 +326,27 @@ om_construct_measures <- function(x){
   if (stringr::str_detect(cols, "Pre")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Pre, Q2Pre) %>%
+      openmindR::polar_measures(Q1Pre, Q2Pre) %>%
       #compute intellectual humility factor score
-      calc_ih("Pre")
+      openmindR::calc_ih("Pre")
   }
 
   ## If Post vars are found
   if (stringr::str_detect(cols, "Post")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Post, Q2Post) %>%
+      openmindR::polar_measures(Q1Post, Q2Post) %>%
       #compute intellectual humility factor score
-      calc_ih("Post")
+      openmindR::calc_ih("Post")
   }
 
   ## If FollowUp vars are found
   if (stringr::str_detect(cols, "FollowUp")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1FollowUp, Q2FollowUp)  %>%
+      openmindR::polar_measures(Q1FollowUp, Q2FollowUp)  %>%
       #compute intellectual humility factor score
-      calc_ih("FollowUp")
+      openmindR::calc_ih("FollowUp")
   }
 
   return(final_dat)
@@ -365,7 +365,7 @@ remove_dups <- function(cleaned_dat) {
   ## pull duplicated OMIDs
   cleaned_dat %>%
     dplyr::filter(duplicated(OMID)) %>%
-    pull(OMID) -> dups
+    dplyr::pull(OMID) -> dups
 
 
   ## pull OMIDs that are most complete + latest entries
@@ -408,7 +408,7 @@ coalesce_join <- function(x, y,
 
   joined <- join(x, y, by = by, suffix = suffix, ...)
   # names of desired output
-  cols <- union(names(x), names(y))
+  cols <- dplyr::union(names(x), names(y))
 
   to_coalesce <- names(joined)[!names(joined) %in% cols]
   suffix_used <- suffix[ifelse(endsWith(to_coalesce, suffix[1]), 1, 2)]

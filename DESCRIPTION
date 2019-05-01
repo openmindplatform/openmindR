@@ -11,6 +11,8 @@ RoxygenNote: 6.1.1
 Imports:
     dplyr,
     stringr,
+    purrr,
+    forcats,
     readr,
     glue,
     highcharter,
