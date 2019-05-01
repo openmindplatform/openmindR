@@ -231,7 +231,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
     dplyr::mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
     # compute ingroup v outgroup affective polarization
     dplyr::mutate(Q17 = abs(Q15 - Q16)) %>%
-    rename_at(dplyr::vars(Q14:Q17), ~paste0(.x, wave))
+    dplyr::rename_at(dplyr::vars(Q14:Q17), ~paste0(.x, wave))
 
   return(final_dat)
 }
