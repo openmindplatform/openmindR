@@ -20,7 +20,7 @@ Load package(s):
 
 ```{r}
 library(openmindR)
-# library(dplyr)
+library(dplyr)
 ```
 
 
@@ -216,7 +216,7 @@ Takes the following arguments:
 dat.ass %>% 
   om_gather(q_c_strings) %>% 
   ## select just the relevant vars as showcase
-  dplyr::select(Question, Response, Type, variable_code)
+  select(Question, Response, Type, variable_code)
 ```
 
 ## `om_summarize_comparisons`

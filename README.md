@@ -11,7 +11,7 @@ Load package(s):
 
 ``` r
 library(openmindR)
-library(tidyverse)
+library(dplyr)
 ```
 
 ## OpenMind Cleaning Functions
@@ -172,10 +172,10 @@ Cleans up ParticipantProgress data and creates several measures:
 
 ``` r
 dat.par %>% 
-  om_clean_par()
+  om_clean_par() 
 ```
 
-    ## # A tibble: 16,974 x 36
+    ## # A tibble: 16,976 x 36
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
     ##  1 7806~ <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
@@ -188,7 +188,7 @@ dat.par %>%
     ##  8 1000~ <NA>      1, 1, 1, 1, 1        0.625        1            0.667
     ##  9 2458~ <NA>      1, 1, 1, 1, 0        1            1            1    
     ## 10 9406~ <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # ... with 16,964 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ## # ... with 16,966 more rows, and 30 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
@@ -250,7 +250,7 @@ dat.ass <- dat.ass %>%
 dat.ass
 ```
 
-    ## # A tibble: 16,895 x 82
+    ## # A tibble: 16,896 x 82
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
@@ -263,7 +263,7 @@ dat.ass
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
     ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
-    ## # ... with 16,885 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## # ... with 16,886 more rows, and 75 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -290,7 +290,7 @@ dat.ass %>%
   om_construct_measures()
 ```
 
-    ## # A tibble: 16,895 x 97
+    ## # A tibble: 16,896 x 97
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -303,7 +303,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,885 more rows, and 90 more variables: Q3Pre <dbl>,
+    ## # ... with 16,886 more rows, and 90 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -337,9 +337,9 @@ dat.ass %>%
   remove_dups()
 ```
 
-    ## Removing 258 duplicates...
+    ## Removing 257 duplicates...
 
-    ## # A tibble: 16,380 x 83
+    ## # A tibble: 16,382 x 83
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -352,7 +352,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,370 more rows, and 76 more variables: Q3Pre <dbl>,
+    ## # ... with 16,372 more rows, and 76 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -399,7 +399,7 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
-    ## # A tibble: 760,275 x 4
+    ## # A tibble: 760,320 x 4
     ##    Question Response Type  variable_code
     ##    <chr>       <dbl> <chr> <chr>        
     ##  1 Q1Pre          40 Pre   Q1           
@@ -412,7 +412,7 @@ dat.ass %>%
     ##  8 Q1Pre          56 Pre   Q1           
     ##  9 Q1Pre          50 Pre   Q1           
     ## 10 Q1Pre          50 Pre   Q1           
-    ## # ... with 760,265 more rows
+    ## # ... with 760,310 more rows
 
 ## `om_summarize_comparisons`
 
