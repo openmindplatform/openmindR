@@ -2,20 +2,22 @@
 % Please edit documentation in R/cleaning.R
 \name{om_filter_data}
 \alias{om_filter_data}
-\title{This function filters down a dataframe by the desired characteristics.}
+\title{This function extracts all data that meet the characteristics specified by these arguments.}
 \usage{
 om_filter_data(app.dat, n_assessments = NULL, version = NULL,
-  accesscode = NULL)
+  accesscode = NULL, exact_search = F)
 }
 \arguments{
 \item{app.dat}{Assessment data from AirTable}
 
-\item{n_assessments}{{AssessmentsDone} Filter down to what asssesments? (Should be 1, 2 and/or 3)}
+\item{n_assessments}{{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)}
 
 \item{version}{{AssessmentVersion} Filter down to what asssesment version?}
 
-\item{accesscode}{{AccessCode} Filter down to specific AccessCodes}
+\item{accesscode}{{AccessCode} Filter down to 1 specific AccessCode. Though, future version may allow selection of lists of AccessCodes}
+
+\item{exact_search}{{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.}
 }
 \description{
-This function filters down a dataframe by the desired characteristics.
+This function extracts all data that meet the characteristics specified by these arguments.
 }
