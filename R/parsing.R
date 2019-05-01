@@ -68,7 +68,7 @@ count_na <- function(x) sum(is.na(x))
 #' @param date date
 #' @export
 chr_to_date <- function(date) {
-  str_remove_all(date, "th,|rd,|st,|nd,") %>% as.Date(format = "%B %d %Y")
+  stringr::str_remove_all(date, "th,|rd,|st,|nd,") %>% as.Date(format = "%B %d %Y")
 }
 
 #' This function assigns colnames
@@ -95,8 +95,8 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
     if (col_length == 25) {
 
       col_names <- col_names %>%
-        discard(~str_detect(.x, "D6")) %>%
-        discard(~str_detect(.x, "B1"))
+        discard(~stringr::str_detect(.x, "D6")) %>%
+        discard(~stringr::str_detect(.x, "B1"))
       return(col_names)
 
     }
@@ -104,7 +104,7 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
     if (col_length == 26) {
 
       col_names <- col_names %>%
-        discard(~str_detect(.x, "B1"))
+        discard(~stringr::str_detect(.x, "B1"))
       return(col_names)
 
     }
@@ -116,7 +116,7 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
   if (b2q) {
     if (col_length == 26) {
 
-      return(col_names %>% discard(~str_detect(.x, "D6")))
+      return(col_names %>% discard(~stringr::str_detect(.x, "D6")))
 
     }
   }
@@ -128,8 +128,8 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
     if (col_length == 25) {
 
       col_names <- col_names %>%
-        discard(~str_detect(.x, "D6")) %>%
-        discard(~str_detect(.x, "B3"))
+        discard(~stringr::str_detect(.x, "D6")) %>%
+        discard(~stringr::str_detect(.x, "B3"))
       return(col_names)
 
     }
@@ -137,7 +137,7 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
     if (col_length == 26) {
 
       col_names <- col_names %>%
-        discard(~str_detect(.x, "B3"))
+        discard(~stringr::str_detect(.x, "B3"))
       return(col_names)
 
     }
@@ -155,7 +155,7 @@ get_colnames <- function(col_length, b2q, b1q, b3q) {
 
 
   if(all(c(!b1q, !b2q, !b3q))){
-    return(col_names %>% discard(~str_detect(.x, "D6")))
+    return(col_names %>% discard(~stringr::str_detect(.x, "D6")))
   }
 
 }
@@ -218,7 +218,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
 
   ## Extract B1 and B3 since they are too weird to deal with
   open_answers <- data %>%
-    str_extract_all("\\[\\|.*?\\|\\],|\\[\\<.*?\\>\\],") %>%
+    stringr::str_extract_all("\\[\\|.*?\\|\\],|\\[\\<.*?\\>\\],") %>%
     magrittr::extract2(1)
 
   ## if neither B1 nor B3 then open_answers is NULL
@@ -236,21 +236,21 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
 
   ## Check if B1 was asked
   b1_q <-  data %>%
-    str_remove_all("\\[\\|.*?\\|\\],") %>%
-    str_remove_all("\\[\\<.*?\\>\\],") %>%
-    str_detect("\\bB1\\b")
+    stringr::str_remove_all("\\[\\|.*?\\|\\],") %>%
+    stringr::str_remove_all("\\[\\<.*?\\>\\],") %>%
+    stringr::str_detect("\\bB1\\b")
 
   ## Check if B2 was asked
   b2_q <-  data %>%
-    str_remove_all("\\[\\|.*?\\|\\],") %>%
-    str_remove_all("\\[\\<.*?\\>\\],") %>%
-    str_detect("\\bB2\\b")
+    stringr::str_remove_all("\\[\\|.*?\\|\\],") %>%
+    stringr::str_remove_all("\\[\\<.*?\\>\\],") %>%
+    stringr::str_detect("\\bB2\\b")
 
   ## Check if B3 was asked
   b3_q <-  data %>%
-    str_remove_all("\\[\\|.*?\\|\\],") %>%
-    str_remove_all("\\[\\<.*?\\>\\],") %>%
-    str_detect("\\bB3\\b")
+    stringr::str_remove_all("\\[\\|.*?\\|\\],") %>%
+    stringr::str_remove_all("\\[\\<.*?\\>\\],") %>%
+    stringr::str_detect("\\bB3\\b")
 
   ## if B1 is found
   if (b1_q) {
@@ -267,7 +267,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       ## Set Column names
       set_names(c("B1Pre", "B1Post")[1:n_open_cols]) %>%
       ## some cleaning
-      mutate_all(~str_remove_all(.x, "\\[|\\],"))
+      mutate_all(~stringr::str_remove_all(.x, "\\[|\\],"))
 
   } else if (b3_q) {
 
@@ -283,7 +283,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       ## Set Column names
       set_names(c("B3Pre", "B3Post")[1:n_open_cols]) %>%
       ## some cleaning
-      mutate_all(~str_remove_all(.x, "\\[|\\],"))
+      mutate_all(~stringr::str_remove_all(.x, "\\[|\\],"))
   }
 
   clean_s1_string <- "abortion rights, Black Lives Matter, gun control|banning abortion, All Lives Matter, gun rights"
@@ -291,17 +291,17 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
 
   row_check <- data %>%
     ## Cleaning up target variable with regex
-    str_replace_all("(?<=\\{[^\\}]{0,100}),", " ")  %>%
-    str_replace_all(clean_s1_string, "") %>%
+    stringr::str_replace_all("(?<=\\{[^\\}]{0,100}),", " ")  %>%
+    stringr::str_replace_all(clean_s1_string, "") %>%
     ## Remove Behavioural Tasks
-    str_remove_all("\\[\\|.*?\\|\\],") %>%
-    str_remove_all("\\[\\<.*?\\>\\],") %>%
+    stringr::str_remove_all("\\[\\|.*?\\|\\],") %>%
+    stringr::str_remove_all("\\[\\<.*?\\>\\],") %>%
     ## Split by Pre and Post
-    str_split("\\}\\],") %>%
-    map(~str_split(.x, ", (?=[^\\|])")) %>%
+    stringr::str_split("\\}\\],") %>%
+    map(~stringr::str_split(.x, ", (?=[^\\|])")) %>%
     flatten() %>%
-    map(str_remove_all, "\\[|\\]") %>%
-    map(str_trim)
+    map(stringr::str_remove_all, "\\[|\\]") %>%
+    map(stringr::str_trim)
 
   ## if there are three answers
   if (length(row_check) == 3) {
@@ -340,17 +340,17 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
   } else if (!is.na(labels)) {
     ## if labels are there
     col_names_fix <- labels %>%
-      str_split(",") %>%
+      stringr::str_split(",") %>%
       unlist() %>%
-      str_trim() %>%
-      str_remove_all("\\[|\\]") %>%
-      map_chr(~str_remove_all(.x, "AssessmentCompleted"))
+      stringr::str_trim() %>%
+      stringr::str_remove_all("\\[|\\]") %>%
+      map_chr(~stringr::str_remove_all(.x, "AssessmentCompleted"))
 
     if (b1_q) {
-      col_names_fix <- col_names_fix %>% discard(~str_detect(.x, "B1"))
+      col_names_fix <- col_names_fix %>% discard(~stringr::str_detect(.x, "B1"))
     }
     if (b3_q) {
-      col_names_fix <- col_names_fix %>% discard(~str_detect(.x, "B3"))
+      col_names_fix <- col_names_fix %>% discard(~stringr::str_detect(.x, "B3"))
     }
 
   }
@@ -369,7 +369,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       ## Wide format
       spread(varnames, V1)  %>%
       ## Demographic varibales appear only once
-      rename_at(vars(D1Pre:D5Pre),  ~str_remove(.x, "Pre")) %>%
+      rename_at(vars(D1Pre:D5Pre),  ~stringr::str_remove(.x, "Pre")) %>%
       ## Add open-ended answers
       bind_cols(open_answers)
 
@@ -384,7 +384,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       spread(varnames, V1) %>%
       ## Demographic varibales appear only once
       select(-D1Post:-D5Post) %>%
-      rename_at(vars(D1Pre:D5Pre),  ~str_remove(.x, "Pre")) %>%
+      rename_at(vars(D1Pre:D5Pre),  ~stringr::str_remove(.x, "Pre")) %>%
       ## Add open-ended answers
       bind_cols(open_answers)
   }
@@ -419,11 +419,11 @@ spread_it <- function(x, row_dat) {
 
   check_it <- selected_dat %>% .[1,2] %>% pull(1)
 
-  is_one <- check_it %>% equals("1")
-  is_two <- check_it %>% equals("2")
-  is_three <- check_it %>% equals("3")
-  is_four <- check_it %>% equals("4")
-  is_five <- check_it %>% equals("5")
+  is_one <- check_it %>% magrittr::equals("1")
+  is_two <- check_it %>% magrittr::equals("2")
+  is_three <- check_it %>% magrittr::equals("3")
+  is_four <- check_it %>% magrittr::equals("4")
+  is_five <- check_it %>% magrittr::equals("5")
 
   if (is_one) selected_dat[,1] <- c("Step1", paste0("Step1_Q", 1:5))
   if (is_two) selected_dat[,1] <- c("Step2", paste0("Step2_Q", 1:5))
@@ -442,9 +442,9 @@ spread_it <- function(x, row_dat) {
 #'@param row_dat
 #'@export
 clean_fa_string <- function(x) {
-  str_trim(x) %>%
-    str_remove(", ") %>%
-    str_remove_all("\\]") %>%
+  stringr::str_trim(x) %>%
+    stringr::str_remove(", ") %>%
+    stringr::str_remove_all("\\]") %>%
     ifelse(. == ",", NA, .) %>%
     ifelse(. == "\\]", NA, .)
 }
@@ -470,9 +470,9 @@ parse_lifehacks <- function(x, var) {
   }
 
   x %>%
-    str_split(",") %>%
-    map(~str_remove_all(.x, "\\[|\\]")) %>%
-    map(str_trim) %>%
+    stringr::str_split(",") %>%
+    map(~stringr::str_remove_all(.x, "\\[|\\]")) %>%
+    map(stringr::str_trim) %>%
     map(t) %>%
     map_dfr(as_tibble) %>%
     set_names(var_names)
@@ -495,14 +495,14 @@ parse_feedback_at <- function(raw_input) {
 
   raw_input %>%
     om_strsplit("],", type = "after") %>%
-    map(~str_split(.x, ",")) %>%
+    map(~stringr::str_split(.x, ",")) %>%
     magrittr::extract2(1) %>%
     map(~{
       fixed_answers <- .x[1:4]
       open_answers <- .x[5:length(.x)] %>%
         glue_collapse(",") %>%
-        str_split(", \\|", n = 2)
-      # str_split("\\.,|\\b , \\b")
+        stringr::str_split(", \\|", n = 2)
+      # stringr::str_split("\\.,|\\b , \\b")
 
       return(list(fixed_answers = fixed_answers,
                   open_answers = open_answers))
@@ -520,11 +520,11 @@ parse_feedback_at <- function(raw_input) {
 
   row_dat <- bind_rows(clean_fix, clean_open) %>%
     mutate_all(function(x) ifelse(nchar(x) == 0, NA, x)) %>%
-    mutate_all(function(x) str_remove_all(x, "\\[\\[|\\[")) %>%
+    mutate_all(function(x) stringr::str_remove_all(x, "\\[\\[|\\[")) %>%
     set_names(.[1,] %>% .[1:ncol(.)]) %>%
     janitor::clean_names() %>%
     mutate(colnames = c("Step", paste0("X", 1:5))) %>%
-    mutate_all(str_trim)
+    mutate_all(stringr::str_trim)
 
   ## Remove duplicate steps
   row_dat <- row_dat[,!(row_dat[1, ] %>% transpose() %>% duplicated())]

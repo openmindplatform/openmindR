@@ -20,7 +20,6 @@ Load package(s):
 
 ```{r}
 library(openmindR)
-library(tidyverse)
 ```
 
 

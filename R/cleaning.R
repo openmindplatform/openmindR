@@ -104,10 +104,10 @@ om_clean_par <- function(dat.par, ...) {
     tidyr::separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~str_remove_all(.x, "[^[:digit:]. ]") %>% parse_number) %>%
+    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~str_remove_all(.x, "[^[:digit:]. ]") %>% readr::parse_number) %>%
     dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), parse_number)  %>%
+    dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
     # ## Steps Complete
     ## Now calculating scores
     ## percent correct for each step
@@ -118,8 +118,8 @@ om_clean_par <- function(dat.par, ...) {
     dplyr::mutate(StepCorrect5 = calc_correct(StepsComplete5, StepsScores5, StepQuestionTotals5)) %>%
     ## Parse Feedback Answers
     dplyr::mutate(data = FeedbackAnswers %>%
-             map(~parse_feedback_at(.x))) %>%
-    unnest(data)  %>%
+             purrr::map(~parse_feedback_at(.x))) %>%
+    tidyr::unnest(data)  %>%
     ## Make Step variables to characters (for merging)
     dplyr::mutate_at(vars(Step1:Step5_Q5), as.character) %>%
     dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
@@ -369,23 +369,23 @@ remove_dups <- function(cleaned_dat) {
 
   ## pull OMIDs that are most complete + latest entries
   removed_airtable_dups <-  cleaned_dat %>%
-    dplyr::mutate(createdTime = as_datetime(createdTime)) %>%
+    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
     dplyr::filter(OMID %in% dups) %>%
     dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
     dplyr::mutate(count_na = rowSums(is.na(.))) %>%
-    arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
+    dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
     dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, everything()) %>%
-    group_by(OMID) %>%
-    slice(1)
+    dplyr::group_by(OMID) %>%
+    dplyr::slice(1)
 
   message(stringr::str_glue("Removing {round(length(dups)/2)} duplicates...\n"))
 
   ## remove OMIDs that we don't want (older + less complete)
   cleaned_dat %>%
     dplyr::filter(!(OMID %in% dups)) %>%
-    dplyr::mutate(createdTime = as_datetime(createdTime)) %>%
+    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
     dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
-    bind_rows(removed_airtable_dups)
+    dplyr::bind_rows(removed_airtable_dups)
 }
 
 #' Coalescing joints
