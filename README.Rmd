@@ -20,7 +20,7 @@ Load package(s):
 
 ```{r}
 library(openmindR)
-# library(dplyr)
+library(dplyr)
 ```
 
 
