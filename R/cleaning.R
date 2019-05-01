@@ -1,11 +1,19 @@
-#' This function extracts all data that meet the characteristics specified by these arguments.
+#' This function filters down Assessment data
+#'
+#' You can filter Assessment data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode}
+#'
+#' Want to match multiple specific Access Codes? Then just specify a vector: \code{c("EddySalemStateUniversityF18", "EddySalemStateUniversityF18k")}.
+#'
+#' If you want multiple "fuzzy" searches for an AccessCode you would use the argument \code{exact_search = F} (the default) and use \code{"Salem|NYU"} which will give you all Access Codes that include Salem and and NYU (the bar indicates separate searches).
+#'
+#' Finally, if you want just one specific Access Code then you'd use \code{"EddySalemStateUniversityF18"} with \code{exact_search = T}
 #'
 #'
 #' @param app.dat Assessment data from AirTable
-#' @param n_assessments {AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
-#' @param version {AssessmentVersion} Filter down to what asssesment version?
-#' @param accesscode {AccessCode} Filter down to 1 specific AccessCode. Though, future version may allow selection of lists of AccessCodes
-#' @param exact_search {logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.
+#' @param n_assessments \code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
+#' @param version \code{AssessmentVersion} Filter down to what asssesment version?
+#' @param accesscode \code{AccessCode} Filter down to (several) AccessCode(s)
+#' @param exact_search \code{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.
 #' @export
 om_filter_data <- function(app.dat, n_assessments = NULL,
                        version = NULL, accesscode = NULL, exact_search = F) {
@@ -59,6 +67,8 @@ om_filter_data <- function(app.dat, n_assessments = NULL,
 }
 
 #' This calculates the correct score for each step
+#'
+#' This is just an internal helper function.
 #'
 #' @param StepScomplete (0/1) Was Step completed?
 #' @param Stepscores What was the score on the step?

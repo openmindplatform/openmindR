@@ -2,7 +2,7 @@
 % Please edit documentation in R/cleaning.R
 \name{om_filter_data}
 \alias{om_filter_data}
-\title{This function extracts all data that meet the characteristics specified by these arguments.}
+\title{This function filters down Assessment data}
 \usage{
 om_filter_data(app.dat, n_assessments = NULL, version = NULL,
   accesscode = NULL, exact_search = F)
@@ -10,14 +10,21 @@ om_filter_data(app.dat, n_assessments = NULL, version = NULL,
 \arguments{
 \item{app.dat}{Assessment data from AirTable}
 
-\item{n_assessments}{{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)}
+\item{n_assessments}{\code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)}
 
-\item{version}{{AssessmentVersion} Filter down to what asssesment version?}
+\item{version}{\code{AssessmentVersion} Filter down to what asssesment version?}
 
-\item{accesscode}{{AccessCode} Filter down to 1 specific AccessCode. Though, future version may allow selection of lists of AccessCodes}
+\item{accesscode}{\code{AccessCode} Filter down to (several) AccessCode(s)}
 
-\item{exact_search}{{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.}
+\item{exact_search}{\code{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.}
 }
 \description{
-This function extracts all data that meet the characteristics specified by these arguments.
+You can filter Assessment data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode}
+}
+\details{
+Want to match multiple specific Access Codes? Then just specify a vector: \code{c("EddySalemStateUniversityF18", "EddySalemStateUniversityF18k")}.
+
+If you want multiple "fuzzy" searches for an AccessCode you would use the argument \code{exact_search = F} (the default) and use \code{"Salem|NYU"} which will give you all Access Codes that include Salem and and NYU (the bar indicates separate searches).
+
+Finally, if you want just one specific Access Code then you'd use \code{"EddySalemStateUniversityF18"} with \code{exact_search = T}
 }

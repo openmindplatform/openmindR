@@ -14,5 +14,5 @@ calc_correct(StepsComplete, StepsScores, StepQuestionTotals)
 \item{Stepscores}{What was the score on the step?}
 }
 \description{
-This calculates the correct score for each step
+This is just an internal helper function.
 }
