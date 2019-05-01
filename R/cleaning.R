@@ -20,8 +20,8 @@ om_filter_data <- function(app.dat, n_assessments = NULL,
 
   if (!is.null(n_assessments)) {
     app.dat <- app.dat %>%
-      dplyr::dplyr::mutate(AssessmentsDone = base::as.numeric(AssessmentsDone)) %>%
-      dplyr::dplyr::filter(AssessmentsDone %in% n_assessments)
+      dplyr::mutate(AssessmentsDone = base::as.numeric(AssessmentsDone)) %>%
+      dplyr::filter(AssessmentsDone %in% n_assessments)
   }
   if (!is.null(version)) {
     app.dat <- app.dat %>%
@@ -147,7 +147,7 @@ om_clean_ppol <- function(app.dat) {
   app.dat %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(vars(matches(var_strings)), as.numeric) %>%
+    dplyr::mutate_at(vars(matches(openmindR::var_strings)), as.numeric) %>%
     ## construct raw ppol variable
     dplyr::mutate(ppol_raw = D4) %>%
     ## fix the names of categories
