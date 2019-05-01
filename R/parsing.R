@@ -219,7 +219,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
   ## Extract B1 and B3 since they are too weird to deal with
   open_answers <- data %>%
     str_extract_all("\\[\\|.*?\\|\\],|\\[\\<.*?\\>\\],") %>%
-    extract2(1)
+    magrittr::extract2(1)
 
   ## if neither B1 nor B3 then open_answers is NULL
   if (length(open_answers) == 0) {
@@ -496,7 +496,7 @@ parse_feedback_at <- function(raw_input) {
   raw_input %>%
     om_strsplit("],", type = "after") %>%
     map(~str_split(.x, ",")) %>%
-    extract2(1) %>%
+    magrittr::extract2(1) %>%
     map(~{
       fixed_answers <- .x[1:4]
       open_answers <- .x[5:length(.x)] %>%
