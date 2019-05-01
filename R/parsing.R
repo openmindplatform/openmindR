@@ -367,7 +367,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       mutate(varnames = factor(varnames, levels = varnames)) %>%
       select(varnames, V1) %>%
       ## Wide format
-      spread(varnames, V1)  %>%
+      tidyr::spread(varnames, V1)  %>%
       ## Demographic varibales appear only once
       rename_at(vars(D1Pre:D5Pre),  ~stringr::str_remove(.x, "Pre")) %>%
       ## Add open-ended answers
@@ -381,7 +381,7 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
       mutate(varnames = factor(varnames, levels = varnames)) %>%
       select(varnames, V1) %>%
       ## Wide format
-      spread(varnames, V1) %>%
+      tidyr::spread(varnames, V1) %>%
       ## Demographic varibales appear only once
       select(-D1Post:-D5Post) %>%
       rename_at(vars(D1Pre:D5Pre),  ~stringr::str_remove(.x, "Pre")) %>%
@@ -432,7 +432,7 @@ spread_it <- function(x, row_dat) {
   if (is_five) selected_dat[,1] <- c("Step5", paste0("Step5_Q", 1:5))
 
   selected_dat %>%
-    spread("colnames", x)
+    tidyr::spread("colnames", x)
 
 }
 
@@ -535,7 +535,7 @@ parse_feedback_at <- function(raw_input) {
   final_dat <- row_dat %>%
     colnames() %>%
     purrr::discard(. == "colnames") %>%
-    purrr::map_dfc(~spread_it(.x, row_dat)) %>%
+    purrr::map_dfc(~openmindR::spread_it(.x, row_dat)) %>%
     dplyr::as_tibble()
 
   return(final_dat)
