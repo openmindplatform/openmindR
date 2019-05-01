@@ -202,7 +202,7 @@ om_clean_ppol <- function(app.dat) {
 polar_measures <- function(final_dat, Q1, Q2) {
 
   ## if ppol_cat is not found then throw error
-  if (not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
+  if (magrittr::not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
     stop("Input data is missing column `ppol_cat`. Please make sure to run om_clean_ppol before you run om_construct_measures.\n")
   }
 
@@ -251,7 +251,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
 calc_ih <- function(final_dat, wave) {
 
   ## if AssessmentVersion is not found then throw error
-  if (not(colnames(final_dat) %in% "AssessmentVersion" %>% any)) {
+  if (magrittr::not(colnames(final_dat) %in% "AssessmentVersion" %>% any)) {
     stop("Input data is missing column `AssessmentVersion`. Please make sure to add this column before you run om_construct_measures.\n")
   }
 
