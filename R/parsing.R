@@ -5,8 +5,8 @@
 #' @export
 get_error_diag <- function(parsed_data) {
   parsed_data %>%
-    map("error") %>%
-    map(~ifelse(is.null(.x), "No Error", .x)) %>%
+    purrr::map("error") %>%
+    purrr::map(~ifelse(is.null(.x), "No Error", .x)) %>%
     unlist() %>%
     tibble(errors = .) %>%
     bind_cols(base_dat) %>%
@@ -298,10 +298,10 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
     stringr::str_remove_all("\\[\\<.*?\\>\\],") %>%
     ## Split by Pre and Post
     stringr::str_split("\\}\\],") %>%
-    map(~stringr::str_split(.x, ", (?=[^\\|])")) %>%
+    purrr::map(~stringr::str_split(.x, ", (?=[^\\|])")) %>%
     flatten() %>%
-    map(stringr::str_remove_all, "\\[|\\]") %>%
-    map(stringr::str_trim)
+    purrr::map(stringr::str_remove_all, "\\[|\\]") %>%
+    purrr::map(stringr::str_trim)
 
   ## if there are three answers
   if (length(row_check) == 3) {
@@ -471,9 +471,9 @@ parse_lifehacks <- function(x, var) {
 
   x %>%
     stringr::str_split(",") %>%
-    map(~stringr::str_remove_all(.x, "\\[|\\]")) %>%
-    map(stringr::str_trim) %>%
-    map(t) %>%
+    purrr::map(~stringr::str_remove_all(.x, "\\[|\\]")) %>%
+    purrr::map(stringr::str_trim) %>%
+    purrr::map(t) %>%
     map_dfr(as_tibble) %>%
     set_names(var_names)
 }
@@ -490,14 +490,14 @@ parse_feedback_at <- function(raw_input) {
   # if (is.na(raw_input)) return(tibble(Step1 = NA))
 
   if (is.na(raw_input)) {
-    return(tibble(no_data = 1))
+    return(dplyr::tibble(no_data = 1))
   }
 
   raw_input %>%
-    om_strsplit("],", type = "after") %>%
-    map(~stringr::str_split(.x, ",")) %>%
+    openmindR::om_strsplit("],", type = "after") %>%
+    purrr::map(~stringr::str_split(.x, ",")) %>%
     magrittr::extract2(1) %>%
-    map(~{
+    purrr::map(~{
       fixed_answers <- .x[1:4]
       open_answers <- .x[5:length(.x)] %>%
         glue::glue_collapse(",") %>%
@@ -509,34 +509,34 @@ parse_feedback_at <- function(raw_input) {
     }) -> split_string
 
   clean_fix <- split_string %>%
-    map("fixed_answers") %>%
-    bind_cols()
+    purrr::map("fixed_answers") %>%
+    dplyr::bind_cols()
 
 
   clean_open <- split_string %>%
-    map("open_answers") %>%
-    flatten() %>%
-    bind_cols()
+    purrr::map("open_answers") %>%
+    purrr::flatten() %>%
+    dplyr::bind_cols()
 
   row_dat <- bind_rows(clean_fix, clean_open) %>%
-    mutate_all(function(x) ifelse(nchar(x) == 0, NA, x)) %>%
-    mutate_all(function(x) stringr::str_remove_all(x, "\\[\\[|\\[")) %>%
-    set_names(.[1,] %>% .[1:ncol(.)]) %>%
+    dplyr::mutate_all(function(x) ifelse(nchar(x) == 0, NA, x)) %>%
+    dplyr::mutate_all(function(x) stringr::str_remove_all(x, "\\[\\[|\\[")) %>%
+    purrr::set_names(.[1,] %>% .[1:ncol(.)]) %>%
     janitor::clean_names() %>%
-    mutate(colnames = c("Step", paste0("X", 1:5))) %>%
-    mutate_all(stringr::str_trim)
+    dplyr::mutate(colnames = c("Step", paste0("X", 1:5))) %>%
+    dplyr::mutate_all(stringr::str_trim)
 
   ## Remove duplicate steps
-  row_dat <- row_dat[,!(row_dat[1, ] %>% transpose() %>% duplicated())]
+  row_dat <- row_dat[,!(row_dat[1, ] %>% purrr::transpose() %>% duplicated())]
 
   ## Remove steps outside of 1 to 5 and Step
   # row_dat <- row_dat[, row_dat[1, ] %>% transpose() %>% .[,1] %>% is_in(c(1:5, "Step"))]
 
   final_dat <- row_dat %>%
     colnames() %>%
-    discard(. == "colnames") %>%
-    map_dfc(~spread_it(.x, row_dat)) %>%
-    as_tibble()
+    purrr::discard(. == "colnames") %>%
+    purrr::map_dfc(~spread_it(.x, row_dat)) %>%
+    dplyr::as_tibble()
 
   return(final_dat)
 
