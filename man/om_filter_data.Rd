@@ -12,7 +12,7 @@ om_filter_data(app.dat, n_assessments = NULL, version = NULL,
 
 \item{n_assessments}{\code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)}
 
-\item{version}{\code{AssessmentVersion} Filter down to what asssesment version?}
+\item{version}{\code{AssessmentVersion} Filter down to what asssesment version. This argument either takes a single number or vector.}
 
 \item{accesscode}{\code{AccessCode} Filter down to (several) AccessCode(s)}
 
