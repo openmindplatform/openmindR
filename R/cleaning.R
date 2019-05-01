@@ -104,10 +104,11 @@ om_clean_par <- function(dat.par, ...) {
     tidyr::separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]") %>% readr::parse_number()) %>%
+    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]")) %>%
+    dplyr::mutate_at(vars(StepTimes1:StepTimes5), readr::parse_number) %>%
     dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number())  %>%
+    dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
     # ## Steps Complete
     ## Now calculating scores
     ## percent correct for each step
