@@ -208,7 +208,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
   }
 
   ## check which wave
-  wave <- dplyr::ase_when(
+  wave <- dplyr::case_when(
     stringr::str_detect(lazyeval::expr_find(Q1), "Pre") ~ "Pre",
     stringr::str_detect(lazyeval::expr_find(Q1), "Post") ~ "Post",
     stringr::str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
