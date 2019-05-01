@@ -20,6 +20,7 @@ Load package(s):
 
 ```{r}
 library(openmindR)
+# library(dplyr)
 ```
 
 
@@ -27,20 +28,15 @@ library(openmindR)
 ## OpenMind Cleaning Functions
 
 ```{r, echo = F}
-library(DBI)
-# library(magrittr)
-# library(glue)
-# library(lubridate)
-# library(sjmisc)
 
 db_get_data <- function(tbl_dat) {
-  con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
+  con <- DBI::dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
 
   out <- con %>%
-    tbl(tbl_dat) %>%
-    collect()
+    dplyr::tbl(tbl_dat) %>%
+    dplyr::collect()
 
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 
   return(out)
 }
@@ -73,7 +69,7 @@ dat.ass4 <- db_get_data("dat.ass4")
 dat.ass5 <- db_get_data("dat.ass5")
 
 dat.ass <- dat.ass4 %>% 
-  rename_at(vars(matches("Followup")), ~str_replace(., "Followup", "FollowUp")) %>%
+  rename_at(vars(matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
   bind_rows(dat.ass5)
 
 

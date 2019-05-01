@@ -31,8 +31,8 @@ om_filter_data <- function(app.dat, n_assessments = NULL,
   if (!is.null(accesscode)) {
 
     ## turn AccessCode and search string to lower
-    app.dat <- app.dat %>% dplyr::mutate(AccessCode2 = str_to_lower(AccessCode))
-    accesscode <- str_to_lower(accesscode)
+    app.dat <- app.dat %>% dplyr::mutate(AccessCode2 = stringr::str_to_lower(AccessCode))
+    accesscode <- stringr::str_to_lower(accesscode)
 
     ## if vector
     if (length(accesscode) >= 2) {
@@ -104,7 +104,7 @@ om_clean_par <- function(dat.par, ...) {
     tidyr::separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
-    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~str_remove_all(.x, "[^[:digit:]. ]") %>% readr::parse_number) %>%
+    dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]") %>% readr::parse_number) %>%
     dplyr::mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
     dplyr::mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
@@ -451,7 +451,7 @@ om_gather <- function(.data, which_strings) {
       stringr::str_detect(Question, "Post") ~ "Post",
       stringr::str_detect(Question, "FollowUp") ~ "FollowUp"
     ))  %>%
-    dplyr::mutate(variable_code = str_remove(Question, Type)) %>%
+    dplyr::mutate(variable_code = stringr::str_remove(Question, Type)) %>%
     dplyr::mutate(Response = as.numeric(Response))
 
   return(gathered_dat)
@@ -479,11 +479,11 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
 db_append <- function(path, tbl, data) {
   con <- dbConnect(RSQLite::SQLite(), path)
 
-  if(!is.null(dbListTables(con))) {
-    dbWriteTable(con, tbl, data, append = T)
+  if(!is.null(DBI::dbListTables(con))) {
+    DBI::dbWriteTable(con, tbl, data, append = T)
   } else {
-    dbWriteTable(con, tbl, data)
+    DBI::dbWriteTable(con, tbl, data)
   }
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 
 }
