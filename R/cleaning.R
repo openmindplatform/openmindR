@@ -1,13 +1,14 @@
-#' This function filters down a dataframe by the desired characteristics.
+#' This function extracts all data that meet the characteristics specified by these arguments.
 #'
 #'
 #' @param app.dat Assessment data from AirTable
-#' @param n_assessments {AssessmentsDone} Filter down to what asssesments? (Should be 1, 2 and/or 3)
+#' @param n_assessments {AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
 #' @param version {AssessmentVersion} Filter down to what asssesment version?
-#' @param accesscode {AccessCode} Filter down to specific AccessCodes
+#' @param accesscode {AccessCode} Filter down to 1 specific AccessCode. Though, future version may allow selection of lists of AccessCodes
+#' @param exact_search {logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.
 #' @export
 om_filter_data <- function(app.dat, n_assessments = NULL,
-                       version = NULL, accesscode = NULL) {
+                       version = NULL, accesscode = NULL, exact_search = F) {
 
   if (!is.null(n_assessments)) {
     app.dat <- app.dat %>%
@@ -31,13 +32,29 @@ om_filter_data <- function(app.dat, n_assessments = NULL,
         filter(AccessCode2 %in% accesscode) %>%
         select(-AccessCode2)
     ## if single string
-    } else
-      app.dat <- app.dat %>%
-        filter(str_detect(AccessCode2, accesscode)) %>%
-        select(-AccessCode2)
+    }
+    if (length(accesscode) == 1) {
+      # if strings seperated by |
+      if (str_detect(accesscode, "\\|")) {
+        app.dat <- app.dat %>%
+          filter(str_detect(AccessCode2, accesscode)) %>%
+          select(-AccessCode2)
+      } # if not seperate strings seperated by | and not exact search
+      if (!str_detect(accesscode, "\\|") & !exact_search) {
+        app.dat <- app.dat %>%
+          filter(str_detect(AccessCode2, accesscode)) %>%
+          select(-AccessCode2)
+      } # if not seperate strings seperated by | and not exact search
+      if (!str_detect(accesscode, "\\|") & exact_search) {
+        app.dat <- app.dat %>%
+          filter(str_detect(AccessCode2, str_glue("\\b{accesscode}\\b"))) %>%
+          select(-AccessCode2)
+      }
+    }
+
   }
 
-  return(app.dat)
+  return(as_tibble(app.dat))
 
 }
 
