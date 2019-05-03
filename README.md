@@ -1,6 +1,15 @@
 openmindR
 ================
 
+**Overview**
+
+  - [openmindR Cleaning
+    Functions](https://github.com/openmindplatform/openmindR#openmindr-cleaning-functions)
+  - [openmindR Analysis
+    Functions](https://github.com/openmindplatform/openmindR#openmindR#openmindr-analysis-functions)
+  - [openmindR ggplot2
+    theme](https://github.com/openmindplatform/openmindR#openmindr-ggplot2-theme)
+
 Install package like this:
 
 ``` r
@@ -14,7 +23,22 @@ library(openmindR)
 library(dplyr)
 ```
 
-## OpenMind Cleaning Functions
+## openmindR Cleaning Functions
+
+The following functions are meant to turn AirTable (and GuidedTrack)
+data into a single clean file that can be analyzed. Along the way it
+parses the data, constructs measures, removes duplicates and optionally
+turns it into long format. The solid line is the suggested workflow for
+a complete dataset. The dashed lines are optional (if you don’t want to
+add GuidedTrack
+    data).
+
+  - [om\_filter\_data](https://github.com/openmindplatform/openmindR#om_filter_data)
+  - [om\_clean\_par](https://github.com/openmindplatform/openmindR#om_clean_par)
+  - [om\_rescale](https://github.com/openmindplatform/openmindR#om_rescale)
+  - [om\_construct\_measures](https://github.com/openmindplatform/openmindR#om_construct_measures)
+  - [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
+  - [remove\_dups](https://github.com/openmindplatform/openmindR#remove_dups)
 
 ![](images/openmindR%20workflow.png)
 
@@ -472,6 +496,8 @@ dat.ass %>%
     ## 10 Q1Pre          50 Pre   Q1           
     ## # ... with 760,310 more rows
 
+# openmindR Analysis Functions
+
 ## `om_summarize_comparisons`
 
 This is a higher-level function that uses both “bind\_questions” and
@@ -510,7 +536,7 @@ gathered_dat %>%
     ## # ... with 30 more rows, and 3 more variables: percentimproved <dbl>,
     ## #   Comparison <chr>, moderates <chr>
 
-## OpenMind ggplot2 theme
+## openmindR ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 

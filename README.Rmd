@@ -3,6 +3,12 @@ title: "openmindR"
 output: github_document
 ---
 
+**Overview**
+
++ [openmindR Cleaning Functions](https://github.com/openmindplatform/openmindR#openmindr-cleaning-functions)
++ [openmindR Analysis Functions](https://github.com/openmindplatform/openmindR#openmindR#openmindr-analysis-functions)
++ [openmindR ggplot2 theme](https://github.com/openmindplatform/openmindR#openmindr-ggplot2-theme)
+
 Install package like this:
 
 ```{r setup, eval=FALSE}
@@ -26,7 +32,16 @@ library(dplyr)
 
 
 
-## OpenMind Cleaning Functions
+## openmindR Cleaning Functions
+
+The following functions are meant to turn AirTable (and GuidedTrack) data into a single clean file that can be analyzed. Along the way it parses the data, constructs measures, removes duplicates and optionally turns it into long format. The solid line is the suggested workflow for a complete dataset. The dashed lines are optional (if you don't want to add GuidedTrack data).
+
++ [om_filter_data](https://github.com/openmindplatform/openmindR#om_filter_data)
++ [om_clean_par](https://github.com/openmindplatform/openmindR#om_clean_par)
++ [om_rescale](https://github.com/openmindplatform/openmindR#om_rescale)
++ [om_construct_measures](https://github.com/openmindplatform/openmindR#om_construct_measures)
++ [om_clean_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
++ [remove_dups](https://github.com/openmindplatform/openmindR#remove_dups)
 
 ![](images/openmindR workflow.png)
 
@@ -246,6 +261,8 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
+# openmindR Analysis Functions
+
 ## `om_summarize_comparisons`
 
 This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d using long-format Assessment data.
@@ -265,7 +282,7 @@ gathered_dat %>%
 ```
 
 
-## OpenMind ggplot2 theme
+## openmindR ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 
