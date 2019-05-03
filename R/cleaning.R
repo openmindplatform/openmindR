@@ -445,7 +445,14 @@ remove_dups <- function(cleaned_dat) {
     dplyr::group_by(OMID) %>%
     dplyr::slice(1) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))  %>%
+    openmindR::do_if(
+      is.numeric(cleaned_dat$AssessmentVersion),
+      ~{.x %>% dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))}
+    ) %>%
+    openmindR::do_if(
+      is.character(cleaned_dat$AssessmentVersion),
+      ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
+    ) %>%
     openmindR::coalesce_join(join = dplyr::left_join, cleaned_dat %>%
                     dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
                     dplyr::filter(OMID %in% dups)) %>%
