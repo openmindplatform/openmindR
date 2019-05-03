@@ -143,6 +143,22 @@ dat.par %>%
   om_clean_par(parse_feedback = T) 
 ```
 
+## `om_rescale`
+
+This function rescales variables from 0 to 1. 
+
+Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divide by 6. 
+
+**Should be run before any measures are constructed so that it is ensured they are all on the same scale.**
+
+
+```{r}
+dat.ass %>% 
+  om_rescale()
+```
+
+
+
 ## `om_construct_measures`
 
 This is a higher-level function that uses both `polar_measures` and `calc_ih` to constuct various measures.

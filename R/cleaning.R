@@ -138,6 +138,23 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
 }
 
 
+#' Rescale Variables
+#'
+#' This function rescales variables from 0 to 1. Q1 and Q2 is divided by 100 and Q3 - Q12 as well as C1 - C3 (divide by 6).
+#'
+#' @param .data Assessment data
+#' @export
+om_rescale <- function(.data) {
+  .data %>%
+    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), readr::parse_number) %>%
+    ## Make variables Q1 and Q2 range 0 to 1
+    ## ATTENTION.. Match Q1 and ONLY Q1 (Q2)!!!
+    dplyr::mutate_at(dplyr::vars(dplyr::matches("Q1P|Q1F|Q2P|Q2F")), function(x) x/100) %>%
+    ## Make variables Q3 to C3 range 0 to 1
+    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::range01_strings)), function(x) x/6)
+}
+
+
 #' Creates several measures of Political Orientation
 #'
 #' Creates the following measures of Political Orientation

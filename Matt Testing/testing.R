@@ -10,15 +10,7 @@ load("data/ins.RData")
 
 
 om_filter_data(dat.ass4,n_assessments=3,version=4)
-# ERROR: 
-#> om_filter_data(dat.ass4,n_assessments=3,version=4)
-#Error in app.dat %>% mutate(AssessmentsDone = as.numeric(AssessmentsDone)) %>%  : 
-#  could not find function "%>%"#
-# tidyverse / tidyr & dplyr are required
-
-library(tidyverse)
-om_filter_data(dat.ass4,n_assessments=3,version=4)
-# script works fine after loading tidyverse
+# script works fine without loading tidyverse anymore
 
 
 n1v4<-om_filter_data(dat.ass4,n_assessments=1,version=4)
@@ -44,25 +36,21 @@ n1rangev4<-om_filter_data(dat.ass4,n_assessments=c(1,2),version=4)
 #yes it can.
 
 # access codes
-n1v4a<-om_filter_data(dat.ass4,n_assessments=1,version=4,accesscode="EddySalemStateUniversityF18")
+n1v4a<-om_filter_data(dat.ass4,n_assessments=3
+                      ,version=4,accesscode="EddySalemStateUniversityF18",exact_search=F)
 #yes, good
 
 #multiple access codes?
-n1v4aplus<-om_filter_data(dat.ass4,n_assessments=1,version=4,accesscode=c("EddySalemStateUniversityF18","EddySalemStateUniversityF18t"))
-# this generates a smaller data frame than when i request just1 access code, but it should be bigger
-# because 2 classes are bigger than 1
+n1v4aplus<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode=c("EddySalemStateUniversityF18","EddySalemStateUniversityF18t","EddySalemStateUniversityF18s"),
+                          exact_search=T)
+# works... but should be mindful and maybe update help file to make clear that "EddySalemStateUniversityF18" includes ALL Eddy codes with other letters
+# appended after the F18 IF exact_search = F
 
-n1v4apluss<-om_filter_data(dat.ass4,n_assessments=1,version=4,accesscode=c("EddySalemStateUniversityF18","EddySalemStateUniversityF18s"))
-# it looks like it is taking the last access code in the list and dropping all data from earlier access codes;
-# this needs to be fixed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 # can it filter down to all access codes by pattern matching?
-n1v4<-om_filter_data(dat.ass4,n_assessments=1,version=4,accesscode=grep("Salem"))
-# ***************************************************************
-#no... this would be a good feature to add **********************
-# ***************************************************************
+n1v4<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode="CLP",exact_search = F)
+# yup!
 
 #v5
 n1v5<-om_filter_data(dat.ass5,n_assessments=1,version=5)
@@ -76,7 +64,7 @@ n3v5<-om_filter_data(dat.ass5,n_assessments=3,version=5)
 nNULLv5<-om_filter_data(dat.ass5,version=5)
 
 #can it accept ranges?
-n1plusv5<-om_filter_data(dat.ass4,n_assessments>1,version=5)
+#n1plusv5<-om_filter_data(dat.ass4,n_assessments>1,version=5)
 # ERROR: Does not like >
 #Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) : 
 #  object 'n_assessments' not found
@@ -113,18 +101,11 @@ calc_correct(as.numeric(dat.par$StepsComplete),as.numeric(dat.par$StepScores),as
 #########################################
 #########################################
 
-library(magrittr)
-library(tidyverse)
-library(glue)
-# om_clean_par
-clean_par<-om_clean_par(dat.par)
-#> om_clean_par(dat.par)
-#ERROR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-#Error in extract2(., 1) : could not find function "extract2" 
-# actually now works... I think...
 
-table(clean_par$StepTimes1)
+clean_par<-om_clean_par(dat.par)
+#> works well. slow, but that's to be expected given that this is the biggest data table we work with
+# perhaps we should add in some arguments to filter it down
+# most likely suspects: AccessCode and country
 
 
 #########################################
@@ -133,9 +114,42 @@ table(clean_par$StepTimes1)
 
 #clean ppol
 ?om_clean_ppol()
-om_clean_ppol(dat.ass4)
-#Error in is_string(match) : object 'var_strings' not found
-om_clean_ppol(n2v4)
-# Error in is_string(match) : object 'var_strings' not found
-require(tidyverse)
-om_clean_ppol(n2v4)
+n3v4cleanppol<-om_clean_ppol(n3v4)
+table(n2v4cleanppol$ppol_num)
+table(n2v4cleanppol$ppol_raw)
+table(n2v4cleanppol$ppol)
+table(n2v4cleanppol$ppol_cat)
+
+
+#########################################
+#########################################
+#########################################
+
+#construct measures
+?om_construct_measures
+om_construct_measures(n3v4cleanppol)
+# this does not work; requires the data frame generated from om_clean_ppol
+
+n3v4constructed<-om_construct_measures(n3v4cleanppol)
+summary(n2v4constructed)
+# this outputs the raw numbers from assessment. 
+# we should rescale all variables to range from 0 to 1 to ease interpretation and visualization 
+# so, let's add (x/(max possible response for individual item)) to function 
+
+
+#########################################
+#########################################
+#########################################
+
+#remove dups
+?remove_dups
+n3v4constructedremdups<-remove_dups(n3v4constructed)
+# removed 0 dups
+
+?om_gather
+n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
+
+
+
+?om_summarize_comparisons()
+om_summarize_comparisons(n3v4long)

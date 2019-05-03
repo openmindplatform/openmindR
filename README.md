@@ -4,7 +4,7 @@ openmindR
 Install package like this:
 
 ``` r
-remotes::install_github("openmindplatform/openmindR")
+devtools::install_github("openmindplatform/openmindR")
 ```
 
 Load package(s):
@@ -168,11 +168,21 @@ Cleans up ParticipantProgress data and creates several measures:
 
   - **FeedbackAnswers:** Q1 to Q5 for each individual step
 
+Takes the following arguments:
+
+  - **dat.par:** ParticipantProgress data from AirTable
+
+  - **parse\_feedback:** Parse Feedback answers (Q1 to Q5 for Step 1 to
+    5). Default is `FALSE`.
+
+  - **…** Arguments for select to get additional variables from
+    ParticipantProgress
+
 <!-- end list -->
 
 ``` r
 dat.par %>% 
-  om_clean_par() 
+  om_clean_par(parse_feedback = T) 
 ```
 
     ## # A tibble: 16,976 x 36

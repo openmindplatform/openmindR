@@ -1,47 +1,74 @@
-#' This function extracts all data that meet the characteristics specified by these arguments.
+#' This function filters down Assessment data
+#'
+#' You can filter Assessment data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode}
+#'
+#' Want to match multiple specific Access Codes? Then just specify a vector: \code{c("EddySalemStateUniversityF18", "EddySalemStateUniversityF18k")}.
+#'
+#' If you want multiple "fuzzy" searches for an AccessCode you would use the argument \code{exact_search = F} (the default) and use \code{"Salem|NYU"} which will give you all Access Codes that include Salem and and NYU (the bar indicates separate searches).
+#'
+#' Finally, if you want just one specific Access Code then you'd use \code{"EddySalemStateUniversityF18"} with \code{exact_search = T}
 #'
 #'
 #' @param app.dat Assessment data from AirTable
-#' @param n_assessments {AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
-#' @param version {AssessmentVersion} Filter down to what asssesment version?
-#' @param accesscode {AccessCode} Filter down to 1 specific AccessCode. Though, future version may allow selection of lists of AccessCodes
+#' @param n_assessments \code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
+#' @param version \code{AssessmentVersion} Filter down to what asssesment version. This argument either takes a single number or vector.
+#' @param accesscode \code{AccessCode} Filter down to (several) AccessCode(s)
+#' @param exact_search \code{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.
 #' @export
 om_filter_data <- function(app.dat, n_assessments = NULL,
-                       version = NULL, accesscode = NULL) {
+                       version = NULL, accesscode = NULL, exact_search = F) {
 
   if (!is.null(n_assessments)) {
     app.dat <- app.dat %>%
-      mutate(AssessmentsDone = as.numeric(AssessmentsDone)) %>%
-      filter(AssessmentsDone %in% n_assessments)
+      dplyr::mutate(AssessmentsDone = base::as.numeric(AssessmentsDone)) %>%
+      dplyr::filter(AssessmentsDone %in% n_assessments)
   }
   if (!is.null(version)) {
     app.dat <- app.dat %>%
-      # mutate(AssessmentVersion = as.numeric(AssessmentVersion)) %>%
-      filter(AssessmentVersion %in% version)
+      # dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion)) %>%
+      dplyr::filter(AssessmentVersion %in% version)
   }
   if (!is.null(accesscode)) {
 
     ## turn AccessCode and search string to lower
-    app.dat <- app.dat %>% mutate(AccessCode2 = str_to_lower(AccessCode))
-    accesscode <- str_to_lower(accesscode)
+    app.dat <- app.dat %>% dplyr::mutate(AccessCode2 = stringr::str_to_lower(AccessCode))
+    accesscode <- stringr::str_to_lower(accesscode)
 
     ## if vector
     if (length(accesscode) >= 2) {
       app.dat <- app.dat %>%
-        filter(AccessCode2 %in% accesscode) %>%
-        select(-AccessCode2)
+        dplyr::filter(AccessCode2 %in% accesscode) %>%
+        dplyr::select(-AccessCode2)
     ## if single string
-    } else
-      app.dat <- app.dat %>%
-        filter(str_detect(AccessCode2, accesscode)) %>%
-        select(-AccessCode2)
+    }
+    if (length(accesscode) == 1) {
+      # if strings seperated by |
+      if (stringr::str_detect(accesscode, "\\|")) {
+        app.dat <- app.dat %>%
+          dplyr::filter(stringr::str_detect(AccessCode2, accesscode)) %>%
+          dplyr::select(-AccessCode2)
+      } # if not seperate strings seperated by | and not exact search
+      if (!stringr::str_detect(accesscode, "\\|") & !exact_search) {
+        app.dat <- app.dat %>%
+          dplyr::filter(stringr::str_detect(AccessCode2, accesscode)) %>%
+          dplyr::select(-AccessCode2)
+      } # if not seperate strings seperated by | and not exact search
+      if (!stringr::str_detect(accesscode, "\\|") & exact_search) {
+        app.dat <- app.dat %>%
+          dplyr::filter(stringr::str_detect(AccessCode2, stringr::str_glue("\\b{accesscode}\\b"))) %>%
+          dplyr::select(-AccessCode2)
+      }
+    }
+
   }
 
-  return(app.dat)
+  return(dplyr::as_tibble(app.dat))
 
 }
 
 #' This calculates the correct score for each step
+#'
+#' This is just an internal helper function.
 #'
 #' @param StepScomplete (0/1) Was Step completed?
 #' @param Stepscores What was the score on the step?
@@ -68,34 +95,35 @@ om_clean_par <- function(dat.par, ...) {
 
   dat.par %>%
     ## seperating StepsComplete brackets
-    separate(StepsComplete, into = paste("StepsComplete", 1:5, sep = ""), remove = F) %>%
+    tidyr::separate(StepsComplete, into = paste("StepsComplete", 1:5, sep = ""), remove = F) %>%
     ## seperating StepsScores brackets
-    separate(StepScores, into = paste("StepsScores", 1:5, sep = "")) %>%
+    tidyr::separate(StepScores, into = paste("StepsScores", 1:5, sep = "")) %>%
     ## seperating StepsQuestionTotals brackets
-    separate(StepQuestionTotals, into = paste("StepQuestionTotals", 1:5, sep = "")) %>%
+    tidyr::separate(StepQuestionTotals, into = paste("StepQuestionTotals", 1:5, sep = "")) %>%
     ## seperating StepTines brackets
-    separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
+    tidyr::separate(StepTimes, into = paste("StepTimes", 1:5, sep = ""),
              sep = ",", remove = F) %>%
     ## Clean up seperated vars
-    mutate_at(vars(StepTimes1:StepTimes5), ~str_remove_all(.x, "[^[:digit:]. ]") %>% parse_number) %>%
-    mutate_at(vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), ~stringr::str_remove_all(.x, "[^[:digit:]. ]")) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), readr::parse_number) %>%
+    dplyr::mutate_at(dplyr::vars(StepTimes1:StepTimes5), ~ifelse(.x == 0, NA, .x)) %>%
     ## Making columns numeric where they need to be
-    mutate_at(vars(StepsComplete1:StepQuestionTotals5, AppRating), as.numeric)  %>%
+    dplyr::mutate_at(dplyr::vars(StepsComplete1:StepQuestionTotals5, AppRating), readr::parse_number)  %>%
     # ## Steps Complete
     ## Now calculating scores
     ## percent correct for each step
-    mutate(StepCorrect1 = calc_correct(StepsComplete1, StepsScores1, StepQuestionTotals1)) %>%
-    mutate(StepCorrect2 = calc_correct(StepsComplete2, StepsScores2, StepQuestionTotals2)) %>%
-    mutate(StepCorrect3 = calc_correct(StepsComplete3, StepsScores3, StepQuestionTotals3)) %>%
-    mutate(StepCorrect4 = calc_correct(StepsComplete4, StepsScores4, StepQuestionTotals4)) %>%
-    mutate(StepCorrect5 = calc_correct(StepsComplete5, StepsScores5, StepQuestionTotals5)) %>%
+    dplyr::mutate(StepCorrect1 = calc_correct(StepsComplete1, StepsScores1, StepQuestionTotals1)) %>%
+    dplyr::mutate(StepCorrect2 = calc_correct(StepsComplete2, StepsScores2, StepQuestionTotals2)) %>%
+    dplyr::mutate(StepCorrect3 = calc_correct(StepsComplete3, StepsScores3, StepQuestionTotals3)) %>%
+    dplyr::mutate(StepCorrect4 = calc_correct(StepsComplete4, StepsScores4, StepQuestionTotals4)) %>%
+    dplyr::mutate(StepCorrect5 = calc_correct(StepsComplete5, StepsScores5, StepQuestionTotals5)) %>%
     ## Parse Feedback Answers
-    mutate(data = FeedbackAnswers %>%
-             map(~parse_feedback_at(.x))) %>%
-    unnest(data)  %>%
+    dplyr::mutate(data = FeedbackAnswers %>%
+             purrr::map(~parse_feedback_at(.x))) %>%
+    tidyr::unnest(data)  %>%
     ## Make Step variables to characters (for merging)
-    mutate_at(vars(Step1:Step5_Q5), as.character) %>%
-    select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
+    dplyr::mutate_at(dplyr::vars(Step1:Step5_Q5), as.character) %>%
+    dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
            FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, at_date, ...)
 }
 
@@ -120,23 +148,23 @@ om_clean_ppol <- function(app.dat) {
   app.dat %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
-    mutate_at(vars(matches(var_strings)), as.numeric) %>%
+    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), as.numeric) %>%
     ## construct raw ppol variable
-    mutate(ppol_raw = D4) %>%
+    dplyr::mutate(ppol_raw = D4) %>%
     ## fix the names of categories
-    mutate(ppol_raw = case_when(
-      str_detect(ppol_raw, "Moderate") ~ "Moderate/Middle-of-the-road",
-      str_detect(ppol_raw, "Slightly progressive") ~ "Slightly Progressive/left",
-      str_detect(ppol_raw, "not political") ~ "Don't know/Not political",
-      str_detect(ppol_raw, "Very progressive") ~ "Very Progressive/left",
-      str_detect(ppol_raw, "Slightly conservative") ~ "Slightly Conservative/right",
-      str_detect(ppol_raw, "classical liberal") ~ "Libertarian/Classical liberal",
-      str_detect(ppol_raw, "Very conservative") ~ "Very Conservative/right",
-      str_detect(ppol_raw, "progressive") ~ "Progressive/left",
+    dplyr::mutate(ppol_raw = dplyr::case_when(
+      stringr::str_detect(ppol_raw, "Moderate") ~ "Moderate/Middle-of-the-road",
+      stringr::str_detect(ppol_raw, "Slightly progressive") ~ "Slightly Progressive/left",
+      stringr::str_detect(ppol_raw, "not political") ~ "Don't know/Not political",
+      stringr::str_detect(ppol_raw, "Very progressive") ~ "Very Progressive/left",
+      stringr::str_detect(ppol_raw, "Slightly conservative") ~ "Slightly Conservative/right",
+      stringr::str_detect(ppol_raw, "classical liberal") ~ "Libertarian/Classical liberal",
+      stringr::str_detect(ppol_raw, "Very conservative") ~ "Very Conservative/right",
+      stringr::str_detect(ppol_raw, "progressive") ~ "Progressive/left",
       T ~ ppol_raw
     )) %>%
     #reorder political orientation into sensible continuum
-    mutate(ppol = factor(ppol_raw, levels = c("Very Progressive/left",
+    dplyr::mutate(ppol = factor(ppol_raw, levels = c("Very Progressive/left",
                                               "Progressive/left",
                                               "Slightly Progressive/left",
                                               "Moderate/Middle-of-the-road",
@@ -144,14 +172,14 @@ om_clean_ppol <- function(app.dat) {
                                               "Conservative/right",
                                               "Very Conservative/right"))) %>%
     ## clean politics variable / make it numeric / only use valid cases
-    mutate(ppol_num = as.numeric(ppol)) %>%
-    # select(ppol, ppol_num, D4) %>%
-    mutate(ppol_cat = case_when(
+    dplyr::mutate(ppol_num = as.numeric(ppol)) %>%
+    # dplyr::select(ppol, ppol_num, D4) %>%
+    dplyr::mutate(ppol_cat = dplyr::case_when(
       ppol_num %in% c(1:3) ~ "Progressives",
       ppol_num %in% c(5:7) ~ "Conservatives",
       T ~ NA_character_
     )) %>%
-    mutate(ppol_cat = fct_relevel(ppol_cat, c("Progressives",
+    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
                                               "Conservatives")))
   # TODO: For future make more ppol variants
 }
@@ -175,35 +203,35 @@ om_clean_ppol <- function(app.dat) {
 polar_measures <- function(final_dat, Q1, Q2) {
 
   ## if ppol_cat is not found then throw error
-  if (not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
+  if (magrittr::not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
     stop("Input data is missing column `ppol_cat`. Please make sure to run om_clean_ppol before you run om_construct_measures.\n")
   }
 
   ## check which wave
-  wave <- case_when(
-    str_detect(lazyeval::expr_find(Q1), "Pre") ~ "Pre",
-    str_detect(lazyeval::expr_find(Q1), "Post") ~ "Post",
-    str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
+  wave <- dplyr::case_when(
+    stringr::str_detect(lazyeval::expr_find(Q1), "Pre") ~ "Pre",
+    stringr::str_detect(lazyeval::expr_find(Q1), "Post") ~ "Post",
+    stringr::str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
   )
 
   ## lazy evaluation
-  Q1 <- enquo(Q1)
-  Q2 <- enquo(Q2)
+  Q1 <- dplyr::enquo(Q1)
+  Q2 <- dplyr::enquo(Q2)
 
 
   final_dat <- final_dat %>%
     # make sure vars are numeric
-    mutate_at(vars(!!Q1, !!Q2), as.numeric) %>%
+    dplyr::mutate_at(dplyr::vars(!!Q1, !!Q2), as.numeric) %>%
     # compute affective polarization
-    mutate(Q14 = abs(!!Q1 - !!Q2)) %>%
+    dplyr::mutate(Q14 = abs(!!Q1 - !!Q2)) %>%
     # compute liking for ingroup vs. disliking for outgroup
     ## my ingroup
-    mutate(Q15 = ifelse(ppol_cat == "Progressives", !!Q1, !!Q2)) %>%
+    dplyr::mutate(Q15 = ifelse(ppol_cat == "Progressives", !!Q1, !!Q2)) %>%
     # my outgroup
-    mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
+    dplyr::mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
     # compute ingroup v outgroup affective polarization
-    mutate(Q17 = abs(Q15 - Q16)) %>%
-    rename_at(vars(Q14:Q17), ~paste0(.x, wave))
+    dplyr::mutate(Q17 = abs(Q15 - Q16)) %>%
+    dplyr::rename_at(dplyr::vars(Q14:Q17), ~paste0(.x, wave))
 
   return(final_dat)
 }
@@ -224,17 +252,17 @@ polar_measures <- function(final_dat, Q1, Q2) {
 calc_ih <- function(final_dat, wave) {
 
   ## if AssessmentVersion is not found then throw error
-  if (not(colnames(final_dat) %in% "AssessmentVersion" %>% any)) {
+  if (magrittr::not(colnames(final_dat) %in% "AssessmentVersion" %>% any)) {
     stop("Input data is missing column `AssessmentVersion`. Please make sure to add this column before you run om_construct_measures.\n")
   }
 
   ## make AssessmentVersion numeric
-  final_dat <- final_dat %>% mutate(AssessmentVersion = as.numeric(AssessmentVersion))
+  final_dat <- final_dat %>% dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))
 
   ## intellectual humility for pre
   if (wave == "Pre") {
     final_dat <- final_dat %>%
-      mutate(Q18Pre = case_when(
+      dplyr::mutate(Q18Pre = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3Pre + Q6Pre + Q7Pre + Q8Pre)/4,
         AssessmentVersion >= 5 ~ (Q5Pre + Q7Pre + Q8Pre + Q9Pre)/4,
         T ~ NA_real_
@@ -244,7 +272,7 @@ calc_ih <- function(final_dat, wave) {
   ## intellectual humility for post
   if (wave == "Post") {
     final_dat <- final_dat %>%
-      mutate(Q18Post = case_when(
+      dplyr::mutate(Q18Post = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3Post + Q6Post + Q7Post + Q8Post)/4,
         AssessmentVersion >= 5 ~ (Q5Post + Q7Post + Q8Post + Q9Post)/4,
         T ~ NA_real_
@@ -254,7 +282,7 @@ calc_ih <- function(final_dat, wave) {
   ## intellectual humility for followup
   if (wave == "FollowUp") {
     final_dat <- final_dat %>%
-      mutate(Q18FollowUp = case_when(
+      dplyr::mutate(Q18FollowUp = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3FollowUp + Q6FollowUp + Q7FollowUp + Q8FollowUp)/4,
         AssessmentVersion >= 5 ~ (Q5FollowUp + Q7FollowUp + Q8FollowUp + Q9FollowUp)/4,
         T ~ NA_real_
@@ -291,34 +319,34 @@ om_construct_measures <- function(x){
 
   cols <- colnames(x) %>% paste0(collapse = "|")
 
-  # app.dat %>% select(AssessmentVersion)
+  # app.dat %>% dplyr::select(AssessmentVersion)
 
 
   ## If Pre vars are found
-  if (str_detect(cols, "Pre")) {
+  if (stringr::str_detect(cols, "Pre")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Pre, Q2Pre) %>%
+      openmindR::polar_measures(Q1Pre, Q2Pre) %>%
       #compute intellectual humility factor score
-      calc_ih("Pre")
+      openmindR::calc_ih("Pre")
   }
 
   ## If Post vars are found
-  if (str_detect(cols, "Post")) {
+  if (stringr::str_detect(cols, "Post")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Post, Q2Post) %>%
+      openmindR::polar_measures(Q1Post, Q2Post) %>%
       #compute intellectual humility factor score
-      calc_ih("Post")
+      openmindR::calc_ih("Post")
   }
 
   ## If FollowUp vars are found
-  if (str_detect(cols, "FollowUp")) {
+  if (stringr::str_detect(cols, "FollowUp")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1FollowUp, Q2FollowUp)  %>%
+      openmindR::polar_measures(Q1FollowUp, Q2FollowUp)  %>%
       #compute intellectual humility factor score
-      calc_ih("FollowUp")
+      openmindR::calc_ih("FollowUp")
   }
 
   return(final_dat)
@@ -336,29 +364,29 @@ remove_dups <- function(cleaned_dat) {
 
   ## pull duplicated OMIDs
   cleaned_dat %>%
-    filter(duplicated(OMID)) %>%
-    pull(OMID) -> dups
+    dplyr::filter(duplicated(OMID)) %>%
+    dplyr::pull(OMID) -> dups
 
 
   ## pull OMIDs that are most complete + latest entries
   removed_airtable_dups <-  cleaned_dat %>%
-    mutate(createdTime = as_datetime(createdTime)) %>%
-    filter(OMID %in% dups) %>%
-    mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
-    mutate(count_na = rowSums(is.na(.))) %>%
-    arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
-    select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, everything()) %>%
-    group_by(OMID) %>%
-    slice(1)
+    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
+    dplyr::filter(OMID %in% dups) %>%
+    dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
+    dplyr::mutate(count_na = rowSums(is.na(.))) %>%
+    dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
+    dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, dplyr::everything()) %>%
+    dplyr::group_by(OMID) %>%
+    dplyr::slice(1)
 
-  message(str_glue("Removing {round(length(dups)/2)} duplicates...\n"))
+  message(stringr::str_glue("Removing {round(length(dups)/2)} duplicates...\n"))
 
   ## remove OMIDs that we don't want (older + less complete)
   cleaned_dat %>%
-    filter(!(OMID %in% dups)) %>%
-    mutate(createdTime = as_datetime(createdTime)) %>%
-    mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
-    bind_rows(removed_airtable_dups)
+    dplyr::filter(!(OMID %in% dups)) %>%
+    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
+    dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
+    dplyr::bind_rows(removed_airtable_dups)
 }
 
 #' Coalescing joints
@@ -380,7 +408,7 @@ coalesce_join <- function(x, y,
 
   joined <- join(x, y, by = by, suffix = suffix, ...)
   # names of desired output
-  cols <- union(names(x), names(y))
+  cols <- dplyr::union(names(x), names(y))
 
   to_coalesce <- names(joined)[!names(joined) %in% cols]
   suffix_used <- suffix[ifelse(endsWith(to_coalesce, suffix[1]), 1, 2)]
@@ -417,15 +445,15 @@ coalesce_join <- function(x, y,
 om_gather <- function(.data, which_strings) {
 
   gathered_dat <- .data %>%
-    gather(Question, Response, matches(which_strings)) %>%
+    tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
     ## filter out pre-post and follow as a variable "Type"
-    mutate(Type = case_when(
-      str_detect(Question, "Pre") ~ "Pre",
-      str_detect(Question, "Post") ~ "Post",
-      str_detect(Question, "FollowUp") ~ "FollowUp"
+    dplyr::mutate(Type = dplyr::case_when(
+      stringr::str_detect(Question, "Pre") ~ "Pre",
+      stringr::str_detect(Question, "Post") ~ "Post",
+      stringr::str_detect(Question, "FollowUp") ~ "FollowUp"
     ))  %>%
-    mutate(variable_code = str_remove(Question, Type)) %>%
-    mutate(Response = as.numeric(Response))
+    dplyr::mutate(variable_code = stringr::str_remove(Question, Type)) %>%
+    dplyr::mutate(Response = as.numeric(Response))
 
   return(gathered_dat)
 }
@@ -452,11 +480,11 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
 db_append <- function(path, tbl, data) {
   con <- dbConnect(RSQLite::SQLite(), path)
 
-  if(!is.null(dbListTables(con))) {
-    dbWriteTable(con, tbl, data, append = T)
+  if(!is.null(DBI::dbListTables(con))) {
+    DBI::dbWriteTable(con, tbl, data, append = T)
   } else {
-    dbWriteTable(con, tbl, data)
+    DBI::dbWriteTable(con, tbl, data)
   }
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 
 }
