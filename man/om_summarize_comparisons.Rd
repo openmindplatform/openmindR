@@ -4,10 +4,13 @@
 \alias{om_summarize_comparisons}
 \title{Conduct t-tests and calculate Cohen's d}
 \usage{
-om_summarize_comparisons(gathered_dat)
+om_summarize_comparisons(gathered_dat, compare = c("PrePost",
+  "PreFollow"))
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}
+
+\item{compare}{With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons.}
 }
 \description{
 This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
