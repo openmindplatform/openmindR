@@ -428,7 +428,7 @@ coalesce_join <- function(x, y,
 
   dplyr::bind_cols(joined, coalesced)[cols]
 }
-openmindR::q_c_strings
+
 
 #' Gather OpenMind data
 #'
