@@ -22,7 +22,6 @@ Load package(s):
 library(openmindR)
 library(dplyr)
 
-
 ```
 
 

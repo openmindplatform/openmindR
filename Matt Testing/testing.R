@@ -153,10 +153,3 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 
 ?om_summarize_comparisons()
 om_summarize_comparisons(n3v4long)
-
-
-## Fabios fact-finding mission
-
-n3v4 %>% View
-
-n3v4long
