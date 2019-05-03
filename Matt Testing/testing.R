@@ -1,6 +1,8 @@
 devtools::install_github("openmindplatform/openmindR")
 library(openmindR)
 
+setwd("C:/Users/Matt/Dropbox/OM Team/Research/Projects/Current Projects/openmindR/Matt Testing/")
+
 #Read in data
 load("data/ass4.RData")
 load("data/ass5.RData")

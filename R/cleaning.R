@@ -152,8 +152,20 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
 #' @param .data Assessment data
 #' @export
 om_rescale <- function(.data) {
+
+  # .data <- cleaned_dat
+
+  vars_numeric <- .data  %>%
+    dplyr::select(dplyr::matches(openmindR::var_strings)) %>%
+    dplyr::summarize_all(is.numeric) %>%
+    .[1,] %>% unlist() %>% unname() %>% all()
+
+
   .data %>%
-    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), ~ifelse(is.numeric(.x), .x, readr::parse_number(.x))) %>%
+    openmindR::do_if(
+      !vars_numeric,
+      dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), readr::parse_number)
+    ) %>%
     ## Make variables Q1 and Q2 range 0 to 1
     ## ATTENTION.. Match Q1 and ONLY Q1 (Q2)!!!
     dplyr::mutate_at(dplyr::vars(dplyr::matches("Q1P|Q1F|Q2P|Q2F")), function(x) x/100) %>%
@@ -429,7 +441,12 @@ remove_dups <- function(cleaned_dat) {
     dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
     dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, dplyr::everything()) %>%
     dplyr::group_by(OMID) %>%
-    dplyr::slice(1)
+    dplyr::slice(1) %>%
+    dplyr::ungroup() %>%
+    coalesce_join(join = left_join, cleaned_dat %>%
+                    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
+                    dplyr::filter(OMID %in% dups)) %>%
+    select(Q1Post)
 
   message(stringr::str_glue("Removing {round(length(dups)/2)} duplicates...\n"))
 

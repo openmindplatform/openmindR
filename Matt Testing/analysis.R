@@ -234,4 +234,3 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
 
   return(final_compared)
 }
-

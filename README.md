@@ -48,7 +48,7 @@ cleaned_dat <-
   ## Participant Progress Data
   dat.par %>% 
   ## calculating step scores and more
-  om_clean_par() %>% 
+  om_clean_par(parse_feedback = T) %>% 
   ## Assessment Data
   left_join(app.dat) %>%
   ## adding actual time
@@ -303,16 +303,16 @@ dat.ass %>%
     ## # A tibble: 16,896 x 78
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
-    ##  1 rec0~ 4616~ GottlickU~ 4                2                0.4   0.6 
-    ##  2 rec0~ 4001~ PotterYCI~ 4                1               NA    NA   
-    ##  3 rec0~ 3465~ LittleUGA~ 4                2                0.3   0.36
-    ##  4 rec0~ 8406~ Jayawickr~ 4                2                0.5   0.5 
-    ##  5 rec0~ 8721~ BurmanCha~ 4                2               NA    NA   
-    ##  6 rec0~ 7194~ Jayawickr~ 4                2                0.8   0.45
-    ##  7 rec0~ 5743~ ZipayUOre~ 4                2                0.78  0.34
-    ##  8 rec0~ 5717~ TalpashWi~ 4                3                0.56  0.54
-    ##  9 rec0~ 5370~ Individua~ 4                2                0.5   0.37
-    ## 10 rec0~ 6459~ BursonInd~ 4                2                0.5   0.5 
+    ##  1 rec0~ 4616~ GottlickU~ 4                2                 0.4   0.6
+    ##  2 rec0~ 4001~ PotterYCI~ 4                1                 0.4   0.6
+    ##  3 rec0~ 3465~ LittleUGA~ 4                2                 0.4   0.6
+    ##  4 rec0~ 8406~ Jayawickr~ 4                2                 0.4   0.6
+    ##  5 rec0~ 8721~ BurmanCha~ 4                2                 0.4   0.6
+    ##  6 rec0~ 7194~ Jayawickr~ 4                2                 0.4   0.6
+    ##  7 rec0~ 5743~ ZipayUOre~ 4                2                 0.4   0.6
+    ##  8 rec0~ 5717~ TalpashWi~ 4                3                 0.4   0.6
+    ##  9 rec0~ 5370~ Individua~ 4                2                 0.4   0.6
+    ## 10 rec0~ 6459~ BursonInd~ 4                2                 0.4   0.6
     ## # ... with 16,886 more rows, and 71 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
