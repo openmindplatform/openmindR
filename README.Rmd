@@ -149,7 +149,7 @@ This function rescales variables from 0 to 1.
 
 Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divide by 6. 
 
-**Should be run before any measures are constructed so that it is ensured they are all on the same scale.**
+**Should be run before any measures are constructed so that they are all on the same scale.**
 
 
 ```{r}
