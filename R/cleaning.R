@@ -153,7 +153,7 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
 #' @export
 om_rescale <- function(.data) {
   .data %>%
-    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), readr::parse_number) %>%
+    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), ~ifelse(is.numeric(.x), .x, readr::parse_number(.x))) %>%
     ## Make variables Q1 and Q2 range 0 to 1
     ## ATTENTION.. Match Q1 and ONLY Q1 (Q2)!!!
     dplyr::mutate_at(dplyr::vars(dplyr::matches("Q1P|Q1F|Q2P|Q2F")), function(x) x/100) %>%

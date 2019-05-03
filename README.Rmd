@@ -51,7 +51,7 @@ cleaned_dat <-
   ## Participant Progress Data
   dat.par %>% 
   ## calculating step scores and more
-  om_clean_par() %>% 
+  om_clean_par(parse_feedback = T) %>% 
   ## Assessment Data
   left_join(app.dat) %>%
   ## adding actual time
