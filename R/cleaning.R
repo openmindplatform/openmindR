@@ -1,6 +1,6 @@
-#' This function filters down Assessment data
+#' This function filters down Assessment (or ParticipantProgress) data
 #'
-#' You can filter Assessment data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode}
+#' You can filter data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode} (ParticipantProgress data can only be filtered by \code{AccessCode})
 #'
 #' Want to match multiple specific Access Codes? Then just specify a vector: \code{c("EddySalemStateUniversityF18", "EddySalemStateUniversityF18k")}.
 #'
@@ -89,11 +89,12 @@ calc_correct <- function(StepsComplete, StepsScores, StepQuestionTotals) {
 #' }
 #'
 #' @param dat.par ParticipantProgress data from AirTable
+#' @param parse_feedback Parse Feedback answers (Q1 to Q5 for Step 1 to 5). Default is \code{FALSE}.
 #' @param ... Arguments for select to get more from ParticipantProgress
 #' @export
-om_clean_par <- function(dat.par, ...) {
+om_clean_par <- function(dat.par, parse_feedback = F, ...) {
 
-  dat.par %>%
+  final_dat <- dat.par %>%
     ## seperating StepsComplete brackets
     tidyr::separate(StepsComplete, into = paste("StepsComplete", 1:5, sep = ""), remove = F) %>%
     ## seperating StepsScores brackets
@@ -117,14 +118,22 @@ om_clean_par <- function(dat.par, ...) {
     dplyr::mutate(StepCorrect3 = calc_correct(StepsComplete3, StepsScores3, StepQuestionTotals3)) %>%
     dplyr::mutate(StepCorrect4 = calc_correct(StepsComplete4, StepsScores4, StepQuestionTotals4)) %>%
     dplyr::mutate(StepCorrect5 = calc_correct(StepsComplete5, StepsScores5, StepQuestionTotals5)) %>%
-    ## Parse Feedback Answers
-    dplyr::mutate(data = FeedbackAnswers %>%
-             purrr::map(~parse_feedback_at(.x))) %>%
-    tidyr::unnest(data)  %>%
     ## Make Step variables to characters (for merging)
     dplyr::mutate_at(dplyr::vars(Step1:Step5_Q5), as.character) %>%
-    dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
+    dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5,
            FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, at_date, ...)
+
+  if (parse_feedback) {
+    ## Parse Feedback Answers
+    final_dat <- dplyr::mutate(data = FeedbackAnswers %>%
+                                 purrr::map(~parse_feedback_at(.x))) %>%
+      tidyr::unnest(data) %>%
+      dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
+                    FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, at_date, ...)
+  }
+
+  return(final_dat)
+
 }
 
 

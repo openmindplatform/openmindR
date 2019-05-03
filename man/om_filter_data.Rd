@@ -2,7 +2,7 @@
 % Please edit documentation in R/cleaning.R
 \name{om_filter_data}
 \alias{om_filter_data}
-\title{This function filters down Assessment data}
+\title{This function filters down Assessment (or ParticipantProgress) data}
 \usage{
 om_filter_data(app.dat, n_assessments = NULL, version = NULL,
   accesscode = NULL, exact_search = F)
@@ -19,7 +19,7 @@ om_filter_data(app.dat, n_assessments = NULL, version = NULL,
 \item{exact_search}{\code{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.}
 }
 \description{
-You can filter Assessment data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode}
+You can filter data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode} (ParticipantProgress data can only be filtered by \code{AccessCode})
 }
 \details{
 Want to match multiple specific Access Codes? Then just specify a vector: \code{c("EddySalemStateUniversityF18", "EddySalemStateUniversityF18k")}.

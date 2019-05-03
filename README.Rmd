@@ -6,7 +6,7 @@ output: github_document
 Install package like this:
 
 ```{r setup, eval=FALSE}
-remotes::install_github("openmindplatform/openmindR")
+devtools::install_github("openmindplatform/openmindR")
 ```
 
 ```{r, echo=F}

@@ -4,10 +4,12 @@
 \alias{om_clean_par}
 \title{Performs cleaning on ParticipantProgress data from AirTable}
 \usage{
-om_clean_par(dat.par, ...)
+om_clean_par(dat.par, parse_feedback = F, ...)
 }
 \arguments{
 \item{dat.par}{ParticipantProgress data from AirTable}
+
+\item{parse_feedback}{Parse Feedback answers (Q1 to Q5 for Step 1 to 5). Default is \code{FALSE}.}
 
 \item{...}{Arguments for select to get more from ParticipantProgress}
 }
