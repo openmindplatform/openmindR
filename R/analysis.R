@@ -61,9 +61,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 #' @export
 bind_questions <- function(.data, ...) {
 
-  # .data <- compare_dat_prepost
-
-  ## this function is necessary because some variables are coded in different direction
+  # .data <- compare_dat_prefollow
 
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17

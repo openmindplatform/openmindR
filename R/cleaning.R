@@ -343,6 +343,10 @@ om_construct_measures <- function(x){
 
   # cols <- colnames(app.dat) %>% paste0(collapse = "|")
 
+  ## necessary because Assessment Version 4 hast Followup lowercase
+  x <- x %>%
+    dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp"))
+
   final_dat <- x
 
   cols <- colnames(x) %>% paste0(collapse = "|")
@@ -473,7 +477,7 @@ coalesce_join <- function(x, y,
 #' @export
 om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
 
-
+  # .data <- n3v4constructedremdups
 
   gathered_dat <- .data  %>%
     dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
