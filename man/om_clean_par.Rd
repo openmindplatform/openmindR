@@ -11,7 +11,7 @@ om_clean_par(dat.par, parse_feedback = F, ...)
 
 \item{parse_feedback}{Parse Feedback answers (Q1 to Q5 for Step 1 to 5). Default is \code{FALSE}.}
 
-\item{...}{Arguments for select to get more from ParticipantProgress}
+\item{...}{Arguments for select to get additional variables from ParticipantProgress}
 }
 \description{
 Creates the following measures
