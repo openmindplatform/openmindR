@@ -16,6 +16,8 @@ library(dplyr)
 
 ## OpenMind Cleaning Functions
 
+![](images/openmindR%20workflow.png)
+
 ## `om_filter_data`
 
 Filter down Assessment data from AirTable by `AssessmentsDone`,
@@ -477,7 +479,8 @@ This is a higher-level function that uses both “bind\_questions” and
 long-format Assessment data.
 
 With the `compare` argument you can specify either `"PrePost"`,
-`"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons.
+`"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the
+latter is the default).
 
 ``` r
 ## Prepare gathered_dat

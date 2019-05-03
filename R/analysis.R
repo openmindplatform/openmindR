@@ -97,7 +97,7 @@ if_flow <- function(.x, if_true, pipe_work) {
 #'
 #' This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
 #' @param gathered_dat Assessment data as long format
-#' @param  compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons.
+#' @param  compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
 #' @export
 om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 
