@@ -22,3 +22,8 @@ creates the following variables:
 }
 Function takes strings in the form of \code{"Q1P|Q2P"} for Pre- and Post Questions 1 & 2
 }
+\section{Workflow}{
+
+\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+}
+

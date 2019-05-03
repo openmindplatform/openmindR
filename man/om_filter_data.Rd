@@ -27,4 +27,11 @@ Want to match multiple specific Access Codes? Then just specify a vector: \code{
 If you want multiple "fuzzy" searches for an AccessCode you would use the argument \code{exact_search = F} (the default) and use \code{"Salem|NYU"} which will give you all Access Codes that include Salem and and NYU (the bar indicates separate searches).
 
 Finally, if you want just one specific Access Code then you'd use \code{"EddySalemStateUniversityF18"} with \code{exact_search = T}
+
+Usually you would run this function first to filter down your data.
 }
+\section{Workflow}{
+
+\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+}
+

@@ -10,7 +10,7 @@ om_summarize_comparisons(gathered_dat, compare = c("PrePost",
 \arguments{
 \item{gathered_dat}{Assessment data as long format}
 
-\item{compare}{With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons.}
+\item{compare}{With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).}
 }
 \description{
 This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.

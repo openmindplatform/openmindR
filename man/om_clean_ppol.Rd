@@ -18,3 +18,8 @@ Creates the following measures of Political Orientation
   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 }
 }
+\section{Workflow}{
+
+\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+}
+

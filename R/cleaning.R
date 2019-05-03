@@ -8,6 +8,11 @@
 #'
 #' Finally, if you want just one specific Access Code then you'd use \code{"EddySalemStateUniversityF18"} with \code{exact_search = T}
 #'
+#' Usually you would run this function first to filter down your data.
+#'
+#' @section Workflow:
+#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+#'
 #'
 #' @param app.dat Assessment data from AirTable
 #' @param n_assessments \code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
@@ -140,7 +145,9 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
 
 #' Rescale Variables
 #'
-#' This function rescales variables from 0 to 1. Q1 and Q2 is divided by 100 and Q3 - Q12 as well as C1 - C3 (divide by 6).
+#' This function rescales variables from 0 to 1. Q1 and Q2 is divided by 100 and Q3 - Q12 as well as C1 - C3 (divided by 6).
+#'
+#'
 #'
 #' @param .data Assessment data
 #' @export
@@ -164,6 +171,9 @@ om_rescale <- function(.data) {
 #'   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
 #'   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 #' }
+#'
+#' @section Workflow:
+#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
 #'
 #'
 #' @param app.dat Assessment data from AirTable
@@ -319,9 +329,11 @@ calc_ih <- function(final_dat, wave) {
   return(final_dat)
 }
 
+
 #' Constructs measures
 #'
-#' This is a higher-level function that uses both "polar_measures" and "calc_ih" to construct various measures.
+#'
+#' This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_ih}} to construct various measures.
 #' Creates the following variables:
 #' \itemize{
 #'   \item Q14: Affective Polarization
@@ -330,8 +342,14 @@ calc_ih <- function(final_dat, wave) {
 #'   \item Q17: Ingroup vs. Outgroup Affective Polarization
 #'   \item Q18: Intellectual Humility
 #' }
+#'
 #' Function automatically accounts for Assessment Version 4 and 5/5.1.
 #' Future assessment versions likely lead to problems so it needs to be adapted.
+#'
+#'
+#' @section Workflow:
+#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+#'
 #'
 #' @param x Assessment data from AirTable
 #' @export
@@ -387,6 +405,8 @@ om_construct_measures <- function(x){
 
 #' Remove duplicates from AirTable
 #'
+#' @section Workflow:
+#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
 #'
 #' @param cleaned_dat Duplicated data from AirTable
 #' @export
@@ -472,6 +492,10 @@ coalesce_join <- function(x, y,
 #'   \item variable_code: Q1, Q2, Q3 etc.
 #' }
 #' Function takes strings in the form of \code{"Q1P|Q2P"} for Pre- and Post Questions 1 & 2
+#'
+#' @section Workflow:
+#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+#'
 #' @param .data Assessment data
 #' @param which_strings a string indicating which variables should be parsed out (default is \code{openmindR::q_c_strings})
 #' @export

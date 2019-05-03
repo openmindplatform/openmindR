@@ -60,7 +60,7 @@ om_strsplit <- function(x,
 #'
 #' @param x Variable
 #' @export
-count_na <- function(x) sum(is.na(x))
+count_na <- function(x) sum(is.na(x), na.rm = T)
 
 
 #' This function removes characters in AirTable and turns them to date

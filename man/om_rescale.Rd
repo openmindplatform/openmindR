@@ -10,5 +10,5 @@ om_rescale(.data)
 \item{.data}{Assessment data}
 }
 \description{
-This function rescales variables from 0 to 1. Q1 and Q2 is divided by 100 and Q3 - Q12 as well as C1 - C3 (divide by 6).
+This function rescales variables from 0 to 1. Q1 and Q2 is divided by 100 and Q3 - Q12 as well as C1 - C3 (divided by 6).
 }

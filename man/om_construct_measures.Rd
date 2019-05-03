@@ -10,7 +10,7 @@ om_construct_measures(x)
 \item{x}{Assessment data from AirTable}
 }
 \description{
-This is a higher-level function that uses both "polar_measures" and "calc_ih" to construct various measures.
+This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_ih}} to construct various measures.
 Creates the following variables:
 \itemize{
   \item Q14: Affective Polarization
@@ -19,6 +19,13 @@ Creates the following variables:
   \item Q17: Ingroup vs. Outgroup Affective Polarization
   \item Q18: Intellectual Humility
 }
+}
+\details{
 Function automatically accounts for Assessment Version 4 and 5/5.1.
 Future assessment versions likely lead to problems so it needs to be adapted.
 }
+\section{Workflow}{
+
+\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+}
+

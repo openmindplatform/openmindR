@@ -12,3 +12,8 @@ remove_dups(cleaned_dat)
 \description{
 Remove duplicates from AirTable
 }
+\section{Workflow}{
+
+\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+}
+

@@ -6,7 +6,7 @@ openmindR
   - [openmindR Cleaning
     Functions](https://github.com/openmindplatform/openmindR#openmindr-cleaning-functions)
   - [openmindR Analysis
-    Functions](https://github.com/openmindplatform/openmindR#openmindR#openmindr-analysis-functions)
+    Functions](https://github.com/openmindplatform/openmindR#openmindr-analysis-functions)
   - [openmindR ggplot2
     theme](https://github.com/openmindplatform/openmindR#openmindr-ggplot2-theme)
 
@@ -39,8 +39,59 @@ add GuidedTrack
   - [om\_construct\_measures](https://github.com/openmindplatform/openmindR#om_construct_measures)
   - [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
   - [remove\_dups](https://github.com/openmindplatform/openmindR#remove_dups)
+  - [om\_gather](https://github.com/openmindplatform/openmindR#om_gather)
 
 ![](images/openmindR%20workflow.png)
+
+``` r
+cleaned_dat <-
+  ## Participant Progress Data
+  dat.par %>% 
+  ## calculating step scores and more
+  om_clean_par() %>% 
+  ## Assessment Data
+  left_join(app.dat) %>%
+  ## adding actual time
+  mutate(createdTime = ifelse(is.na(createdTime), at_date, createdTime)) %>% 
+  ## Make variables Q1 and Q2 as well as Q3 to C3 range 0 to 1
+  om_rescale() %>% 
+  ## construct ppol measures
+  om_clean_ppol()  %>% 
+  ## construct measures such as intellectual humility
+  om_construct_measures() %>% 
+  ## AccessCode Data  (only keep variables specified in acc_filters)
+  left_join(dat.acc %>% select(acc_filters)) %>% 
+  ## remove duplicates
+  remove_dups() %>% 
+  ## make vars numeric
+  mutate_at(vars(matches(var_strings)), as.numeric) %>% 
+  mutate_at(vars(Step1:Step5_Q5), as.character) %>%  
+  mutate(AssessmentsDone = as.character(AssessmentsDone)) %>% 
+  ##  GuidedTrack Data
+  mutate(Source = "AirTable") %>% 
+  ## TODO: Should happen automatically in om_clean_par but not, whats going on
+  mutate(AppRating = as.character(AppRating)) %>% 
+  coalesce_join(gt_parsed_feedback %>%
+                  mutate(Source = "GT") %>%
+                  mutate(AppRating = as.character(AppRating)) %>%
+                  mutate_at(vars(Step1:Step5_Q5), as.character) %>%
+                  mutate(AssessmentsDone = as.character(AssessmentsDone)) %>%
+                  mutate(createdTime = date), by = "OMID") %>%
+  ## weird case where UserType is empty string
+  mutate(UserType = ifelse(nchar(UserType) == 0, NA, UserType)) %>%
+  drop_na(UserType) %>% 
+  mutate(createdTime = as_datetime(createdTime)) %>% 
+  ## Count how many steps complete
+  mutate(steps_complete = str_count(StepsComplete, "1") %>% as.character) %>% 
+  ## we only want AssessmentsDone 1 thru 3
+  ## Problem: There are AssessmentsDone 0 in the data.. they have completed steps but no Assessment.. how is that possible?
+  filter(AssessmentsDone %in% 1:3) %>% 
+  ## TODO: maybe this is not needed
+  mutate(AppRating = as.numeric(AppRating)) 
+
+## Turn data into long format
+gathered_dat <- om_gather(cleaned_dat, q_c_strings)
+```
 
 ## `om_filter_data`
 
@@ -239,7 +290,7 @@ dat.par %>%
 
 This function rescales variables from 0 to 1.
 
-Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divide by 6.
+Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divided by 6.
 
 **Should be run before any measures are constructed so that they are all
 on the same scale.**
@@ -570,7 +621,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -596,7 +647,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -615,4 +666,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->

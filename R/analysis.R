@@ -93,6 +93,42 @@ if_flow <- function(.x, if_true, pipe_work) {
   }
 }
 
+# only_carb4 <- T
+#
+#
+# mtcars %>%
+#   if_flow(
+#     only_carb4,
+#     function(x) filter(x, carb == 4)
+#   ) %>%
+#   mutate(new = "deineMutter")
+#
+# if_flow <- function(.x, if_true, pipe_work) {
+#
+#   test <- quo(dplyr::filter(carb == 4)
+#   )
+#
+#   {if (if_true) {
+#     pipe_work(.x)
+#   }
+#   }
+# }
+#
+# only_carb4 <- T
+#
+# mtcars %>%
+#   # filter(., carb == 4)
+#   rlang::eval_tidy(test, data =.)
+#
+# mtcars %>%
+#   if_flow(
+#     .,
+#     only_carb4,
+#     filter(carb == 4)
+#   ) %>%
+#   mutate(new = "deineMutter")
+
+
 #' Conduct t-tests and calculate Cohen's d
 #'
 #' This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
