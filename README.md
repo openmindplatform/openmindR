@@ -476,6 +476,9 @@ This is a higher-level function that uses both “bind\_questions” and
 “summarize\_comparison” to calculate t-tests and Cohen’s d using
 long-format Assessment data.
 
+With the `compare` argument you can specify either `"PrePost"`,
+`"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons.
+
 ``` r
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
@@ -484,7 +487,7 @@ gathered_dat <- dat.ass %>%
   om_gather(q_c_strings) 
 
 gathered_dat %>% 
-  om_summarize_comparisons() %>% 
+  om_summarize_comparisons(compare = c("PrePost", "PreFollow")) %>% 
   arrange(desc(percentimproved))
 ```
 

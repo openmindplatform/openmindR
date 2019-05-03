@@ -21,6 +21,8 @@ Load package(s):
 ```{r}
 library(openmindR)
 library(dplyr)
+
+
 ```
 
 
@@ -256,7 +258,7 @@ gathered_dat <- dat.ass %>%
   om_gather(q_c_strings) 
 
 gathered_dat %>% 
-  om_summarize_comparisons(compare = "PrePost") %>% 
+  om_summarize_comparisons(compare = c("PrePost", "PreFollow")) %>% 
   arrange(desc(percentimproved))
 ```
 

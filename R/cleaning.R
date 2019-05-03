@@ -473,7 +473,10 @@ coalesce_join <- function(x, y,
 #' @export
 om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
 
-  gathered_dat <- .data %>%
+
+
+  gathered_dat <- .data  %>%
+    dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
     tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
     ## filter out pre-post and follow as a variable "Type"
     dplyr::mutate(Type = dplyr::case_when(

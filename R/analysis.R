@@ -103,7 +103,7 @@ if_flow <- function(.x, if_true, pipe_work) {
 #' @export
 om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 
-  # gathered_dat
+  gathered_dat <- n3v4long
 
   ## this is the higher level function which
   ## brings together bind_questions and summarize_comparison

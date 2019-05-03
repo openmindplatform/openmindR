@@ -16,7 +16,7 @@ om_filter_data(dat.ass4,n_assessments=3,version=4)
 n1v4<-om_filter_data(dat.ass4,n_assessments=1,version=4)
 n2v4<-om_filter_data(dat.ass4,n_assessments=2,version=4)
 n3v4<-om_filter_data(dat.ass4,n_assessments=3,version=4)
-# the above genrates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment. 
+# the above genrates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
 # does this mean that when we set the number of assessments argument equal to something, then it only includes
 # people with exactly that number of assessments?
 # yep. how cool. should make a note of this in the help documentation
@@ -26,9 +26,9 @@ nNULLv4<-om_filter_data(dat.ass4,version=4)
 #can it accept ranges?
 n1plusv4<-om_filter_data(dat.ass4,n_assessments>1,version=4)
 # ERROR: Does not like >
-#Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) : 
+#Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) :
 #  object 'n_assessments' not found
-# I think requiring n_assessments to be set at a specific value is better than a range; so i'd keep it like it is. 
+# I think requiring n_assessments to be set at a specific value is better than a range; so i'd keep it like it is.
 # Maybe add a note to help file saying it must be 1 discrete value would be good
 
 #can it accept multiple values?
@@ -56,7 +56,7 @@ n1v4<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode="CLP",exact_s
 n1v5<-om_filter_data(dat.ass5,n_assessments=1,version=5)
 n2v5<-om_filter_data(dat.ass5,n_assessments=2,version=5)
 n3v5<-om_filter_data(dat.ass5,n_assessments=3,version=5)
-# the above generates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment. 
+# the above generates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
 # does this mean that when we set the number of assessments argument equal to something, then it only includes
 # people with exactly that number of assessments?
 # yep. how cool. should make a note of this in the help documentation
@@ -66,9 +66,9 @@ nNULLv5<-om_filter_data(dat.ass5,version=5)
 #can it accept ranges?
 #n1plusv5<-om_filter_data(dat.ass4,n_assessments>1,version=5)
 # ERROR: Does not like >
-#Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) : 
+#Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) :
 #  object 'n_assessments' not found
-# I think requiring n_assessments to be set at a specific value is better than a range; so i'd keep it like it is. 
+# I think requiring n_assessments to be set at a specific value is better than a range; so i'd keep it like it is.
 # Maybe add a note to help file saying it must be 1 discrete value would be good
 
 #can it accept multiple values?
@@ -132,9 +132,9 @@ om_construct_measures(n3v4cleanppol)
 
 n3v4constructed<-om_construct_measures(n3v4cleanppol)
 summary(n2v4constructed)
-# this outputs the raw numbers from assessment. 
-# we should rescale all variables to range from 0 to 1 to ease interpretation and visualization 
-# so, let's add (x/(max possible response for individual item)) to function 
+# this outputs the raw numbers from assessment.
+# we should rescale all variables to range from 0 to 1 to ease interpretation and visualization
+# so, let's add (x/(max possible response for individual item)) to function
 
 
 #########################################
@@ -153,3 +153,10 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 
 ?om_summarize_comparisons()
 om_summarize_comparisons(n3v4long)
+
+
+## Fabios fact-finding mission
+
+n3v4 %>% View
+
+n3v4long
