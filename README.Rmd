@@ -54,12 +54,16 @@ db_get_data <- function(tbl_dat) {
 # ## Matching string for all (relevant) D, Q and C variables
 # var_strings <- paste0(q_strings, "|", d_strings, "|", c_strings, collapse = "|")
 # ## Matching string for all Q and C variables
-# q_c_strings <- paste0(q_strings, "|", c_strings, collapse = "|")
+q_c_strings <- paste0(q_strings, "|", c_strings, collapse = "|")
 # ## Matching string for ranging vars from 0 to 1
 # range01_strings <- stringr::str_c(stringr::str_c("Q", 3:12, "P", collapse = "|"), "|",
 #                          stringr::str_c("Q", 3:12, "F", collapse = "|"),
 #                          stringr::str_c("|", c_strings, collapse = "|")
 # )
+
+
+
+q_c_strings %>% paste0("|S1|S2")
 
 # usethis::use_data(range01_strings)
 

@@ -20,4 +20,5 @@ Creates the following variables:
   \item Q18: Intellectual Humility
 }
 Function automatically accounts for Assessment Version 4 and 5/5.1.
+Future assessment versions likely lead to problems so it needs to be adapted.
 }

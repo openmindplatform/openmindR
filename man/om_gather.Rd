@@ -4,12 +4,12 @@
 \alias{om_gather}
 \title{Gather OpenMind data}
 \usage{
-om_gather(.data, which_strings)
+om_gather(.data, which_strings = openmindR::q_c_strings)
 }
 \arguments{
 \item{.data}{Assessment data}
 
-\item{which_strings}{a string indicating which variables should be parsed out}
+\item{which_strings}{a string indicating which variables should be parsed out (default is \code{openmindR::q_c_strings})}
 }
 \description{
 This function will turn Assessment data into long format and
@@ -20,4 +20,5 @@ creates the following variables:
   \item Response: Values of the Question
   \item variable_code: Q1, Q2, Q3 etc.
 }
+Function takes strings in the form of \code{"Q1P|Q2P"} for Pre- and Post Questions 1 & 2
 }

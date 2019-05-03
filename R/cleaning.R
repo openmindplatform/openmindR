@@ -304,6 +304,7 @@ calc_ih <- function(final_dat, wave) {
 #'   \item Q18: Intellectual Humility
 #' }
 #' Function automatically accounts for Assessment Version 4 and 5/5.1.
+#' Future assessment versions likely lead to problems so it needs to be adapted.
 #'
 #' @param x Assessment data from AirTable
 #' @export
@@ -427,7 +428,7 @@ coalesce_join <- function(x, y,
 
   dplyr::bind_cols(joined, coalesced)[cols]
 }
-
+openmindR::q_c_strings
 
 #' Gather OpenMind data
 #'
@@ -439,10 +440,11 @@ coalesce_join <- function(x, y,
 #'   \item Response: Values of the Question
 #'   \item variable_code: Q1, Q2, Q3 etc.
 #' }
+#' Function takes strings in the form of \code{"Q1P|Q2P"} for Pre- and Post Questions 1 & 2
 #' @param .data Assessment data
-#' @param which_strings a string indicating which variables should be parsed out
+#' @param which_strings a string indicating which variables should be parsed out (default is \code{openmindR::q_c_strings})
 #' @export
-om_gather <- function(.data, which_strings) {
+om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
 
   gathered_dat <- .data %>%
     tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
