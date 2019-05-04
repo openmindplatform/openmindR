@@ -123,9 +123,11 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
     dplyr::mutate(StepCorrect3 = calc_correct(StepsComplete3, StepsScores3, StepQuestionTotals3)) %>%
     dplyr::mutate(StepCorrect4 = calc_correct(StepsComplete4, StepsScores4, StepQuestionTotals4)) %>%
     dplyr::mutate(StepCorrect5 = calc_correct(StepsComplete5, StepsScores5, StepQuestionTotals5)) %>%
-    dplyr::mutate(createdTime = at_date) %>%
+    # dplyr::mutate(createdTime = at_date) %>%
     dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5,
-           FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, createdTime, at_date, ...)
+           FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend,
+           # createdTime,
+           at_date, ...)
 
   if (parse_feedback) {
     ## Parse Feedback Answers
@@ -136,7 +138,9 @@ om_clean_par <- function(dat.par, parse_feedback = F, ...) {
       ## Make Step variables to characters (for merging)
       dplyr::mutate_at(dplyr::vars(Step1:Step5_Q5), as.character) %>%
       dplyr::select(OMID, StepTimes, StepsComplete, StepCorrect1:StepCorrect5, StepTimes1:StepTimes5, Step1:Step5_Q5,
-                    FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend, createdTime, at_date, ...)
+                    FeedbackAnswers, FeedbackAnswersVariableNames, AppRating, AppRecommend,
+                    # createdTime,
+                    at_date, ...)
   }
 
   return(final_dat)

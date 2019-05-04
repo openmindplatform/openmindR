@@ -344,6 +344,11 @@ There are three functions for the ggplot2 theme:
 
 Make sure you have the Poppins font installed!
 
+```{r, eval = F}
+extrafont::font_import()
+```
+
+
 ```{r}
 windowsFonts(`Poppins` = windowsFont("Poppins"))
 
