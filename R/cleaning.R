@@ -446,20 +446,19 @@ remove_dups <- function(cleaned_dat) {
     dplyr::group_by(OMID) %>%
     dplyr::slice(1) %>%
     dplyr::ungroup() %>%
-    openmindR::do_if(
-      is.numeric(cleaned_dat$AssessmentVersion),
-      ~{.x %>% dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))}
+    openmindR::do_if(.,
+        condition = is.numeric(cleaned_dat$AssessmentVersion),
+        call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))}
     ) %>%
-    openmindR::do_if(
-      is.character(cleaned_dat$AssessmentVersion),
-      ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
+    openmindR::do_if(.,
+        condition = is.character(cleaned_dat$AssessmentVersion),
+        call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
     ) %>%
     openmindR::coalesce_join(join = dplyr::left_join, cleaned_dat %>%
-                    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
-                    dplyr::filter(OMID %in% dups)) %>%
-    dplyr::select(Q1Post)
+                               dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
+                               dplyr::filter(OMID %in% dups))
 
-  message(stringr::str_glue("Removing {round(length(dups)/2)} duplicates...\n"))
+  message(stringr::str_glue("Removing {round(length(dups))} duplicates...\n"))
 
   ## remove OMIDs that we don't want (older + less complete)
   cleaned_dat %>%

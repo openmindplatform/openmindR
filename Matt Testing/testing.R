@@ -133,7 +133,7 @@ om_construct_measures(n3v4cleanppol)
 # this does not work; requires the data frame generated from om_clean_ppol
 
 n3v4constructed<-om_construct_measures(n3v4cleanppol)
-summary(n2v4constructed)
+summary(n3v4constructed)
 # this outputs the raw numbers from assessment.
 # we should rescale all variables to range from 0 to 1 to ease interpretation and visualization
 # so, let's add (x/(max possible response for individual item)) to function
@@ -155,3 +155,5 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 
 ?om_summarize_comparisons()
 om_summarize_comparisons(n3v4long)
+prepo<-om_summarize_comparisons(n3v4long,compare="PrePost")
+prefo<-om_summarize_comparisons(n3v4long,compare="PreFollow")
