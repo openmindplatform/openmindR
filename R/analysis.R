@@ -287,8 +287,8 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   if (plot_model) {
     ## get coefficient plot for model
     ggmod <- lme_dat %>%
-      sjPlot::plot_model(type = "std", show.p = T, show.values = T) +
-      ggplot2::theme_minimal()
+      sjPlot::plot_model(type = "std", show.p = T, show.values = T)# +
+      # ggplot2::theme_minimal()
 
     final <- rlist::list.append(final, ggmod = ggmod)
 
