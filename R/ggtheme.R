@@ -15,18 +15,18 @@ theme_om <- function(legend_position = c(.55, .93),
                      legend_text_size = 24,
                      title_size = 26,
                      overall_text_size = 24, ...){
-  theme(panel.background = element_rect(fill="white"),
-        legend.text = element_text(size=legend_text_size),
+  ggplot2::theme(panel.background = ggplot2::element_rect(fill="white"),
+        legend.text = ggplot2::element_text(size=legend_text_size),
         legend.position = legend_position,
-        legend.title=element_blank(),
-        plot.title = element_text(hjust = 0.5, size=title_size),
-        axis.line.x = element_line(),
-        axis.line.y = element_line(),
-        axis.text.x = element_text(color = "grey20", size = axis_text_size),
-        axis.text.y = element_text(color = "grey20", size = axis_text_size),
-        axis.title.x = element_text(color = "grey20", size = axis_title_size),
-        axis.title.y = element_text(color = "grey20", size = axis_title_size),
-        text = element_text(family="Poppins",size=24, ...))
+        legend.title = ggplot2::element_blank(),
+        plot.title = ggplot2::element_text(hjust = 0.5, size=title_size),
+        axis.line.x = ggplot2::element_line(),
+        axis.line.y = ggplot2::element_line(),
+        axis.text.x = ggplot2::element_text(color = "grey20", size = axis_text_size),
+        axis.text.y = ggplot2::element_text(color = "grey20", size = axis_text_size),
+        axis.title.x = ggplot2::element_text(color = "grey20", size = axis_title_size),
+        axis.title.y = ggplot2::element_text(color = "grey20", size = axis_title_size),
+        text = ggplot2::element_text(family="Poppins",size=24, ...))
 }
 
 
@@ -68,7 +68,7 @@ pal_om <- scales::manual_pal(c("#2a98db","#3d4fa1","#e8df15","#65c6c3","#ec145b"
 #'
 #' This object contains a palette with the official OpenMind colors
 #' @export
-scale_color_om <- function(...) { discrete_scale("colour", "om", pal_om, ...) }
+scale_color_om <- function(...) { ggplot2::discrete_scale("colour", "om", pal_om, ...) }
 
 
 #' A ggplot2 fill palette
@@ -89,7 +89,7 @@ scale_color_om <- function(...) { discrete_scale("colour", "om", pal_om, ...) }
 #'
 #' This object contains a palette with the official OpenMind colors
 #' @export
-scale_fill_om <- function(...) { discrete_scale("fill", "om", pal_om, ...) }
+scale_fill_om <- function(...) { ggplot2::discrete_scale("fill", "om", pal_om, ...) }
 
 #' A highcharter theme
 #'

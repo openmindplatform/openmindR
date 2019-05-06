@@ -39,8 +39,8 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 
     final_dat <- x %>% dplyr::summarize(
       cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1],
-      cohendCIhi = effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2],
+      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2]),
       tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
       pvalue = t.test(Response~Type, paired=TRUE)$p.value,
       df = t.test(Response~Type, paired=TRUE)$parameter,
@@ -231,8 +231,11 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
   if (all("PreFollow" == compare)) final_compared <- final_compared_prefollow
 
   final_compared <- final_compared %>%
-    mutate(cohendCIlow = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
-    mutate(cohendCIhi = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi))
+    mutate(cohendCIlow2 = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
+    mutate(cohendCIhi2 = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi)) %>%
+    select(-cohendCIlow, -cohendCIhi) %>%
+    rename(cohendCIlow = cohendCIlow2,
+           cohendCIhi = cohendCIhi2)
 
 
   return(final_compared)
@@ -284,7 +287,8 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   if (plot_model) {
     ## get coefficient plot for model
     ggmod <- lme_dat %>%
-      sjPlot::plot_model(type = "std", show.p = T, show.values = T)
+      sjPlot::plot_model(type = "std", show.p = T, show.values = T) +
+      theme_minimal()
 
     final <- rlist::list.append(final, ggmod = ggmod)
 

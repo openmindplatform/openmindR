@@ -407,14 +407,16 @@ Q11_dat$ggmod
 The argument `get_effects = T` will give us marginal effects of the model:
 
 ```{r}
-Q11_dat$effects_dat
+Q11_dat$effects_dat %>% 
+  knitr::kable()
 ```
 
 
 The argument `get_tidy = T` will give us coefficients and pseudo cohen's d values of the model as a tidy dataframe:
 
 ```{r}
-Q11_dat$tidy_dat
+Q11_dat$tidy_dat %>% 
+  knitr::kable()
 ```
 
 Finally, by default `om_mixed_models` produces the raw `lme4` object containing the model:
