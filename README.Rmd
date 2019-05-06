@@ -315,6 +315,13 @@ dat.ass %>%
 
 # openmindR Analysis Functions
 
+This section introduces the openmindR analysis functions.
+
++ [om_summarize_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
++ [om_mix_models](https://github.com/openmindplatform/openmindR#om_mix_models)
++ [om_mix_plot](https://github.com/openmindplatform/openmindR#om_mix_plot)
++ [om_mix_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
+
 ## `om_summarize_comparisons`
 
 This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d using long-format Assessment data.
@@ -361,7 +368,7 @@ gathered_dat <- cleaned_data %>%
   om_gather(q_c_strings)
 ```
 
-Now that we have the Ann Miller data in long format we can use our analysis functions to perform mixed models.
+Now that we have the Ann Miller data in long format we can use our analysis functions to perform mixed models. All mixed models functions follow the same pattern `om_mix_*`
 
 ## ´om_mix_models´
 

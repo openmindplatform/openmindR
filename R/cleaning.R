@@ -433,6 +433,8 @@ remove_dups <- function(cleaned_dat) {
 
   ## remove duplicates from AirTable
 
+  # cleaned_dat <- dat.ass
+
   ## pull duplicated OMIDs
   cleaned_dat %>%
     dplyr::filter(duplicated(OMID)) %>%
@@ -458,9 +460,11 @@ remove_dups <- function(cleaned_dat) {
         condition = is.character(cleaned_dat$AssessmentVersion),
         call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
     ) %>%
-    openmindR::coalesce_join(join = dplyr::left_join, cleaned_dat %>%
+    openmindR::coalesce_join(join = dplyr::left_join,
+                             cleaned_dat %>%
                                dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
-                               dplyr::filter(OMID %in% dups))
+                               dplyr::filter(OMID %in% dups)) %>%
+    dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))
 
   message(stringr::str_glue("Removing {round(length(dups))} duplicates...\n"))
 

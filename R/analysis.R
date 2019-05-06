@@ -21,8 +21,8 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
   if (q14_q17) {
     final_dat <- x %>% dplyr::summarize(
       cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1],
-      cohendCIhi = effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2],
+      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2]),
       tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
       pvalue = t.test(Response~Type, paired=TRUE)$p.value,
       df = t.test(Response~Type, paired=TRUE)$parameter,
@@ -169,7 +169,6 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
       dplyr::filter(!is.nan(cohend)) %>%
       dplyr::mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
 
-
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prepost <- compare_dat_prepost %>%
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
@@ -230,6 +229,10 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
 
   if (all("PrePost" == compare)) final_compared <- final_compared_prepost
   if (all("PreFollow" == compare)) final_compared <- final_compared_prefollow
+
+  final_compared <- final_compared %>%
+    mutate(cohendCIlow = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
+    mutate(cohendCIhi = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi))
 
 
   return(final_compared)
