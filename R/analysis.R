@@ -246,7 +246,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 #' This is a higher-level function that uses "om_compare", "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
 #' @param gathered_dat Assessment data as long format
 #' @param compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
-#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}
+#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} or \code{"All"}
 #' @export
 om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c("PrePost", "PreFollow")) {
 
@@ -327,7 +327,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
 #'
 #' This function calculates several measures for plotting
 #' @param gathered_dat Assessment data as long format
-#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}
+#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} or \code{"All"}
 #' @export
 om_label_stats <- function(gathered_dat, aversion = "All") {
 
@@ -354,7 +354,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
-      dplyr::mutate(Variant = Variante) ,
+      dplyr::mutate(Variant = aversion) ,
 
     openmindR::c_strings_seps %>%
       purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
@@ -362,18 +362,18 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
-      mutate(Variant = Variante) ,
+      mutate(Variant = aversion) ,
 
     c("Q15", "Q16", "Q17") %>%
-      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat %>% drop_na(ppol_cat), variable_code == .x),
+      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat %>% tidyr::drop_na(ppol_cat), variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
-      dplyr::mutate(Variant = Variante)
+      dplyr::mutate(Variant = aversion)
   )
 
-  final_dat <- plot_dat %>% as_tibble()
+  final_dat <- plot_dat %>% dplyr::as_tibble()
 
   return(final_dat)
 
