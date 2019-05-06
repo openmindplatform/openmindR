@@ -262,7 +262,7 @@ dat.par %>%
   om_clean_par(parse_feedback = T) 
 ```
 
-    ## # A tibble: 17,072 x 36
+    ## # A tibble: 17,109 x 36
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
     ##  1 7806~ <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
@@ -275,7 +275,7 @@ dat.par %>%
     ##  8 1000~ <NA>      1, 1, 1, 1, 1        0.625        1            0.667
     ##  9 2458~ <NA>      1, 1, 1, 1, 0        1            1            1    
     ## 10 9406~ <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # ... with 17,062 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ## # ... with 17,099 more rows, and 30 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
@@ -300,7 +300,7 @@ dat.ass %>%
   om_rescale()
 ```
 
-    ## # A tibble: 16,990 x 78
+    ## # A tibble: 17,013 x 78
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                0.4   0.6 
@@ -313,7 +313,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                0.56  0.54
     ##  9 rec0~ 5370~ Individua~ 4                2                0.5   0.37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                0.5   0.5 
-    ## # ... with 16,980 more rows, and 71 more variables: Q3Pre <dbl>,
+    ## # ... with 17,003 more rows, and 71 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -383,7 +383,7 @@ dat.ass <- dat.ass %>%
 dat.ass
 ```
 
-    ## # A tibble: 16,990 x 82
+    ## # A tibble: 17,013 x 82
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
@@ -396,7 +396,7 @@ dat.ass
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
     ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
-    ## # ... with 16,980 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## # ... with 17,003 more rows, and 75 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -423,7 +423,7 @@ dat.ass %>%
   om_construct_measures()
 ```
 
-    ## # A tibble: 16,990 x 97
+    ## # A tibble: 17,013 x 97
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -436,7 +436,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,980 more rows, and 90 more variables: Q3Pre <dbl>,
+    ## # ... with 17,003 more rows, and 90 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -472,9 +472,9 @@ dat.ass %>%
 
     ## Joining, by = c("OMID", "createdTime", "AssessmentVersion", "AssessmentsDone", "id", "AccessCode", "Q1Pre", "Q2Pre", "Q3Pre", "Q4Pre", "Q5Pre", "Q6Pre", "Q7Pre", "Q8Pre", "Q9Pre", "Q10Pre", "Q11Pre", "Q12Pre", "C1Pre", "C2Pre", "C3Pre", "D1", "D2", "D3", "D4", "D5", "DatePre", "Q1Post", "Q2Post", "Q3Post", "Q4Post", "Q5Post", "Q6Post", "Q7Post", "Q8Post", "Q9Post", "Q10Post", "Q11Post", "Q12Post", "DatePost", "B1Pre", "B1Post", "Q1FollowUp", "Q2FollowUp", "Q3FollowUp", "Q4FollowUp", "Q5FollowUp", "Q6FollowUp", "Q7FollowUp", "Q8FollowUp", "Q9FollowUp", "Q10FollowUp", "Q11FollowUp", "Q12FollowUp", "C1FollowUp", "C2FollowUp", "C3FollowUp", "DateFollowUp", "W1FollowUp", "B1FollowUp", "S1Pre", "BTaskPre", "B2Pre", "B3Pre", "S1Post", "C1Post", "C2Post", "C3Post", "BTaskPost", "B2Post", "B3Post", "W1Post", "W1Pre", "D6", "S1FollowUp", "BTaskFollowUp", "B2FollowUp", "B3FollowUp", "ppol_raw", "ppol", "ppol_num", "ppol_cat")
 
-    ## Removing 258 duplicates...
+    ## Removing 515 duplicates...
 
-    ## # A tibble: 16,475 x 82
+    ## # A tibble: 16,498 x 83
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -487,7 +487,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,465 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## # ... with 16,488 more rows, and 76 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -505,7 +505,8 @@ dat.ass %>%
     ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
     ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
     ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
-    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>
+    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
+    ## #   count_na <dbl>
 
 ## `om_gather`
 
@@ -533,7 +534,7 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
-    ## # A tibble: 764,550 x 4
+    ## # A tibble: 765,585 x 4
     ##    Question Response Type  variable_code
     ##    <chr>       <dbl> <chr> <chr>        
     ##  1 Q1Pre          40 Pre   Q1           
@@ -546,9 +547,17 @@ dat.ass %>%
     ##  8 Q1Pre          56 Pre   Q1           
     ##  9 Q1Pre          50 Pre   Q1           
     ## 10 Q1Pre          50 Pre   Q1           
-    ## # ... with 764,540 more rows
+    ## # ... with 765,575 more rows
 
 # openmindR Analysis Functions
+
+This section introduces the openmindR analysis
+    functions.
+
+  - [om\_summarize\_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
+  - [om\_mix\_models](https://github.com/openmindplatform/openmindR#om_mix_models)
+  - [om\_mix\_plot](https://github.com/openmindplatform/openmindR#om_mix_plot)
+  - [om\_mix\_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
 
 ## `om_summarize_comparisons`
 
@@ -573,20 +582,202 @@ gathered_dat %>%
 ```
 
     ## # A tibble: 40 x 10
-    ##    variable_code cohend cohendCIlow cohendCIhi tstat    pvalue    df
-    ##    <chr>          <dbl>       <dbl>      <dbl> <dbl>     <dbl> <dbl>
-    ##  1 Q17            0.516       0.373     0.659  10.2  1.11e- 21   387
-    ##  2 Q17            0.532       0.492     0.572  37.4  2.05e-270  4948
-    ##  3 Q16            0.465      -0.505    -0.425  32.7  7.65e-213  4948
-    ##  4 Q16            0.386      -0.528    -0.244   7.60 2.26e- 13   387
-    ##  5 Q18            0.341      -0.372    -0.311  31.1  1.78e-200  8278
-    ##  6 Q14            0.422       0.391     0.453  38.2  1.35e-293  8178
-    ##  7 Q14            0.358       0.247     0.470   8.97 3.29e- 18   626
-    ##  8 Q18            0.228      -0.320    -0.137   6.93 7.69e- 12   922
-    ##  9 Q2             0.166      -0.277    -0.0550  4.16 3.69e-  5   626
-    ## 10 Q2             0.233      -0.264    -0.202  21.1  5.66e- 96  8178
-    ## # ... with 30 more rows, and 3 more variables: percentimproved <dbl>,
-    ## #   Comparison <chr>, moderates <chr>
+    ##    variable_code cohend tstat    pvalue    df percentimproved Comparison
+    ##    <chr>          <dbl> <dbl>     <dbl> <dbl>           <dbl> <chr>     
+    ##  1 Q17            0.519 11.0  5.49e- 25   447           0.663 PreFollow 
+    ##  2 Q17            0.534 38.6  1.99e-286  5219           0.657 PrePost   
+    ##  3 Q16            0.403  8.53 2.36e- 16   447           0.618 PreFollow 
+    ##  4 Q16            0.470 33.9  2.34e-228  5219           0.618 PrePost   
+    ##  5 Q18            0.336 31.4  1.57e-205  8773           0.578 PrePost   
+    ##  6 Q14            0.423 39.3  1.52e-310  8633           0.569 PrePost   
+    ##  7 Q14            0.365  9.82 1.93e- 21   723           0.566 PreFollow 
+    ##  8 Q18            0.235  7.53 1.10e- 13  1024           0.537 PreFollow 
+    ##  9 Q2             0.207  5.56 3.79e-  8   723           0.521 PreFollow 
+    ## 10 Q2             0.240 22.3  8.76e-107  8633           0.493 PrePost   
+    ## # ... with 30 more rows, and 3 more variables: moderates <chr>,
+    ## #   cohendCIlow <dbl>, cohendCIhi <dbl>
+
+## Analyzing mixed effects
+
+Example workflow for Ann Miller experimental data
+
+``` r
+load("../om_parser/data/ann_miller_merged.Rdata")
+
+cleaned_data <- ann_miller_merged %>% 
+  ## make unique OMID
+  mutate(OMID = ifelse(is.na(OMID), ResearchID, OMID)) %>% 
+  ## rescale vars
+  om_rescale() %>% 
+  ## make D4 to standard PoliticalAffil
+  mutate(D4 = ifelse(is.na(D4), PoliticalAffil, D4)) %>% 
+  ## create ppols
+  om_clean_ppol() %>%
+  ## om_construct measures needs a complete AV4
+  mutate(AssessmentVersion = 4) %>% 
+  ## construct measures
+  om_construct_measures() %>%
+  ## remove duplicates
+  remove_dups()  
+  
+
+gathered_dat <- cleaned_data %>% 
+  om_gather(q_c_strings)
+```
+
+Now that we have the Ann Miller data in long format we can use our
+analysis functions to perform mixed models. All mixed models functions
+follow the same pattern `om_mix_*`
+
+## `om_mix_models`
+
+This function performs mixed models (Currently only works on Ann Miller
+experimental data).
+
+Takes the following arguments:
+
+  - **gathered\_dat** Assessment data as long format
+
+  - **question** Specify question that you want to perform analysis for
+    (ex: `"Q18"`)
+
+  - **plot\_model** logical. Show a coefficient plot of the model.
+    Default is `FALSE`
+
+  - **get\_effects** logical. Get marginal effects. Default is `FALSE`
+
+  - **get\_tidy** logical. Get a tidy dataframe with estimates. Also
+    calculates pseudo cohen’s d effcct sizes. Default is `FALSE`
+
+Lets perform a model on `Q11` with all arguments turned on.
+
+``` r
+Q11_dat <- om_mix_models(gathered_dat, 
+              question = "Q11", 
+              plot_model = T, 
+              get_effects = T, 
+              get_tidy = T)
+```
+
+`om_mixed_models` outputs the results of mixed effects in several ways.
+
+For instance, the argument `plot_model = T` will give us a coefficient
+plot of the model:
+
+``` r
+Q11_dat$ggmod
+```
+
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+The argument `get_effects = T` will give us marginal effects of the
+model:
+
+``` r
+Q11_dat$effects_dat %>% 
+  knitr::kable()
+```
+
+| x        | predicted | std.error |  conf.low | conf.high | group | Condition | Type |
+| :------- | --------: | --------: | --------: | --------: | :---- | :-------- | :--- |
+| Article  | 0.3266667 | 0.0432821 | 0.2416908 | 0.4116425 | Pre   | Article   | Pre  |
+| OpenMind | 0.6655844 | 0.0167022 | 0.6327930 | 0.6983759 | Pre   | OpenMind  | Pre  |
+| Article  | 0.2966667 | 0.0418379 | 0.2145263 | 0.3788070 | Post  | Article   | Post |
+| OpenMind | 0.7537879 | 0.0160937 | 0.7221911 | 0.7853846 | Post  | OpenMind  | Post |
+
+The argument `get_tidy = T` will give us coefficients and pseudo cohen’s
+d values of the model as a tidy dataframe:
+
+``` r
+Q11_dat$tidy_dat %>% 
+  knitr::kable()
+```
+
+| term                       |    estimate | std.error |   statistic | group | n\_coef | n\_dat |         d |
+| :------------------------- | ----------: | --------: | ----------: | :---- | ------: | -----: | --------: |
+| (Intercept)                |   0.3266667 | 0.0432821 |   7.5473825 | fixed |       4 |    358 | 0.4011389 |
+| ConditionOpenMind          |   0.3389177 | 0.0463929 |   7.3053734 | fixed |       4 |    358 | 0.3882762 |
+| TypePost                   | \-0.0300000 | 0.0407868 | \-0.7355312 | fixed |       4 |    358 | 0.0390930 |
+| ConditionOpenMind:TypePost |   0.1182035 | 0.0439730 |   2.6880905 | fixed |       4 |    358 | 0.1428704 |
+
+Finally, by default `om_mixed_models` produces the raw `lme4` object
+containing the model:
+
+``` r
+Q11_dat$lme_dat
+```
+
+    ## Linear mixed model fit by maximum likelihood  ['lmerMod']
+    ## Formula: 
+    ## Response ~ Condition * Type + (1 + Condition | OMID) + (1 + Type |  
+    ##     OMID)
+    ##    Data: .TeMpVaR
+    ##      AIC      BIC   logLik deviance df.resid 
+    ## 173.7359 224.0464 -75.8679 151.7359      705 
+    ## Random effects:
+    ##  Groups   Name              Std.Dev. Corr 
+    ##  OMID     (Intercept)       0.1972        
+    ##           ConditionOpenMind 0.1247   -0.47
+    ##  OMID.1   (Intercept)       0.1809        
+    ##           TypePost          0.1976   -0.63
+    ##  Residual                   0.1485        
+    ## Number of obs: 716, groups:  OMID, 358
+    ## Fixed Effects:
+    ##                (Intercept)           ConditionOpenMind  
+    ##                     0.3267                      0.3389  
+    ##                   TypePost  ConditionOpenMind:TypePost  
+    ##                    -0.0300                      0.1182  
+    ## convergence code 0; 2 optimizer warnings; 0 lme4 warnings
+
+## `om_mix_plot`
+
+This function plots the results of mixed models (currently only works on
+Ann Miller experimental data).
+
+Takes the following arguments:
+
+  - **effects\_dat** is a dataset produced by `om_mix_models` and
+    supplies the marginal effects of the model
+  - **tidy\_dat** is a dataset produced by `om_mix_models` and supplies
+    the pseudo cohen’s d for plotting
+  - **var\_label** supply a character that is plotted as title and
+    y-axis
+  - **show\_stats** Show statistics on the bottom right. Only possible
+    if you supply `tidy_dat`
+
+<!-- end list -->
+
+``` r
+om_mix_plot(effects_dat = Q11_dat$effects_dat, 
+            tidy_dat = Q11_dat$tidy_dat, 
+            var_label = "Growth Mindset",
+            show_stats = T)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+## `om_mix_complete`
+
+This function allows to run **and** plot a mixed model. It makes use of
+both `om_mix_models` and `om_plot_mix` (currently only works on Ann
+Miller experimental data).
+
+Just specify data and title where the latter needs to be one of the
+following (at the moment):
+
+  - `"Growth Mindset"`
+  - `"Intellectual Humility"`
+  - `"Affective Polarization"`
+  - `"Social Closeness"`
+  - `"Perspective-Taking"`
+
+<!-- end list -->
+
+``` r
+om_mix_complete(gathered_dat, "Growth Mindset")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ## openmindR ggplot2 theme
 
@@ -597,6 +788,10 @@ There are three functions for the ggplot2 theme:
   - `scale_color_om`
 
 Make sure you have the Poppins font installed\!
+
+``` r
+extrafont::font_import()
+```
 
 ``` r
 windowsFonts(`Poppins` = windowsFont("Poppins"))
@@ -622,7 +817,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -648,7 +843,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -667,4 +862,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->

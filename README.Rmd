@@ -370,7 +370,7 @@ gathered_dat <- cleaned_data %>%
 
 Now that we have the Ann Miller data in long format we can use our analysis functions to perform mixed models. All mixed models functions follow the same pattern `om_mix_*`
 
-## ´om_mix_models´
+## `om_mix_models`
 
 This function performs mixed models (Currently only works on Ann Miller experimental data).
 
@@ -378,13 +378,13 @@ Takes the following arguments:
 
 + **gathered_dat** Assessment data as long format
 
-+ **question** Specify question that you want to perform analysis for (ex: `"Q18`)
++ **question** Specify question that you want to perform analysis for (ex: `"Q18"`)
 
 + **plot_model** logical. Show a coefficient plot of the model. Default is `FALSE`
 
 + **get_effects** logical. Get marginal effects. Default is `FALSE`
 
-+ **get_tidy** logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d efecct sizes. Default is `FALSE`
++ **get_tidy** logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d effcct sizes. Default is `FALSE`
 
 Lets perform a model on `Q11` with all arguments turned on.
 
@@ -400,7 +400,7 @@ Q11_dat <- om_mix_models(gathered_dat,
 
 For instance, the argument `plot_model = T` will give us a coefficient plot of the model:
 
-```{r}
+```{r, fig.width = 12, fig.height = 8.58}
 Q11_dat$ggmod
 ```
 
@@ -426,7 +426,7 @@ Q11_dat$lme_dat
 ```
 
 
-## ´om_mix_plot´
+## `om_mix_plot`
 
 This function plots the results of mixed models (currently only works on Ann Miller experimental data).
 
@@ -437,7 +437,7 @@ Takes the following arguments:
 + **var_label** supply a character that is plotted as title and y-axis
 + **show_stats** Show statistics on the bottom right. Only possible if you supply `tidy_dat`
 
-```{r}
+```{r, fig.width = 12, fig.height = 8.58}
 om_mix_plot(effects_dat = Q11_dat$effects_dat, 
             tidy_dat = Q11_dat$tidy_dat, 
             var_label = "Growth Mindset",
@@ -452,16 +452,12 @@ This function allows to run **and** plot a mixed model. It makes use of both `om
 Just specify data and title where the latter needs to be one of the following (at the moment):
 
 + `"Growth Mindset"`
-
 + `"Intellectual Humility"`
-
 + `"Affective Polarization"`
-
 + `"Social Closeness"`
-
 + `"Perspective-Taking"`
 
-```{r}
+```{r, fig.width = 12, fig.height = 8.58,}
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
 
