@@ -135,11 +135,11 @@ do_if <- function(.data, condition, call){
 
 #' Conduct t-tests and calculate Cohen's d
 #'
-#' This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
+#' This is lower-level function that belongs to om_summarize_comparisons. This function is not meant to be used outside of om_summarize_comparisons.
 #' @param gathered_dat Assessment data as long format
 #' @param  compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
 #' @export
-om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
+om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 
   # gathered_dat <- n3v4long
 
@@ -241,6 +241,146 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
   return(final_compared)
 }
 
+#' Conduct t-tests and calculate Cohen's d
+#'
+#' This is a higher-level function that uses "om_compare", "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
+#' @param gathered_dat Assessment data as long format
+#' @param compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
+#' @param aversion AssessmnentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or\code{"All"}
+#' @export
+om_summarize_comparisons <- function(gathered_dat, aversion, compare = c("PrePost", "PreFollow")) {
+
+  # Variant <- "V5"
+
+  gathered_dat <- gathered_dat %>%
+    openmindR::do_if(.data = .,
+          condition = aversion == "V4",
+          call = ~{
+            .x %>%
+              dplyr::filter(AssessmentVersion == 4)
+          }
+    ) %>%
+    openmindR::do_if(.data = .,
+          condition = aversion == "V5/V5.1",
+          call = ~{
+            .x %>%
+              dplyr::filter(AssessmentVersion >= 5)
+          }
+    )
+
+
+  basicsummarystats <- gathered_dat %>%
+    openmindR::om_compare(compare) %>%
+    openmindR::do_if(.data = .,
+          condition = aversion == "V5",
+          call = ~{
+            .x %>%
+              dplyr::left_join(assessmentv5_codebook %>%
+              dplyr::rename(variable_code = Mapping)) %>%
+              dplyr::mutate(Variant = "V5/V5.1")
+          }
+    ) %>%
+    openmindR::do_if(.data = .,
+          condition = aversion == "V4",
+          call = ~{
+            .x %>%
+              dplyr::left_join(assessmentv4_codebook %>%
+              dplyr::rename(variable_code = Mapping)) %>%
+              dplyr::mutate(Variant = "V4")
+          }
+    ) %>%
+    openmindR::do_if(.data = .,
+          condition = aversion == "All",
+          call = ~{
+            .x %>%
+              dplyr::left_join(assessmentv5_codebook %>%
+              dplyr::rename(variable_code = Mapping)) %>%
+              dplyr::mutate(Variant = "All")
+          }
+    ) %>%
+    dplyr::rename(Question_txt = Content) %>%
+    dplyr::mutate(Question_txt = dplyr::case_when(
+      variable_code == "Q14" ~ "Affective Polarization",
+      variable_code == "Q15" ~ "Liking for Ingroup",
+      variable_code == "Q16" ~ "Liking for Outgroup",
+      variable_code == "Q17" ~ "Ingroup-Outgroup Polarization",
+      variable_code == "Q18" ~ "Intellectual Humility",
+      T ~ Question_txt
+    )) %>%
+    dplyr::mutate(Outcome = dplyr::case_when(
+      variable_code == "Q14" ~ 'Affective Polarization Measure',
+      variable_code == "Q15" ~  'Liking of Ingroup',
+      variable_code == "Q16" ~  'Liking of Outgroup',
+      variable_code == "Q17" ~  'Ingroup-Outgroup Polarization Measure',
+      variable_code == "Q18" ~  'Intellectual Humility Measure',
+      T ~ Construct
+    )) %>%
+    dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code, Comparison, moderates, Variant) %>%
+    tidyr::drop_na(Outcome)
+
+  return(basicsummarystats)
+
+}
+
+
+#' Prepare paired data for plot with within subject error term
+#'
+#' This function calculates several measures for plotting
+#' @param gathered_dat Assessment data as long format
+#' @param aversion AssessmnentVersion should be one of \code{"V4"}, \code{"V5"} and/or\code{"All"}
+#' @export
+om_label_stats <- function(gathered_dat, aversion) {
+
+  gathered_dat <- gathered_dat  %>%
+    openmindR::do_if(.data = .,
+                     condition = aversion == "V4",
+                     call = ~{
+                       .x %>%
+                         dplyr::filter(AssessmentVersion == 4)
+                     }
+    ) %>%
+    openmindR::do_if(.data = .,
+                     condition = aversion == "V5/V5.1",
+                     call = ~{
+                       .x %>%
+                         dplyr::filter(AssessmentVersion >= 5)
+                     }
+    )
+
+  plot_dat <- bind_rows(
+    q_strings_new %>%
+      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
+                                             measurevar = "Response",
+                                             withinvars = "Type",
+                                             idvar = "OMID", na.rm = T) %>%
+                       dplyr::mutate(variable_code = .x)) %>%
+      dplyr::mutate(Variant = Variante) ,
+
+    c_strings_new %>%
+      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
+                                             measurevar = "Response",
+                                             withinvars = "Type",
+                                             idvar = "OMID", na.rm = T) %>%
+                       dplyr::mutate(variable_code = .x)) %>%
+      mutate(Variant = Variante) ,
+
+    c("Q15", "Q16", "Q17") %>%
+      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat %>% drop_na(ppol_cat), variable_code == .x),
+                                             measurevar = "Response",
+                                             withinvars = "Type",
+                                             idvar = "OMID", na.rm = T) %>%
+                       dplyr::mutate(variable_code = .x)) %>%
+      dplyr::mutate(Variant = Variante)
+  )
+
+  final_dat <- plot_dat %>% as_tibble()
+
+  return(final_dat)
+
+}
+
+
+
 #' Run mixed effects model
 #'
 #' This function performs mixed models (Currently only works on Ann Miller experimental data)
@@ -330,6 +470,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   return(final)
 
 }
+
 
 
 #' Plot mixed effects model
