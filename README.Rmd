@@ -32,7 +32,7 @@ library(dplyr)
 
 
 
-## openmindR Cleaning Functions
+# openmindR Cleaning Functions
 
 The following functions are meant to turn AirTable (and GuidedTrack) data into a single clean file that can be analyzed. Along the way it parses the data, constructs measures, removes duplicates and optionally turns it into long format. The solid line is the suggested workflow for a complete dataset. The dashed lines are optional (if you don't want to add GuidedTrack data).
 
@@ -318,6 +318,7 @@ dat.ass %>%
 This section introduces the openmindR analysis functions.
 
 + [om_summarize_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
++ [om_label_stats](https://github.com/openmindplatform/openmindR#om_label_stats)
 + [om_mix_models](https://github.com/openmindplatform/openmindR#om_mix_models)
 + [om_mix_plot](https://github.com/openmindplatform/openmindR#om_mix_plot)
 + [om_mix_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
@@ -343,7 +344,7 @@ gathered_dat %>%
   arrange(desc(percentimproved))
 ```
 
-### `om_label_stats`
+## `om_label_stats`
 
 Prepare paired data for plot with within subject error term.
 
@@ -354,7 +355,7 @@ om_label_stats(gathered_dat, aversion = "V4")
 ```
 
 
-## Analyzing mixed effects
+# Analyzing mixed effects
 
 Example workflow for Ann Miller experimental data
 
@@ -414,7 +415,7 @@ Q11_dat <- om_mix_models(gathered_dat,
 
 For instance, the argument `plot_model = T` will give us a coefficient plot of the model:
 
-```{r, fig.width = 12, fig.height = 8.58}
+```{r, fig.width = 8, fig.height = 5}
 Q11_dat$ggmod
 ```
 
@@ -471,12 +472,12 @@ Just specify data and title where the latter needs to be one of the following (a
 + `"Social Closeness"`
 + `"Perspective-Taking"`
 
-```{r, fig.width = 12, fig.height = 8.58,}
+```{r, fig.width = 12, fig.height = 8.58}
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
 
 
-## openmindR ggplot2 theme
+# openmindR ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 

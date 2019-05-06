@@ -584,6 +584,24 @@ db_append <- function(path, tbl, data) {
 
 }
 
+#' SQL Database Retrieve
+#'
+#' This is a helper function that will retreive a dataframe to a SQL database
+#'
+#'
+#' @export
+db_get_data <- function(tbl_dat, path = "sql_data/omdata.db") {
+  # con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
+  con <- dbConnect(RSQLite::SQLite(), path)
+
+  out <- con %>%
+    tbl(tbl_dat) %>%
+    collect()
+
+  dbDisconnect(con)
+
+  return(out)
+}
 
 #' Specify a decimal
 #'
@@ -591,3 +609,5 @@ db_append <- function(path, tbl, data) {
 #' @param k round to which position after the comma
 #' @export
 specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+
+
