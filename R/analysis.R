@@ -231,10 +231,10 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
   if (all("PreFollow" == compare)) final_compared <- final_compared_prefollow
 
   final_compared <- final_compared %>%
-    mutate(cohendCIlow2 = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
-    mutate(cohendCIhi2 = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi)) %>%
-    select(-cohendCIlow, -cohendCIhi) %>%
-    rename(cohendCIlow = cohendCIlow2,
+    dplyr::mutate(cohendCIlow2 = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
+    dplyr::mutate(cohendCIhi2 = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi)) %>%
+    dplyr::select(-cohendCIlow, -cohendCIhi) %>%
+    dplyr::rename(cohendCIlow = cohendCIlow2,
            cohendCIhi = cohendCIhi2)
 
 
