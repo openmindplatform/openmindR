@@ -347,8 +347,8 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
                      }
     )
 
-  plot_dat <- bind_rows(
-    q_strings_new %>%
+  plot_dat <- dplyr::bind_rows(
+    openmindR::q_strings_seps %>%
       purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
@@ -356,7 +356,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
                        dplyr::mutate(variable_code = .x)) %>%
       dplyr::mutate(Variant = Variante) ,
 
-    c_strings_new %>%
+    openmindR::c_strings_seps %>%
       purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
