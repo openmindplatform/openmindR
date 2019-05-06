@@ -11,9 +11,13 @@ RoxygenNote: 6.1.1
 Imports:
     dplyr,
     stringr,
+    ggplot2,
     purrr,
     forcats,
+    sjPlot,
+    rlist,
     sjmisc,
+    lme4,
     readr,
     glue,
     highcharter,

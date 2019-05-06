@@ -579,3 +579,11 @@ db_append <- function(path, tbl, data) {
   DBI::dbDisconnect(con)
 
 }
+
+
+#' Specify a decimal
+#'
+#' @param x a number to be rounded
+#' @param k round to which position after the comma
+#' @export
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))

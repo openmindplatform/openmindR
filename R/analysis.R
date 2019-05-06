@@ -235,3 +235,193 @@ om_summarize_comparisons <- function(gathered_dat, compare = c("PrePost", "PreFo
   return(final_compared)
 }
 
+#' Run mixed effects model
+#'
+#' This function performs mixed models (Currently only works on Ann Miller experimental data)
+#' @param gathered_dat Assessment data as long format
+#' @param question Specify question that you want to perform analysis for (ex: \code{"Q18"})
+#' @param plot_model logical. Show a coefficient plot of the model. Default is \code{FALSE}
+#' @param get_effects logical. Get marginal effects. Default is \code{FALSE}
+#' @param get_tidy logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d efecct sizes. Default is \code{FALSE}
+#' @export
+om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = F, get_tidy = F) {
+
+  # question <- "Q18"
+
+  # is.data.frame(mods_dat2)
+
+  ## some data wrangling
+  mods_dat <- gathered_dat %>%
+    dplyr::filter(variable_code == question) %>%
+    dplyr::filter(Type %in% c("Pre", "Post")) %>%
+    dplyr::mutate(Condition = as.factor(Condition)) %>%
+    dplyr::mutate(Type = as.factor(Type)) %>%
+    dplyr::mutate(OMID = as.factor(OMID)) %>%
+    tidyr::drop_na(Response) %>%
+    dplyr::add_count(OMID) %>%
+    dplyr::filter(n == 2) %>%
+    dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+    base::as.data.frame()
+
+  ## Assign to a symbol that's unlikely to be in use in .GlobalEnv
+  ## (and make sure this function cleans up after itself!)
+  assign(".TeMpVaR", mods_dat, envir = globalenv())
+  on.exit(rm(.TeMpVaR, envir = globalenv()))
+
+  ## getting unique IDs we will need this for calculating pseduo cohens d
+  individs <- mods_dat %>% dplyr::distinct(OMID) %>% nrow
+
+  ## Run model
+  lme_dat <- lme4::lmer(Response ~ Condition*Type +(1+Condition|OMID) + (1+Type|OMID),
+                        data = .TeMpVaR, REML = F,
+                        control = lme4::lmerControl(check.nobs.vs.nRE = "ignore"))
+
+  final <- list(lme_dat = lme_dat)
+
+  if (plot_model) {
+    ## get coefficient plot for model
+    ggmod <- lme_dat %>%
+      sjPlot::plot_model(type = "std", show.p = T, show.values = T)
+
+    final <- rlist::list.append(final, ggmod = ggmod)
+
+  }
+
+
+
+  if (get_effects) {
+    ### This tells R to give the AP estimate at levels of Time and Ideology that we
+    ### specify. In this example we want an estimate of AP for each level of time
+    ### (Pre, Post, Follow-up) plotted at 1 sd below (liberal) and above
+    ### (conservative) the midpoint (4) for ideology. It uses the info from mod1
+    ### above to adjust for the within subjects variance we're throwing out.
+    effects_dat <- ggeffects::ggeffect(lme_dat, c("Condition", "Type" ),
+                                       x.as.factor = T,
+                                       ci.lvl = .95,
+                                       typical = "mean") %>%
+      ### Now we turn both of these into factors to make plots easier (i.e. add labels
+      ### and make sure time is in the right order, not graphed alphabetically)
+      dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind"))) %>%
+      dplyr::mutate(Type = factor(group, levels = c("Pre", "Post")))
+
+    final <- rlist::list.append(final, effects_dat = effects_dat)
+  }
+
+  if (get_tidy) {
+    ## get tidy dataframe
+    coefs <- broom::tidy(lme_dat) %>%
+      dplyr::filter(group == "fixed") %>%
+      dplyr::mutate(n_coef = nrow(.)) %>%
+      dplyr::mutate(n_dat = individs) %>%
+      ## calculate pseudo cohens d
+      dplyr::mutate(d = abs(estimate/(sqrt(n_dat - n_coef)*std.error)))
+
+    final <- rlist::list.append(final, tidy_dat = coefs)
+  }
+
+
+  return(final)
+
+}
+
+
+#' Plot mixed effects model
+#'
+#' This function plots the results of mixed models (Currently only works on Ann Miller experimental data)
+#' @param effects_dat \code{effects_dat} is a dataset produced by \code{\link{om_mix_models}} and supplies the marginal effects of the model
+#' @param tidy_dat \code{tidy_dat} is a dataset produced by \code{\link{om_mix_models}} and supplies the pseudo cohen's d for plotting
+#' @param var_label supply a character that is plotted as title and y-axis
+#' @param show_stats Show statistics on the bottom right. Only possible if you supply \code{tidy_dat}
+#' @export
+om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T) {
+
+  ### Here's a pretty graph of effects by time period with the proper within subjects error bars/estimates
+
+  # effects_dat <- Q18_dat$effects_dat
+  # tidy_dat <- Q18_dat$tidy_dat
+  # var_label <- "Intellctual Humility"
+
+  ggmod <-
+    effects_dat %>%
+    ggplot2::ggplot(ggplot2::aes(x = Type, y = predicted, fill = Condition))+
+    ggplot2::geom_bar(position = ggplot2::position_dodge(),
+             stat = "identity",
+             colour = "black", # Use black outlines,
+             size = .3,show.legend=TRUE) +      # Thinner lines
+    ggplot2::geom_errorbar(aes(ymin = predicted - std.error, ymax = predicted + std.error),
+                  size=.7,    # Thinner lines
+                  width=.2,
+                  position=ggplot2::position_dodge(.9)) +
+    ggplot2::scale_fill_manual("Condition",values = c("Article" = "#3d4fa1", "OpenMind" = "#65c6c3"))+
+    ggplot2::ylab(var_label)+
+    ggplot2::xlab("Time Point") +
+    ggplot2::coord_cartesian(ylim=c(0, 1))+
+    ggplot2::ggtitle(var_label) +
+    ggplot2::scale_y_continuous(expand = c(0, 0),limits = c(0,1)) +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill="white"),
+          text = ggplot2::element_text(family="Poppins",size=20),
+          legend.text = ggplot2::element_text(size=12),
+          legend.position = c(.08, .81),
+          #legend.title=element_blank(),
+          plot.title = ggplot2::element_text(hjust = 0.5,size=28),
+          axis.line.x = ggplot2::element_line(),
+          axis.text.x = ggplot2::element_text(hjust=0.5,size=24),
+          axis.title.x = ggplot2::element_text(hjust=0.5, size=24),
+          axis.line.y = ggplot2::element_line(),
+          axis.text.y = ggplot2::element_text(hjust=0.5,size=24),
+          axis.title.y = ggplot2::element_text(hjust=0.5, size=24),
+          legend.margin = ggplot2::margin(0, 0, 0, 0))
+
+
+
+  if (show_stats) {
+    label_dat <- tidy_dat %>%
+      dplyr::select(-group) %>%
+      dplyr::mutate_at(dplyr::vars(estimate, std.error, d), ~openmindR::specify_decimal(.x, 3)) %>%
+      dplyr::mutate(cite_stats = stringr::str_glue("B = {estimate}, SE = {std.error}, d = {d}")) %>%
+      dplyr::mutate(label = dplyr::case_when(
+        term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
+        term == "ConditionOpenMind" ~ stringr::str_glue("Article v. OpenMind: {cite_stats}\n\n"),
+        term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
+        term == "ConditionOpenMind:TypePost" ~ stringr::str_glue("Condition X Time: {cite_stats}"),
+      )) %>%
+      dplyr::pull(label) %>% glue::glue_collapse() %>% as.character()
+
+
+    ggmod <- ggmod +
+      ggplot2::labs(caption = label_dat) +
+      ggplot2::theme(plot.caption = ggplot2::element_text(family = "Poppins", size = 14, colour = "#756f71"))
+
+  }
+
+  return(ggmod)
+}
+
+
+#' Run and plot mixed effects model
+#'
+#' This function allows to run and plot a mixed model. It makes use of both \code{\link{om_mix_models}} and \code{\link{om_mix_plot}} (currently only works on Ann Miller experimental data)
+#' @param experiment Specify a dataset with experimental data
+#' @param title specify a title and y-label for the plot
+#' @export
+om_mix_complete <- function(experiment, title) {
+
+  # question <- "Q11"
+
+  question <- dplyr::case_when(
+    title == "Growth Mindset" ~ "Q11",
+    title == "Intellectual Humility" ~ "Q18",
+    title == "Affective Polarization" ~ "Q14",
+    title == "Social Closeness" ~ "Q10",
+    title == "Perspective-Taking" ~ "Q4"
+  )
+
+  gg_dat <- openmindR::om_mix_models(experiment,
+                          question = question,
+                          plot_model = F,
+                          get_effects = T,
+                          get_tidy = T)
+
+  openmindR::om_mix_plot(gg_dat$effects_dat, gg_dat$tidy_dat, title)
+
+}

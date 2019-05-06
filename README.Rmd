@@ -333,6 +333,129 @@ gathered_dat %>%
   arrange(desc(percentimproved))
 ```
 
+## Analyzing mixed effects
+
+Example workflow for Ann Miller experimental data
+
+```{r}
+load("../om_parser/data/ann_miller_merged.Rdata")
+
+cleaned_data <- ann_miller_merged %>% 
+  ## make unique OMID
+  mutate(OMID = ifelse(is.na(OMID), ResearchID, OMID)) %>% 
+  ## rescale vars
+  om_rescale() %>% 
+  ## make D4 to standard PoliticalAffil
+  mutate(D4 = ifelse(is.na(D4), PoliticalAffil, D4)) %>% 
+  ## create ppols
+  om_clean_ppol() %>%
+  ## om_construct measures needs a complete AV4
+  mutate(AssessmentVersion = 4) %>% 
+  ## construct measures
+  om_construct_measures() %>%
+  ## remove duplicates
+  remove_dups()  
+  
+
+gathered_dat <- cleaned_data %>% 
+  om_gather(q_c_strings)
+```
+
+Now that we have the Ann Miller data in long format we can use our analysis functions to perform mixed models.
+
+## ´om_mix_models´
+
+This function performs mixed models (Currently only works on Ann Miller experimental data).
+
+Takes the following arguments:
+
++ **gathered_dat** Assessment data as long format
+
++ **question** Specify question that you want to perform analysis for (ex: `"Q18`)
+
++ **plot_model** logical. Show a coefficient plot of the model. Default is `FALSE`
+
++ **get_effects** logical. Get marginal effects. Default is `FALSE`
+
++ **get_tidy** logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d efecct sizes. Default is `FALSE`
+
+Lets perform a model on `Q11` with all arguments turned on.
+
+```{r}
+Q11_dat <- om_mix_models(gathered_dat, 
+              question = "Q11", 
+              plot_model = T, 
+              get_effects = T, 
+              get_tidy = T)
+```
+
+`om_mixed_models` outputs the results of mixed effects in several ways.
+
+For instance, the argument `plot_model = T` will give us a coefficient plot of the model:
+
+```{r}
+Q11_dat$ggmod
+```
+
+The argument `get_effects = T` will give us marginal effects of the model:
+
+```{r}
+Q11_dat$effects_dat
+```
+
+
+The argument `get_tidy = T` will give us coefficients and pseudo cohen's d values of the model as a tidy dataframe:
+
+```{r}
+Q11_dat$tidy_dat
+```
+
+Finally, by default `om_mixed_models` produces the raw `lme4` object containing the model:
+
+```{r}
+Q11_dat$lme_dat
+```
+
+
+## ´om_mix_plot´
+
+This function plots the results of mixed models (currently only works on Ann Miller experimental data).
+
+Takes the following arguments:
+
++ **effects_dat** is a dataset produced by `om_mix_models` and supplies the marginal effects of the model
++ **tidy_dat** is a dataset produced by `om_mix_models` and supplies the pseudo cohen's d for plotting
++ **var_label** supply a character that is plotted as title and y-axis
++ **show_stats** Show statistics on the bottom right. Only possible if you supply `tidy_dat`
+
+```{r}
+om_mix_plot(effects_dat = Q11_dat$effects_dat, 
+            tidy_dat = Q11_dat$tidy_dat, 
+            var_label = "Growth Mindset",
+            show_stats = T)
+```
+
+
+## `om_mix_complete`
+
+This function allows to run **and** plot a mixed model. It makes use of both `om_mix_models` and `om_plot_mix` (currently only works on Ann Miller experimental data).
+
+Just specify data and title where the latter needs to be one of the following (at the moment):
+
++ `"Growth Mindset"`
+
++ `"Intellectual Humility"`
+
++ `"Affective Polarization"`
+
++ `"Social Closeness"`
+
++ `"Perspective-Taking"`
+
+```{r}
+om_mix_complete(gathered_dat, "Growth Mindset")
+```
+
 
 ## openmindR ggplot2 theme
 
