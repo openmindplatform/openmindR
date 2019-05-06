@@ -355,7 +355,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
              stat = "identity",
              colour = "black", # Use black outlines,
              size = .3,show.legend=TRUE) +      # Thinner lines
-    ggplot2::geom_errorbar(aes(ymin = predicted - std.error, ymax = predicted + std.error),
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = predicted - std.error, ymax = predicted + std.error),
                   size=.7,    # Thinner lines
                   width=.2,
                   position=ggplot2::position_dodge(.9)) +
