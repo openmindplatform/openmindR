@@ -4,13 +4,13 @@
 \alias{om_summarize_comparisons}
 \title{Conduct t-tests and calculate Cohen's d}
 \usage{
-om_summarize_comparisons(gathered_dat, aversion, compare = c("PrePost",
-  "PreFollow"))
+om_summarize_comparisons(gathered_dat, aversion = "All",
+  compare = c("PrePost", "PreFollow"))
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}
 
-\item{aversion}{AssessmnentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or\code{"All"}}
+\item{aversion}{AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}}
 
 \item{compare}{With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).}
 }

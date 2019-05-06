@@ -324,7 +324,9 @@ This section introduces the openmindR analysis functions.
 
 ## `om_summarize_comparisons`
 
-This is a higher-level function that uses both "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d using long-format Assessment data.
+This is a higher-level function that uses "om_compare", "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d using long-format Assessment data.
+
+The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` and/or `"All"`
 
 With the `compare` argument you can specify either `"PrePost"`, `"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the latter is the default).
 
@@ -336,9 +338,21 @@ gathered_dat <- dat.ass %>%
   om_gather(q_c_strings) 
 
 gathered_dat %>% 
-  om_summarize_comparisons(compare = c("PrePost", "PreFollow")) %>% 
+  om_summarize_comparisons(aversion = "V4",
+                           compare = c("PrePost", "PreFollow")) %>% 
   arrange(desc(percentimproved))
 ```
+
+### `om_label_stats`
+
+Prepare paired data for plot with within subject error term.
+
+The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` and/or `"All"`
+
+```{r}
+om_label_stats(gathered_dat, aversion = "V4")
+```
+
 
 ## Analyzing mixed effects
 

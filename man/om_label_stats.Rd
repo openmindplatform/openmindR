@@ -4,12 +4,12 @@
 \alias{om_label_stats}
 \title{Prepare paired data for plot with within subject error term}
 \usage{
-om_label_stats(gathered_dat, aversion)
+om_label_stats(gathered_dat, aversion = "All")
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}
 
-\item{aversion}{AssessmnentVersion should be one of \code{"V4"}, \code{"V5"} and/or\code{"All"}}
+\item{aversion}{AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}}
 }
 \description{
 This function calculates several measures for plotting

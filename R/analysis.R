@@ -246,9 +246,9 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 #' This is a higher-level function that uses "om_compare", "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d on Assessment data.
 #' @param gathered_dat Assessment data as long format
 #' @param compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
-#' @param aversion AssessmnentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or\code{"All"}
+#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}
 #' @export
-om_summarize_comparisons <- function(gathered_dat, aversion, compare = c("PrePost", "PreFollow")) {
+om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c("PrePost", "PreFollow")) {
 
   # Variant <- "V5"
 
@@ -272,7 +272,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion, compare = c("PrePos
   basicsummarystats <- gathered_dat %>%
     openmindR::om_compare(compare) %>%
     openmindR::do_if(.data = .,
-          condition = aversion == "V5",
+          condition = aversion == "V5/V5.1",
           call = ~{
             .x %>%
               dplyr::left_join(assessmentv5_codebook %>%
@@ -327,9 +327,9 @@ om_summarize_comparisons <- function(gathered_dat, aversion, compare = c("PrePos
 #'
 #' This function calculates several measures for plotting
 #' @param gathered_dat Assessment data as long format
-#' @param aversion AssessmnentVersion should be one of \code{"V4"}, \code{"V5"} and/or\code{"All"}
+#' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} and/or \code{"All"}
 #' @export
-om_label_stats <- function(gathered_dat, aversion) {
+om_label_stats <- function(gathered_dat, aversion = "All") {
 
   gathered_dat <- gathered_dat  %>%
     openmindR::do_if(.data = .,
