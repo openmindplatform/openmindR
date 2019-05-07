@@ -23,7 +23,7 @@ library(openmindR)
 library(dplyr)
 ```
 
-## openmindR Cleaning Functions
+# openmindR Cleaning Functions
 
 The following functions are meant to turn AirTable (and GuidedTrack)
 data into a single clean file that can be analyzed. Along the way it
@@ -262,7 +262,7 @@ dat.par %>%
   om_clean_par(parse_feedback = T) 
 ```
 
-    ## # A tibble: 17,109 x 36
+    ## # A tibble: 17,139 x 36
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
     ##  1 7806~ <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
@@ -275,7 +275,7 @@ dat.par %>%
     ##  8 1000~ <NA>      1, 1, 1, 1, 1        0.625        1            0.667
     ##  9 2458~ <NA>      1, 1, 1, 1, 0        1            1            1    
     ## 10 9406~ <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # ... with 17,099 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ## # ... with 17,129 more rows, and 30 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
@@ -300,7 +300,7 @@ dat.ass %>%
   om_rescale()
 ```
 
-    ## # A tibble: 17,013 x 78
+    ## # A tibble: 17,040 x 78
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                0.4   0.6 
@@ -313,7 +313,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                0.56  0.54
     ##  9 rec0~ 5370~ Individua~ 4                2                0.5   0.37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                0.5   0.5 
-    ## # ... with 17,003 more rows, and 71 more variables: Q3Pre <dbl>,
+    ## # ... with 17,030 more rows, and 71 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -383,7 +383,7 @@ dat.ass <- dat.ass %>%
 dat.ass
 ```
 
-    ## # A tibble: 17,013 x 82
+    ## # A tibble: 17,040 x 82
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
@@ -396,7 +396,7 @@ dat.ass
     ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
     ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
     ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
-    ## # ... with 17,003 more rows, and 75 more variables: Q3Pre <dbl>,
+    ## # ... with 17,030 more rows, and 75 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -423,7 +423,7 @@ dat.ass %>%
   om_construct_measures()
 ```
 
-    ## # A tibble: 17,013 x 97
+    ## # A tibble: 17,040 x 97
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -436,7 +436,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 17,003 more rows, and 90 more variables: Q3Pre <dbl>,
+    ## # ... with 17,030 more rows, and 90 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -474,7 +474,7 @@ dat.ass %>%
 
     ## Removing 515 duplicates...
 
-    ## # A tibble: 16,498 x 83
+    ## # A tibble: 16,525 x 83
     ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
     ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
@@ -487,7 +487,7 @@ dat.ass %>%
     ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
     ##  9 rec0~ 5370~ Individua~                4 2                  50    37
     ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,488 more rows, and 76 more variables: Q3Pre <dbl>,
+    ## # ... with 16,515 more rows, and 76 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -534,7 +534,7 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
-    ## # A tibble: 765,585 x 4
+    ## # A tibble: 766,800 x 4
     ##    Question Response Type  variable_code
     ##    <chr>       <dbl> <chr> <chr>        
     ##  1 Q1Pre          40 Pre   Q1           
@@ -547,7 +547,7 @@ dat.ass %>%
     ##  8 Q1Pre          56 Pre   Q1           
     ##  9 Q1Pre          50 Pre   Q1           
     ## 10 Q1Pre          50 Pre   Q1           
-    ## # ... with 765,575 more rows
+    ## # ... with 766,790 more rows
 
 # openmindR Analysis Functions
 
@@ -555,15 +555,19 @@ This section introduces the openmindR analysis
     functions.
 
   - [om\_summarize\_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
+  - [om\_label\_stats](https://github.com/openmindplatform/openmindR#om_label_stats)
   - [om\_mix\_models](https://github.com/openmindplatform/openmindR#om_mix_models)
   - [om\_mix\_plot](https://github.com/openmindplatform/openmindR#om_mix_plot)
   - [om\_mix\_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
 
 ## `om_summarize_comparisons`
 
-This is a higher-level function that uses both “bind\_questions” and
-“summarize\_comparison” to calculate t-tests and Cohen’s d using
-long-format Assessment data.
+This is a higher-level function that uses “om\_compare”,
+“bind\_questions” and “summarize\_comparison” to calculate t-tests and
+Cohen’s d using long-format Assessment data.
+
+The `aversion` argument specifies which Assessment version you want to
+perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
 
 With the `compare` argument you can specify either `"PrePost"`,
 `"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the
@@ -577,27 +581,54 @@ gathered_dat <- dat.ass %>%
   om_gather(q_c_strings) 
 
 gathered_dat %>% 
-  om_summarize_comparisons(compare = c("PrePost", "PreFollow")) %>% 
+  om_summarize_comparisons(aversion = "V4",
+                           compare = c("PrePost", "PreFollow")) %>% 
   arrange(desc(percentimproved))
 ```
 
-    ## # A tibble: 40 x 10
-    ##    variable_code cohend tstat    pvalue    df percentimproved Comparison
-    ##    <chr>          <dbl> <dbl>     <dbl> <dbl>           <dbl> <chr>     
-    ##  1 Q17            0.519 11.0  5.49e- 25   447           0.663 PreFollow 
-    ##  2 Q17            0.534 38.6  1.99e-286  5219           0.657 PrePost   
-    ##  3 Q16            0.403  8.53 2.36e- 16   447           0.618 PreFollow 
-    ##  4 Q16            0.470 33.9  2.34e-228  5219           0.618 PrePost   
-    ##  5 Q18            0.336 31.4  1.57e-205  8773           0.578 PrePost   
-    ##  6 Q14            0.423 39.3  1.52e-310  8633           0.569 PrePost   
-    ##  7 Q14            0.365  9.82 1.93e- 21   723           0.566 PreFollow 
-    ##  8 Q18            0.235  7.53 1.10e- 13  1024           0.537 PreFollow 
-    ##  9 Q2             0.207  5.56 3.79e-  8   723           0.521 PreFollow 
-    ## 10 Q2             0.240 22.3  8.76e-107  8633           0.493 PrePost   
-    ## # ... with 30 more rows, and 3 more variables: moderates <chr>,
-    ## #   cohendCIlow <dbl>, cohendCIhi <dbl>
+    ## # A tibble: 37 x 11
+    ##    Outcome Question_txt cohend tstat    pvalue    df percentimproved
+    ##    <chr>   <chr>         <dbl> <dbl>     <dbl> <dbl>           <dbl>
+    ##  1 Ingrou~ Ingroup-Out~  0.510 27.5  1.74e-148  2917           0.639
+    ##  2 Ingrou~ Ingroup-Out~  0.483  6.77 1.51e- 10   195           0.622
+    ##  3 Liking~ Liking for ~  0.452 24.4  3.64e-120  2917           0.607
+    ##  4 Intell~ Intellectua~  0.366 25.4  7.59e-134  4818           0.587
+    ##  5 Liking~ Liking for ~  0.358  5.01 1.24e-  6   195           0.571
+    ##  6 Affect~ Affective P~  0.397 27.5  3.98e-155  4814           0.552
+    ##  7 Intell~ Intellectua~  0.249  6.20 1.02e-  9   618           0.544
+    ##  8 Affect~ Affective P~  0.278  5.08 6.34e-  7   332           0.520
+    ##  9 Affect~ How do you ~  0.218 15.1  1.95e- 50  4814           0.484
+    ## 10 Affect~ How do you ~  0.179  3.26 1.23e-  3   332           0.468
+    ## # ... with 27 more rows, and 4 more variables: variable_code <chr>,
+    ## #   Comparison <chr>, moderates <chr>, Variant <chr>
 
-## Analyzing mixed effects
+## `om_label_stats`
+
+Prepare paired data for plot with within subject error term.
+
+The `aversion` argument specifies which Assessment version you want to
+perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
+
+``` r
+om_label_stats(gathered_dat, aversion = "V4")
+```
+
+    ## # A tibble: 60 x 8
+    ##    Type         N Response     sd      se     ci variable_code Variant
+    ##    <fct>    <dbl>    <dbl>  <dbl>   <dbl>  <dbl> <chr>         <chr>  
+    ##  1 FollowUp   337    62.3  12.2   0.664   1.31   Q1            V4     
+    ##  2 Post      4937    61.6  10.9   0.156   0.305  Q1            V4     
+    ##  3 Pre       8031    61.7   8.73  0.0974  0.191  Q1            V4     
+    ##  4 FollowUp   337    50.9  11.6   0.632   1.24   Q2            V4     
+    ##  5 Post      4937    51.6  10.6   0.151   0.297  Q2            V4     
+    ##  6 Pre       8031    48.6   8.50  0.0948  0.186  Q2            V4     
+    ##  7 FollowUp   622     3.60  1.18  0.0473  0.0928 Q3            V4     
+    ##  8 Post      4820     3.61  1.08  0.0155  0.0304 Q3            V4     
+    ##  9 Pre       8672     3.42  0.838 0.00899 0.0176 Q3            V4     
+    ## 10 FollowUp   622     4.00  1.19  0.0478  0.0939 Q4            V4     
+    ## # ... with 50 more rows
+
+# Analyzing mixed effects
 
 Example workflow for Ann Miller experimental data
 
@@ -668,7 +699,7 @@ plot of the model:
 Q11_dat$ggmod
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 The argument `get_effects = T` will give us marginal effects of the
 model:
@@ -754,7 +785,7 @@ om_mix_plot(effects_dat = Q11_dat$effects_dat,
             show_stats = T)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ## `om_mix_complete`
 
@@ -777,9 +808,9 @@ following (at the moment):
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
-## openmindR ggplot2 theme
+# openmindR ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 
@@ -817,7 +848,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -843,7 +874,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -862,4 +893,4 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
