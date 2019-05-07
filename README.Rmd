@@ -334,6 +334,8 @@ With the `compare` argument you can specify either `"PrePost"`, `"PreFollow"` or
 ```{r}
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
+  om_rescale() %>% 
+  om_clean_ppol() %>%
   om_construct_measures() %>%
   remove_dups() %>%  
   om_gather(q_c_strings) 
@@ -349,6 +351,8 @@ gathered_dat %>%
 Prepare paired data for plot with within subject error term.
 
 The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
+
+Todo: remove C1, C2, C3 post 
 
 ```{r}
 om_label_stats(gathered_dat, aversion = "V4")
