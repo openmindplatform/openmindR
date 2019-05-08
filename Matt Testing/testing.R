@@ -163,3 +163,23 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 eddysummary<-om_summarize_comparisons(eddylong)
 prepo<-om_summarize_comparisons(n3v4long,compare="PrePost")
 prefo<-om_summarize_comparisons(n3v4long,compare="PreFollow")
+
+
+
+eddy$Condition <- car::recode(eddy$AccessCode, 
+                               "'EddySalemStateUniversityF18' = 'Experimental Treatment';
+                               'EddySalemStateUniversityF18s' = 'Experimental Treatment';
+                               'EddySalemStateUniversityF18p' = 'Experimental Treatment';
+                               'EddySalemStateUniversityF18t' = 'Delayed Treatment';
+                               'EddySalemStateUniversityF18r' = 'Delayed Treatment';
+                               else=NA")
+eddylong$Condition<-car::recode(eddylong$AccessCode, 
+                      "'EddySalemStateUniversityF18' = 'Experimental Treatment';
+                      'EddySalemStateUniversityF18s' = 'Experimental Treatment';
+                      'EddySalemStateUniversityF18p' = 'Experimental Treatment';
+                      'EddySalemStateUniversityF18t' = 'Delayed Treatment';
+                      'EddySalemStateUniversityF18r' = 'Delayed Treatment';
+                      else=NA")
+wut<-om_label_stats(eddylong, aversion = "V4")
+gm.s<-om_mix_models(eddylong,question="Q11",plot_model=T,get_effects=T,get_tidy=T)
+om_mix_plot(gm.s$effects_dat,tidy_dat=gm.s$tidy_dat,show_stats=T,var_label="Growth Mindset")
