@@ -452,7 +452,14 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
                                        typical = "mean") %>%
       ### Now we turn both of these into factors to make plots easier (i.e. add labels
       ### and make sure time is in the right order, not graphed alphabetically)
-      dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind"))) %>%
+      openmindR::do_if(.data = .,
+        condition = "Article" %in% unique(mods_dat$Condition),
+        call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind")))}
+      ) %>%
+      openmindR::do_if(.data = .,
+        condition = "Delayed" %in% unique(mods_dat$Condition),
+        call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Experimental Treatment", "Delayed Treatment")))}
+      ) %>%
       dplyr::mutate(Type = factor(group, levels = c("Pre", "Post")))
 
     final <- rlist::list.append(final, effects_dat = effects_dat)
@@ -504,7 +511,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
                   size=.7,    # Thinner lines
                   width=.2,
                   position=ggplot2::position_dodge(.9)) +
-    ggplot2::scale_fill_manual("Condition",values = c("Article" = "#3d4fa1", "OpenMind" = "#65c6c3"))+
+    ggplot2::scale_fill_manual("Condition", values = c("#3d4fa1", "#65c6c3")) +
     ggplot2::ylab(var_label)+
     ggplot2::xlab("Time Point") +
     ggplot2::coord_cartesian(ylim=c(0, 1))+

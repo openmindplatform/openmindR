@@ -11,7 +11,7 @@ load("data/par.RData")
 load("data/ins.RData")
 
 
-om_filter_data(dat.ass4,n_assessments=3,version=4)
+n2v4<-om_filter_data(dat.ass4,n_assessments=c(1,2,3),version=4,accesscode="EddySalem",exact_search=F)
 # script works fine without loading tidyverse anymore
 
 
@@ -39,7 +39,7 @@ n1rangev4<-om_filter_data(dat.ass4,n_assessments=c(1,2),version=4)
 
 # access codes
 n1v4a<-om_filter_data(dat.ass4,n_assessments=3
-                      ,version=4,accesscode="EddySalemStateUniversityF18",exact_search=F)
+                      ,version=4,accesscode="EddySalem",exact_search=F)
 #yes, good
 
 #multiple access codes?
@@ -123,6 +123,12 @@ table(n2v4cleanppol$ppol)
 table(n2v4cleanppol$ppol_cat)
 
 
+eddy<-om_rescale(n2v4)
+eddy<-om_clean_ppol(eddy)
+eddy<-om_construct_measures(eddy)
+eddy<-remove_dups(eddy)
+eddylong<-om_gather(eddy)
+
 #########################################
 #########################################
 #########################################
@@ -154,6 +160,6 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 
 
 ?om_summarize_comparisons()
-om_summarize_comparisons(n3v4long)
+eddysummary<-om_summarize_comparisons(eddylong)
 prepo<-om_summarize_comparisons(n3v4long,compare="PrePost")
 prefo<-om_summarize_comparisons(n3v4long,compare="PreFollow")
