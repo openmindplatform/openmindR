@@ -29,7 +29,7 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
 
   final_list <- list()
 
-  #### downloads full data table ####
+  ## downloads full data table
   if ("AssessmentV4" %in% tables) {
     cat("Download AssessmentV4 Data\n")
     final_list$dat.ass4 <- dat.ass.1$AssessmentV4$select_all()
