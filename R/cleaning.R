@@ -14,6 +14,7 @@
 #'@param key key for AirTable API
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
+#'@export
 om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
 
   cat("Seting up key\n")
