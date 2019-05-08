@@ -230,7 +230,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
   # codes, we could tag their data in GuidedTrack and AirTable
   # Instead of simply labeling AccessCodes as "RCTA" - we could name them RCTA-Exp vs. RCTA-Con
   # This latter approach will reduce likelihood of error in manually spelling out which access 
-  # codes are in which conditions
+  # codes are in which conditions#
   
   ## lazy evaluation
   Q1 <- dplyr::enquo(Q1)
