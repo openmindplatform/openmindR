@@ -457,7 +457,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
         call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind")))}
       ) %>%
       openmindR::do_if(.data = .,
-        condition = "Delayed" %in% unique(mods_dat$Condition),
+        condition = "Delayed Treatment" %in% unique(mods_dat$Condition),
         call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Experimental Treatment", "Delayed Treatment")))}
       ) %>%
       dplyr::mutate(Type = factor(group, levels = c("Pre", "Post")))
@@ -472,6 +472,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
       dplyr::mutate(n_coef = nrow(.)) %>%
       dplyr::mutate(n_dat = individs) %>%
       ## calculate pseudo cohens d
+      # todo: add note in output that it is a pseudo-d
       dplyr::mutate(d = abs(estimate/(sqrt(n_dat - n_coef)*std.error)))
 
     final <- rlist::list.append(final, tidy_dat = coefs)
@@ -537,6 +538,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
     label_dat <- tidy_dat %>%
       dplyr::select(-group) %>%
       dplyr::mutate_at(dplyr::vars(estimate, std.error, d), ~openmindR::specify_decimal(.x, 3)) %>%
+      #todo: add subscript p to d because it is a pseudo-d, not actual d
       dplyr::mutate(cite_stats = stringr::str_glue("B = {estimate}, SE = {std.error}, d = {d}")) %>%
       dplyr::mutate(label = dplyr::case_when(
         term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
