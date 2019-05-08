@@ -67,7 +67,7 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     cat(paste0("Done. Technical Inquiries Data has ", nrow(final_list$dat.tec), " rows\n"))
   }
 
-  if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2()
+  if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1)
 
   return(final_list)
 
