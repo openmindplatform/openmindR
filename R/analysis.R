@@ -391,10 +391,10 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
 #' @param get_tidy logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d efecct sizes. Default is \code{FALSE}
 #' @export
 om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = F, get_tidy = F) {
-##todo:this function needs examples in the documentation
-## where do we specify what the between subjects variable being tested in the model is?
-## for ann miller, it's "condition"... does this function simply look for that variable?
-## need to make this more general/robust to other experiments#
+  ##todo:this function needs examples in the documentation
+  ## where do we specify what the between subjects variable being tested in the model is?
+  ## for ann miller, it's "condition"... does this function simply look for that variable?
+  ## need to make this more general/robust to other experiments#
 
   # question <- "Q18"
 
@@ -432,7 +432,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
     ## get coefficient plot for model
     ggmod <- lme_dat %>%
       sjPlot::plot_model(type = "std", show.p = T, show.values = T)# +
-      # ggplot2::theme_minimal()
+    # ggplot2::theme_minimal()
 
     final <- rlist::list.append(final, ggmod = ggmod)
 
@@ -453,12 +453,12 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
       ### Now we turn both of these into factors to make plots easier (i.e. add labels
       ### and make sure time is in the right order, not graphed alphabetically)
       openmindR::do_if(.data = .,
-        condition = "Article" %in% unique(mods_dat$Condition),
-        call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind")))}
+                       condition = "Article" %in% unique(mods_dat$Condition),
+                       call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Article","OpenMind")))}
       ) %>%
       openmindR::do_if(.data = .,
-        condition = "Delayed Treatment" %in% unique(mods_dat$Condition),
-        call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Experimental Treatment", "Delayed Treatment")))}
+                       condition = "Delayed Treatment" %in% unique(mods_dat$Condition),
+                       call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Experimental Treatment", "Delayed Treatment")))}
       ) %>%
       dplyr::mutate(Type = factor(group, levels = c("Pre", "Post")))
 
@@ -484,7 +484,6 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
 }
 
 
-
 #' Plot mixed effects model
 #'
 #' This function plots the results of mixed models (Currently only works on Ann Miller experimental data)
@@ -497,21 +496,21 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
 
   ### Here's a pretty graph of effects by time period with the proper within subjects error bars/estimates
 
-  # effects_dat <- Q18_dat$effects_dat
-  # tidy_dat <- Q18_dat$tidy_dat
+  # effects_dat <- gm.s$effects_dat
+  # tidy_dat <- gm.s$tidy_dat
   # var_label <- "Intellctual Humility"
 
   ggmod <-
     effects_dat %>%
     ggplot2::ggplot(ggplot2::aes(x = Type, y = predicted, fill = Condition))+
     ggplot2::geom_bar(position = ggplot2::position_dodge(),
-             stat = "identity",
-             colour = "black", # Use black outlines,
-             size = .3,show.legend=TRUE) +      # Thinner lines
+                      stat = "identity",
+                      colour = "black", # Use black outlines,
+                      size = .3,show.legend=TRUE) +      # Thinner lines
     ggplot2::geom_errorbar(ggplot2::aes(ymin = predicted - std.error, ymax = predicted + std.error),
-                  size=.7,    # Thinner lines
-                  width=.2,
-                  position=ggplot2::position_dodge(.9)) +
+                           size=.7,    # Thinner lines
+                           width=.2,
+                           position=ggplot2::position_dodge(.9)) +
     ggplot2::scale_fill_manual("Condition", values = c("#3d4fa1", "#65c6c3")) +
     ggplot2::ylab(var_label)+
     ggplot2::xlab("Time Point") +
@@ -519,18 +518,18 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
     ggplot2::ggtitle(var_label) +
     ggplot2::scale_y_continuous(expand = c(0, 0),limits = c(0,1)) +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill="white"),
-          text = ggplot2::element_text(family="Poppins",size=20),
-          legend.text = ggplot2::element_text(size=12),
-          legend.position = c(.08, .81),
-          #legend.title=element_blank(),
-          plot.title = ggplot2::element_text(hjust = 0.5,size=28),
-          axis.line.x = ggplot2::element_line(),
-          axis.text.x = ggplot2::element_text(hjust=0.5,size=24),
-          axis.title.x = ggplot2::element_text(hjust=0.5, size=24),
-          axis.line.y = ggplot2::element_line(),
-          axis.text.y = ggplot2::element_text(hjust=0.5,size=24),
-          axis.title.y = ggplot2::element_text(hjust=0.5, size=24),
-          legend.margin = ggplot2::margin(0, 0, 0, 0))
+                   text = ggplot2::element_text(family="Poppins",size=20),
+                   legend.text = ggplot2::element_text(size=12),
+                   legend.position = c(.08, .81),
+                   #legend.title=element_blank(),
+                   plot.title = ggplot2::element_text(hjust = 0.5,size=28),
+                   axis.line.x = ggplot2::element_line(),
+                   axis.text.x = ggplot2::element_text(hjust=0.5,size=24),
+                   axis.title.x = ggplot2::element_text(hjust=0.5, size=24),
+                   axis.line.y = ggplot2::element_line(),
+                   axis.text.y = ggplot2::element_text(hjust=0.5,size=24),
+                   axis.title.y = ggplot2::element_text(hjust=0.5, size=24),
+                   legend.margin = ggplot2::margin(0, 0, 0, 0))
 
 
 
@@ -540,12 +539,28 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
       dplyr::mutate_at(dplyr::vars(estimate, std.error, d), ~openmindR::specify_decimal(.x, 3)) %>%
       #todo: add subscript p to d because it is a pseudo-d, not actual d
       dplyr::mutate(cite_stats = stringr::str_glue("B = {estimate}, SE = {std.error}, d = {d}")) %>%
-      dplyr::mutate(label = dplyr::case_when(
-        term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
-        term == "ConditionOpenMind" ~ stringr::str_glue("Article v. OpenMind: {cite_stats}\n\n"),
-        term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
-        term == "ConditionOpenMind:TypePost" ~ stringr::str_glue("Condition X Time: {cite_stats}"),
-      )) %>%
+      openmindR::do_if(.data = .,
+                       condition = "ConditionExperimental Treatment" %in% unique(tidy_dat$term),
+                       call = ~{.x %>%
+                           dplyr::mutate(label = dplyr::case_when(
+                             term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
+                             term == "ConditionExperimental Treatment" ~ stringr::str_glue("Experimental v. Delayed: {cite_stats}\n\n"),
+                             term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
+                             term == "ConditionExperimental Treatment:TypePost" ~ stringr::str_glue("Condition X Time: {cite_stats}")
+                           )
+                           )}
+      ) %>%
+      openmindR::do_if(.data = .,
+                       condition = "ConditionOpenMind" %in% unique(tidy_dat$term),
+                       call = ~{.x %>%
+                           dplyr::mutate(label = dplyr::case_when(
+                             term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
+                             term == "ConditionOpenMind" ~ stringr::str_glue("Article v. OpenMind: {cite_stats}\n\n"),
+                             term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
+                             term == "ConditionOpenMind:TypePost	" ~ stringr::str_glue("Condition X Time: {cite_stats}")
+                           )
+                           )}
+      ) %>%
       dplyr::pull(label) %>% glue::glue_collapse() %>% as.character()
 
 
@@ -557,7 +572,6 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
 
   return(ggmod)
 }
-
 
 #' Run and plot mixed effects model
 #'
