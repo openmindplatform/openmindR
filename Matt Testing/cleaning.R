@@ -214,6 +214,24 @@ polar_measures <- function(final_dat, Q1, Q2) {
     stringr::str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
   )
 
+  ## Todo: Add in argument where we can specify what AccessCodes correspond to which conditions
+  # for example, in the Eddy study 3 access codes were in the normal OM / experimental condition
+  # and 2 access codes were in the delay condition. I've pasted the code I used to manually
+  # assign condition to each of the Eddy access codes below
+ # Eddy.p$condition <- car::recode(Eddy.p$AccessCode, 
+ #                                 "'EddySalemStateUniversityF18' = 'Experimental Treatment';
+ #                                 'EddySalemStateUniversityF18s' = 'Experimental Treatment';
+ #                                 'EddySalemStateUniversityF18p' = 'Experimental Treatment';
+ #                                 'EddySalemStateUniversityF18t' = 'Delayed Treatment';
+ #                                 'EddySalemStateUniversityF18r' = 'Delayed Treatment';
+ #                                 else=NA")
+ # Eddy.p$condition<-as.factor(Eddy.p$condition)
+  # ALTERNATIVELY, when we assign sections to conditions when the professors create the access
+  # codes, we could tag their data in GuidedTrack and AirTable
+  # Instead of simply labeling AccessCodes as "RCTA" - we could name them RCTA-Exp vs. RCTA-Con
+  # This latter approach will reduce likelihood of error in manually spelling out which access 
+  # codes are in which conditions
+  
   ## lazy evaluation
   Q1 <- dplyr::enquo(Q1)
   Q2 <- dplyr::enquo(Q2)

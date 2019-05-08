@@ -391,6 +391,10 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
 #' @param get_tidy logical. Get a tidy dataframe with estimates. Also calculates pseudo cohen's d efecct sizes. Default is \code{FALSE}
 #' @export
 om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = F, get_tidy = F) {
+##todo:this function needs examples in the documentation
+## where do we specify what the between subjects variable being tested in the model is?
+## for ann miller, it's "condition"... does this function simply look for that variable?
+## need to make this more general/robust to other experiments
 
   # question <- "Q18"
 
