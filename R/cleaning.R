@@ -1,3 +1,77 @@
+#' Download AirTable data
+#'
+#' This function downloads current AirTable data
+#'
+#' @md
+#' @section Currently allowed input:
+#' + `"AssessmentV4"`
+#' + `"AssessmentV5"`
+#' + `"AccessCodes"`
+#' + `"ParticipantProgress"`
+#' + `"InstructorSurvey"`
+#' + `"TechnicalInquiries"`
+#'
+#'@param key key for AirTable API
+#'@param tables specify which tables you want to download
+#'@return a list with (several) dataframe(s)
+om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
+
+  cat("Seting up key\n")
+
+  Sys.setenv(AIRTABLE_API_KEY = key)
+  AIRTABLE_API_KEY = key
+
+
+  dat.ass.1 <- airtabler::airtable(
+    base = "appjU7KUyybZ4rGvT",
+    tables = tables
+  )
+
+  final_list <- list()
+
+  #### downloads full data table ####
+  if ("AssessmentV4" %in% tables) {
+    cat("Download AssessmentV4 Data\n")
+    final_list$dat.ass4 <- dat.ass.1$AssessmentV4$select_all()
+    cat(paste0("Done. AssessmentV4 Data has ", nrow(final_list$dat.ass4), " rows\n"))
+  }
+
+  if ("AssessmentV5" %in% tables) {
+    cat("Download AssessmentV5 Data\n")
+    final_list$dat.ass5 <- dat.ass.1$AssessmentV5$select_all()
+    cat(paste0("Done. AssessmentV5 Data has ", nrow(final_list$dat.ass5), " rows\n"))
+  }
+
+  if ("AccessCodes" %in% tables) {
+    cat("Download AccessCodes Data\n")
+    final_list$dat.acc <- dat.ass.1$AccessCodes$select_all()
+    cat(paste0("Done. AccessCodes Data has ", nrow(final_list$dat.acc), " rows\n"))
+  }
+
+
+  if ("ParticipantProgress" %in% tables) {
+    cat("Download Participant Progress Data\n")
+    final_list$dat.par <- dat.ass.1$ParticipantProgress$select_all()
+    cat(paste0("Done. Participant Progress Data has ", nrow(final_list$dat.par), " rows\n"))
+  }
+
+  if ("InstructorSurvey" %in% tables) {
+    cat("Download Instructor Survey Data\n")
+    final_list$dat.ins <- dat.ass.1$InstructorSurvey$select_all()
+    cat(paste0("Done. Instructor Survey Data has ", nrow(final_list$dat.ins), " rows\n"))
+  }
+
+  if ("TechnicalInquiries" %in% tables) {
+    cat("Download Technial Inquiries Data\n")
+    final_list$dat.tec <- dat.ass.1$TechnicalInquiries$select_all()
+    cat(paste0("Done. Technical Inquiries Data has ", nrow(final_list$dat.tec), " rows\n"))
+  }
+
+  return(final_list)
+
+}
+
+
 #' This function filters down Assessment (or ParticipantProgress) data
 #'
 #' You can filter data by \code{AssessmentsDone}, \code{AssessmentVersion} and \code{AccessCode} (ParticipantProgress data can only be filtered by \code{AccessCode})
