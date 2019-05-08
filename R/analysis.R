@@ -414,7 +414,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   assign(".TeMpVaR", mods_dat, envir = globalenv())
   on.exit(rm(.TeMpVaR, envir = globalenv()))
 
-  ## getting unique IDs we will need this for calculating pseduo cohens d
+  ## getting unique IDs we will need this for calculating pseudo cohens d
   individs <- mods_dat %>% dplyr::distinct(OMID) %>% nrow
 
   ## Run model

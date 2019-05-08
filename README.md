@@ -30,8 +30,7 @@ data into a single clean file that can be analyzed. Along the way it
 parses the data, constructs measures, removes duplicates and optionally
 turns it into long format. The solid line is the suggested workflow for
 a complete dataset. The dashed lines are optional (if you don’t want to
-add GuidedTrack
-    data).
+add GuidedTrack data).
 
   - [om\_filter\_data](https://github.com/openmindplatform/openmindR#om_filter_data)
   - [om\_clean\_par](https://github.com/openmindplatform/openmindR#om_clean_par)
@@ -551,8 +550,7 @@ dat.ass %>%
 
 # openmindR Analysis Functions
 
-This section introduces the openmindR analysis
-    functions.
+This section introduces the openmindR analysis functions.
 
   - [om\_summarize\_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
   - [om\_label\_stats](https://github.com/openmindplatform/openmindR#om_label_stats)
@@ -561,6 +559,8 @@ This section introduces the openmindR analysis
   - [om\_mix\_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
 
 ## `om_summarize_comparisons`
+
+TODO; CLEANED LONG DATASET
 
 This is a higher-level function that uses “om\_compare”,
 “bind\_questions” and “summarize\_comparison” to calculate t-tests and
@@ -678,7 +678,7 @@ Takes the following arguments:
   - **get\_effects** logical. Get marginal effects. Default is `FALSE`
 
   - **get\_tidy** logical. Get a tidy dataframe with estimates. Also
-    calculates pseudo cohen’s d effcct sizes. Default is `FALSE`
+    calculates pseudo cohen’s d effect sizes. Default is `FALSE`
 
 Lets perform a model on `Q11` with all arguments turned on.
 
