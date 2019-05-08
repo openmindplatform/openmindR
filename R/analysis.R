@@ -580,7 +580,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
 #' @param title specify a title and y-label for the plot
 #' @export
 om_mix_complete <- function(experiment, title) {
-
+#todo: would be nice to be able to specify ALL, some, or just one of the outcome variables
   # question <- "Q11"
 
   question <- dplyr::case_when(
