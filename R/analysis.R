@@ -394,7 +394,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
 ##todo:this function needs examples in the documentation
 ## where do we specify what the between subjects variable being tested in the model is?
 ## for ann miller, it's "condition"... does this function simply look for that variable?
-## need to make this more general/robust to other experiments
+## need to make this more general/robust to other experiments#
 
   # question <- "Q18"
 
