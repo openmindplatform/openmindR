@@ -15,18 +15,18 @@ n2v4<-om_filter_data(dat.ass4,n_assessments=c(1,2,3),version=4,accesscode="EddyS
 # script works fine without loading tidyverse anymore
 
 
-n1v4<-om_filter_data(dat.ass4,n_assessments=1,version=4)
-n2v4<-om_filter_data(dat.ass4,n_assessments=2,version=4)
-n3v4<-om_filter_data(dat.ass4,n_assessments=3,version=4)
-# the above genrates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
-# does this mean that when we set the number of assessments argument equal to something, then it only includes
-# people with exactly that number of assessments?
-# yep. how cool. should make a note of this in the help documentation
-
-nNULLv4<-om_filter_data(dat.ass4,version=4)
-
-#can it accept ranges?
-n1plusv4<-om_filter_data(dat.ass4,n_assessments>1,version=4)
+#n1v4<-om_filter_data(dat.ass4,n_assessments=1,version=4)
+#n2v4<-om_filter_data(dat.ass4,n_assessments=2,version=4)
+#n3v4<-om_filter_data(dat.ass4,n_assessments=3,version=4)
+## the above genrates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
+## does this mean that when we set the number of assessments argument equal to something, then it only includes
+## people with exactly that number of assessments?
+## yep. how cool. should make a note of this in the help documentation
+#
+#nNULLv4<-om_filter_data(dat.ass4,version=4)
+#
+##can it accept ranges?
+#n1plusv4<-om_filter_data(dat.ass4,n_assessments>1,version=4)
 # ERROR: Does not like >
 #Error in om_filter_data(dat.ass4, n_assessments > 1, version = 4) :
 #  object 'n_assessments' not found
@@ -34,31 +34,31 @@ n1plusv4<-om_filter_data(dat.ass4,n_assessments>1,version=4)
 # Maybe add a note to help file saying it must be 1 discrete value would be good
 
 #can it accept multiple values?
-n1rangev4<-om_filter_data(dat.ass4,n_assessments=c(1,2),version=4)
+#n1rangev4<-om_filter_data(dat.ass4,n_assessments=c(1,2),version=4)
 #yes it can.
 
 # access codes
-n1v4a<-om_filter_data(dat.ass4,n_assessments=3
-                      ,version=4,accesscode="EddySalem",exact_search=F)
+#n1v4a<-om_filter_data(dat.ass4,n_assessments=3
+ #                     ,version=4,accesscode="EddySalem",exact_search=F)
 #yes, good
 
 #multiple access codes?
-n1v4aplus<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode=c("EddySalemStateUniversityF18","EddySalemStateUniversityF18t","EddySalemStateUniversityF18s"),
-                          exact_search=T)
+#n1v4aplus<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode=c("EddySalemStateUniversityF18","EddySalemStateUniversityF18t","EddySalemStateUniversityF18s"),
+#                          exact_search=T)
 # works... but should be mindful and maybe update help file to make clear that "EddySalemStateUniversityF18" includes ALL Eddy codes with other letters
 # appended after the F18 IF exact_search = F
 
 
 
 # can it filter down to all access codes by pattern matching?
-n1v4<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode="CLP",exact_search = F)
+#n1v4<-om_filter_data(dat.ass4,n_assessments=3,version=4,accesscode="CLP",exact_search = F)
 # yup!
 
 #v5
-n1v5<-om_filter_data(dat.ass5,n_assessments=1,version=5)
-n2v5<-om_filter_data(dat.ass5,n_assessments=2,version=5)
-n3v5<-om_filter_data(dat.ass5,n_assessments=3,version=5)
-# the above generates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
+#n1v5<-om_filter_data(dat.ass5,n_assessments=1,version=5)
+#n2v5<-om_filter_data(dat.ass5,n_assessments=2,version=5)
+#n3v5<-om_filter_data(dat.ass5,n_assessments=3,version=5)
+## the above generates 3 data frames; oddly, there are more people with 2 assessments than 1 assessment.
 # does this mean that when we set the number of assessments argument equal to something, then it only includes
 # people with exactly that number of assessments?
 # yep. how cool. should make a note of this in the help documentation
@@ -86,17 +86,6 @@ n3v5.1<-om_filter_data(dat.ass5,n_assessments=3,version=5.1)
 
 
 
-#########################################
-#########################################
-#########################################
-
-# calc_correct
-calc_correct(dat.par$StepsComplete,dat.par$StepScores,dat.par$StepQuestionTotals)
-# spits out a bunch of NAs
-# this function should have an argument specifying data frame where those 3 variables are, and convert them to numeric
-calc_correct(as.numeric(dat.par$StepsComplete),as.numeric(dat.par$StepScores),as.numeric(par$StepQuestionTotals))
-#this also does not work; gives same NA output as before
-
 
 
 #########################################
@@ -117,10 +106,7 @@ clean_par<-om_clean_par(dat.par)
 #clean ppol
 ?om_clean_ppol()
 n3v4cleanppol<-om_clean_ppol(n3v4)
-table(n2v4cleanppol$ppol_num)
-table(n2v4cleanppol$ppol_raw)
-table(n2v4cleanppol$ppol)
-table(n2v4cleanppol$ppol_cat)
+
 
 
 eddy<-om_rescale(n2v4)
@@ -159,13 +145,11 @@ n3v4long<-om_gather(n3v4constructedremdups,which_strings=q_c_strings)
 
 
 
-?om_summarize_comparisons()
 eddysummary<-om_summarize_comparisons(eddylong)
-prepo<-om_summarize_comparisons(n3v4long,compare="PrePost")
-prefo<-om_summarize_comparisons(n3v4long,compare="PreFollow")
 
 
 
+library(tidyverse)
 eddy$Condition <- car::recode(eddy$AccessCode, 
                                "'EddySalemStateUniversityF18' = 'Experimental Treatment';
                                'EddySalemStateUniversityF18s' = 'Experimental Treatment';
@@ -182,4 +166,7 @@ eddylong$Condition<-car::recode(eddylong$AccessCode,
                       else=NA")
 wut<-om_label_stats(eddylong, aversion = "V4")
 gm.s<-om_mix_models(eddylong,question="Q11",plot_model=T,get_effects=T,get_tidy=T)
-om_mix_plot(gm.s$effects_dat,tidy_dat=gm.s$tidy_dat,show_stats=T,var_label="Growth Mindset")
+om_mix_plot(gm.s$effects_dat,tidy_dat=gm.s$tidy_dat,show_stats=T,var_label="Growth Mindset")+
+  theme(legend.position = c(.15, .9))
+om_mix_complete(eddylong,c("Growth Mindset","Intellectual Humility"))+
+  theme(legend.position = c(.2, .9))

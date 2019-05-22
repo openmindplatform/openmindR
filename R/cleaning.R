@@ -17,6 +17,10 @@
 #'@export
 om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
 
+  if (tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
+    message("Warning: Should be one of the following: c('AssessmentV4', 'AssessmentV5','AccessCodes','ParticipantProgress','InstructorSurvey', 'TechnicalInquiries')\n")
+  }
+
   cat("Seting up key\n")
 
   Sys.setenv(AIRTABLE_API_KEY = key)
@@ -33,42 +37,42 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
   ## downloads full data table
   if ("AssessmentV4" %in% tables) {
     cat("Download AssessmentV4 Data\n")
-    final_list$dat.ass4 <- dat.ass.1$AssessmentV4$select_all()
+    final_list$dat.ass4 <- dat.ass.1$AssessmentV4$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. AssessmentV4 Data has ", nrow(final_list$dat.ass4), " rows\n"))
   }
 
   if ("AssessmentV5" %in% tables) {
     cat("Download AssessmentV5 Data\n")
-    final_list$dat.ass5 <- dat.ass.1$AssessmentV5$select_all()
+    final_list$dat.ass5 <- dat.ass.1$AssessmentV5$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. AssessmentV5 Data has ", nrow(final_list$dat.ass5), " rows\n"))
   }
 
   if ("AccessCodes" %in% tables) {
     cat("Download AccessCodes Data\n")
-    final_list$dat.acc <- dat.ass.1$AccessCodes$select_all()
+    final_list$dat.acc <- dat.ass.1$AccessCodes$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. AccessCodes Data has ", nrow(final_list$dat.acc), " rows\n"))
   }
 
 
   if ("ParticipantProgress" %in% tables) {
     cat("Download Participant Progress Data\n")
-    final_list$dat.par <- dat.ass.1$ParticipantProgress$select_all()
+    final_list$dat.par <- dat.ass.1$ParticipantProgress$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Participant Progress Data has ", nrow(final_list$dat.par), " rows\n"))
   }
 
   if ("InstructorSurvey" %in% tables) {
     cat("Download Instructor Survey Data\n")
-    final_list$dat.ins <- dat.ass.1$InstructorSurvey$select_all()
+    final_list$dat.ins <- dat.ass.1$InstructorSurvey$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Instructor Survey Data has ", nrow(final_list$dat.ins), " rows\n"))
   }
 
   if ("TechnicalInquiries" %in% tables) {
     cat("Download Technial Inquiries Data\n")
-    final_list$dat.tec <- dat.ass.1$TechnicalInquiries$select_all()
+    final_list$dat.tec <- dat.ass.1$TechnicalInquiries$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Technical Inquiries Data has ", nrow(final_list$dat.tec), " rows\n"))
   }
 
-  if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1)
+  if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()
 
   return(final_list)
 
@@ -517,14 +521,16 @@ remove_dups <- function(cleaned_dat) {
     dplyr::filter(duplicated(OMID)) %>%
     dplyr::pull(OMID) -> dups
 
+  # count_na <- function(x) sum(is.na(x), na.rm = T)
 
   ## pull OMIDs that are most complete + latest entries
   removed_airtable_dups <-  cleaned_dat %>%
     dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
     dplyr::filter(OMID %in% dups) %>%
     dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))  %>%
-    dplyr::mutate(count_na = rowSums(is.na(.))) %>%
-    dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), count_na) %>%
+    dplyr::mutate(AssessmentsDone = as.numeric(AssessmentsDone))  %>%
+    dplyr::mutate(count_na = rowSums(is.na(.), na.rm = T)) %>%
+    dplyr::arrange(OMID, desc(createdTime), desc(AssessmentVersion), desc(AssessmentsDone), count_na) %>%
     dplyr::select(OMID, createdTime, AssessmentVersion, AssessmentsDone, count_na, dplyr::everything()) %>%
     dplyr::group_by(OMID) %>%
     dplyr::slice(1) %>%
@@ -650,7 +656,7 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
 #'
 #' @export
 db_append <- function(path, tbl, data) {
-  con <- dbConnect(RSQLite::SQLite(), path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
 
   if(!is.null(DBI::dbListTables(con))) {
     DBI::dbWriteTable(con, tbl, data, append = T)
@@ -669,13 +675,13 @@ db_append <- function(path, tbl, data) {
 #' @export
 db_get_data <- function(tbl_dat, path = "sql_data/omdata.db") {
   # con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
-  con <- dbConnect(RSQLite::SQLite(), path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
 
   out <- con %>%
-    tbl(tbl_dat) %>%
-    collect()
+    dplyr::tbl(tbl_dat) %>%
+    dplyr::collect()
 
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 
   return(out)
 }
