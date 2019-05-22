@@ -667,6 +667,7 @@ db_append <- function(path, tbl, data) {
 
 }
 
+
 #' SQL Database Retrieve
 #'
 #' This is a helper function that will retreive a dataframe to a SQL database
