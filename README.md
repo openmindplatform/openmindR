@@ -110,19 +110,19 @@ dat.ass %>%
 ```
 
     ## # A tibble: 653 x 78
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0~ 5717~ TalpashWi~ 4                              3 56    54   
-    ##  2 rec0~ 1101~ ThomasWil~ 4                              2 70    40   
-    ##  3 rec0~ 1430~ MaykWilke~ 4                              2 50    50   
-    ##  4 rec0~ 1144~ SuszkoWil~ 4                              2 31    65   
-    ##  5 rec0~ 4351~ WilliamsW~ 4                              3 77    25   
-    ##  6 rec0~ 2247~ PradoWilk~ 4                              2 19    100  
-    ##  7 rec0~ 3909~ VosikPeka~ 4                              2 50    58   
-    ##  8 rec0~ 3873~ BalesterW~ 4                              2 63    85   
-    ##  9 rec1~ 7625~ BalesterW~ 4                              2 73    30   
-    ## 10 rec1~ 6771~ KarimiWil~ 4                              3 90    20   
-    ## # ... with 643 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
+    ##  1 rec0… 5717… TalpashWi… 4                              3 56    54   
+    ##  2 rec0… 1101… ThomasWil… 4                              2 70    40   
+    ##  3 rec0… 1430… MaykWilke… 4                              2 50    50   
+    ##  4 rec0… 1144… SuszkoWil… 4                              2 31    65   
+    ##  5 rec0… 4351… WilliamsW… 4                              3 77    25   
+    ##  6 rec0… 2247… PradoWilk… 4                              2 19    100  
+    ##  7 rec0… 3909… VosikPeka… 4                              2 50    58   
+    ##  8 rec0… 3873… BalesterW… 4                              2 63    85   
+    ##  9 rec1… 7625… BalesterW… 4                              2 73    30   
+    ## 10 rec1… 6771… KarimiWil… 4                              3 90    20   
+    ## # … with 643 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
     ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
     ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
     ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
@@ -157,19 +157,19 @@ dat.ass %>%
 ```
 
     ## # A tibble: 31 x 78
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0~ 1144~ SuszkoWil~ 4                              2 31    65   
-    ##  2 rec1~ 6771~ KarimiWil~ 4                              3 90    20   
-    ##  3 rec5~ 5923~ SuszkoWil~ 4                              2 50    50   
-    ##  4 rec5~ 1915~ KarimiWil~ 4                              2 35    5    
-    ##  5 rec7~ 1018~ SuszkoWil~ 4                              2 30    85   
-    ##  6 recA~ 1326~ KarimiWil~ 4                              2 70    45   
-    ##  7 recE~ 3793~ KarimiWil~ 4                              2 100   30   
-    ##  8 recH~ 2939~ SuszkoWil~ 4                              2 <NA>  <NA> 
-    ##  9 recL~ 7456~ SuszkoWil~ 4                              2 25    75   
-    ## 10 recT~ 3521~ KarimiWil~ 4                              2 25    67   
-    ## # ... with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
+    ##  1 rec0… 1144… SuszkoWil… 4                              2 31    65   
+    ##  2 rec1… 6771… KarimiWil… 4                              3 90    20   
+    ##  3 rec5… 5923… SuszkoWil… 4                              2 50    50   
+    ##  4 rec5… 1915… KarimiWil… 4                              2 35    5    
+    ##  5 rec7… 1018… SuszkoWil… 4                              2 30    85   
+    ##  6 recA… 1326… KarimiWil… 4                              2 70    45   
+    ##  7 recE… 3793… KarimiWil… 4                              2 100   30   
+    ##  8 recH… 2939… SuszkoWil… 4                              2 <NA>  <NA> 
+    ##  9 recL… 7456… SuszkoWil… 4                              2 25    75   
+    ## 10 recT… 3521… KarimiWil… 4                              2 25    67   
+    ## # … with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
     ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
     ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
     ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
@@ -202,19 +202,19 @@ dat.ass %>%
 ```
 
     ## # A tibble: 31 x 78
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0~ 1144~ SuszkoWil~ 4                              2 31    65   
-    ##  2 rec1~ 6771~ KarimiWil~ 4                              3 90    20   
-    ##  3 rec5~ 5923~ SuszkoWil~ 4                              2 50    50   
-    ##  4 rec5~ 1915~ KarimiWil~ 4                              2 35    5    
-    ##  5 rec7~ 1018~ SuszkoWil~ 4                              2 30    85   
-    ##  6 recA~ 1326~ KarimiWil~ 4                              2 70    45   
-    ##  7 recE~ 3793~ KarimiWil~ 4                              2 100   30   
-    ##  8 recH~ 2939~ SuszkoWil~ 4                              2 <NA>  <NA> 
-    ##  9 recL~ 7456~ SuszkoWil~ 4                              2 25    75   
-    ## 10 recT~ 3521~ KarimiWil~ 4                              2 25    67   
-    ## # ... with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
+    ##  1 rec0… 1144… SuszkoWil… 4                              2 31    65   
+    ##  2 rec1… 6771… KarimiWil… 4                              3 90    20   
+    ##  3 rec5… 5923… SuszkoWil… 4                              2 50    50   
+    ##  4 rec5… 1915… KarimiWil… 4                              2 35    5    
+    ##  5 rec7… 1018… SuszkoWil… 4                              2 30    85   
+    ##  6 recA… 1326… KarimiWil… 4                              2 70    45   
+    ##  7 recE… 3793… KarimiWil… 4                              2 100   30   
+    ##  8 recH… 2939… SuszkoWil… 4                              2 <NA>  <NA> 
+    ##  9 recL… 7456… SuszkoWil… 4                              2 25    75   
+    ## 10 recT… 3521… KarimiWil… 4                              2 25    67   
+    ## # … with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
     ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
     ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
     ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
@@ -261,20 +261,20 @@ dat.par %>%
   om_clean_par(parse_feedback = T) 
 ```
 
-    ## # A tibble: 17,210 x 36
+    ## # A tibble: 17,219 x 36
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
-    ##  1 7806~ <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
-    ##  2 1000~ <NA>      1, 1, 1, 1, 1        0.75         1            0.833
-    ##  3 1945~ <NA>      1, 1, 1, 1, 1        0.667        1            0.667
-    ##  4 7858~ <NA>      1, 0, 0, 0, 0        0.833       NA           NA    
-    ##  5 9277~ <NA>      1, 1, 1, 1, 1        1            1            1    
-    ##  6 6750~ <NA>      1, 1, 1, 1, 1        1            1            1    
-    ##  7 4023~ <NA>      1, 1, 1, 1, 1        0.833        1            0.667
-    ##  8 1000~ <NA>      1, 1, 1, 1, 1        0.625        1            0.667
-    ##  9 2458~ <NA>      1, 1, 1, 1, 0        1            1            1    
-    ## 10 9406~ <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # ... with 17,200 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ##  1 7806… <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
+    ##  2 1000… <NA>      1, 1, 1, 1, 1        0.75         1            0.833
+    ##  3 1945… <NA>      1, 1, 1, 1, 1        0.667        1            0.667
+    ##  4 7858… <NA>      1, 0, 0, 0, 0        0.833       NA           NA    
+    ##  5 9277… <NA>      1, 1, 1, 1, 1        1            1            1    
+    ##  6 6750… <NA>      1, 1, 1, 1, 1        1            1            1    
+    ##  7 4023… <NA>      1, 1, 1, 1, 1        0.833        1            0.667
+    ##  8 1000… <NA>      1, 1, 1, 1, 1        0.625        1            0.667
+    ##  9 2458… <NA>      1, 1, 1, 1, 0        1            1            1    
+    ## 10 9406… <NA>      1, 1, 0, 0, 0        1            1           NA    
+    ## # … with 17,209 more rows, and 30 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
@@ -299,20 +299,20 @@ dat.ass %>%
   om_rescale()
 ```
 
-    ## # A tibble: 17,101 x 78
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ## # A tibble: 16,816 x 78
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
-    ##  1 rec0~ 4616~ GottlickU~ 4                2                0.4   0.6 
-    ##  2 rec0~ 4001~ PotterYCI~ 4                1               NA    NA   
-    ##  3 rec0~ 3465~ LittleUGA~ 4                2                0.3   0.36
-    ##  4 rec0~ 8406~ Jayawickr~ 4                2                0.5   0.5 
-    ##  5 rec0~ 8721~ BurmanCha~ 4                2               NA    NA   
-    ##  6 rec0~ 7194~ Jayawickr~ 4                2                0.8   0.45
-    ##  7 rec0~ 5743~ ZipayUOre~ 4                2                0.78  0.34
-    ##  8 rec0~ 5717~ TalpashWi~ 4                3                0.56  0.54
-    ##  9 rec0~ 5370~ Individua~ 4                2                0.5   0.37
-    ## 10 rec0~ 6459~ BursonInd~ 4                2                0.5   0.5 
-    ## # ... with 17,091 more rows, and 71 more variables: Q3Pre <dbl>,
+    ##  1 rec0… 4616… GottlickU… 4                2                0.4   0.6 
+    ##  2 rec0… 4001… PotterYCI… 4                1               NA    NA   
+    ##  3 rec0… 3465… LittleUGA… 4                2                0.3   0.36
+    ##  4 rec0… 8406… Jayawickr… 4                2                0.5   0.5 
+    ##  5 rec0… 8721… BurmanCha… 4                2               NA    NA   
+    ##  6 rec0… 7194… Jayawickr… 4                2                0.8   0.45
+    ##  7 rec0… 5743… ZipayUOre… 4                2                0.78  0.34
+    ##  8 rec0… 5717… TalpashWi… 4                3                0.56  0.54
+    ##  9 rec0… 5370… Individua… 4                2                0.5   0.37
+    ## 10 rec0… 6459… BursonInd… 4                2                0.5   0.5 
+    ## # … with 16,806 more rows, and 71 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -382,20 +382,20 @@ dat.ass <- dat.ass %>%
 dat.ass
 ```
 
-    ## # A tibble: 17,101 x 82
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ## # A tibble: 16,816 x 82
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
-    ##  1 rec0~ 4616~ GottlickU~ 4                2                  40    60
-    ##  2 rec0~ 4001~ PotterYCI~ 4                1                  NA    NA
-    ##  3 rec0~ 3465~ LittleUGA~ 4                2                  30    36
-    ##  4 rec0~ 8406~ Jayawickr~ 4                2                  50    50
-    ##  5 rec0~ 8721~ BurmanCha~ 4                2                  NA    NA
-    ##  6 rec0~ 7194~ Jayawickr~ 4                2                  80    45
-    ##  7 rec0~ 5743~ ZipayUOre~ 4                2                  78    34
-    ##  8 rec0~ 5717~ TalpashWi~ 4                3                  56    54
-    ##  9 rec0~ 5370~ Individua~ 4                2                  50    37
-    ## 10 rec0~ 6459~ BursonInd~ 4                2                  50    50
-    ## # ... with 17,091 more rows, and 75 more variables: Q3Pre <dbl>,
+    ##  1 rec0… 4616… GottlickU… 4                2                  40    60
+    ##  2 rec0… 4001… PotterYCI… 4                1                  NA    NA
+    ##  3 rec0… 3465… LittleUGA… 4                2                  30    36
+    ##  4 rec0… 8406… Jayawickr… 4                2                  50    50
+    ##  5 rec0… 8721… BurmanCha… 4                2                  NA    NA
+    ##  6 rec0… 7194… Jayawickr… 4                2                  80    45
+    ##  7 rec0… 5743… ZipayUOre… 4                2                  78    34
+    ##  8 rec0… 5717… TalpashWi… 4                3                  56    54
+    ##  9 rec0… 5370… Individua… 4                2                  50    37
+    ## 10 rec0… 6459… BursonInd… 4                2                  50    50
+    ## # … with 16,806 more rows, and 75 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -422,20 +422,20 @@ dat.ass %>%
   om_construct_measures()
 ```
 
-    ## # A tibble: 17,101 x 97
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ## # A tibble: 16,816 x 97
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
-    ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
-    ##  2 rec0~ 4001~ PotterYCI~                4 1                  NA    NA
-    ##  3 rec0~ 3465~ LittleUGA~                4 2                  30    36
-    ##  4 rec0~ 8406~ Jayawickr~                4 2                  50    50
-    ##  5 rec0~ 8721~ BurmanCha~                4 2                  NA    NA
-    ##  6 rec0~ 7194~ Jayawickr~                4 2                  80    45
-    ##  7 rec0~ 5743~ ZipayUOre~                4 2                  78    34
-    ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
-    ##  9 rec0~ 5370~ Individua~                4 2                  50    37
-    ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 17,091 more rows, and 90 more variables: Q3Pre <dbl>,
+    ##  1 rec0… 4616… GottlickU…                4 2                  40    60
+    ##  2 rec0… 4001… PotterYCI…                4 1                  NA    NA
+    ##  3 rec0… 3465… LittleUGA…                4 2                  30    36
+    ##  4 rec0… 8406… Jayawickr…                4 2                  50    50
+    ##  5 rec0… 8721… BurmanCha…                4 2                  NA    NA
+    ##  6 rec0… 7194… Jayawickr…                4 2                  80    45
+    ##  7 rec0… 5743… ZipayUOre…                4 2                  78    34
+    ##  8 rec0… 5717… TalpashWi…                4 3                  56    54
+    ##  9 rec0… 5370… Individua…                4 2                  50    37
+    ## 10 rec0… 6459… BursonInd…                4 2                  50    50
+    ## # … with 16,806 more rows, and 90 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -471,22 +471,22 @@ dat.ass %>%
 
     ## Joining, by = c("OMID", "createdTime", "AssessmentVersion", "AssessmentsDone", "id", "AccessCode", "Q1Pre", "Q2Pre", "Q3Pre", "Q4Pre", "Q5Pre", "Q6Pre", "Q7Pre", "Q8Pre", "Q9Pre", "Q10Pre", "Q11Pre", "Q12Pre", "C1Pre", "C2Pre", "C3Pre", "D1", "D2", "D3", "D4", "D5", "DatePre", "Q1Post", "Q2Post", "Q3Post", "Q4Post", "Q5Post", "Q6Post", "Q7Post", "Q8Post", "Q9Post", "Q10Post", "Q11Post", "Q12Post", "DatePost", "B1Pre", "B1Post", "Q1FollowUp", "Q2FollowUp", "Q3FollowUp", "Q4FollowUp", "Q5FollowUp", "Q6FollowUp", "Q7FollowUp", "Q8FollowUp", "Q9FollowUp", "Q10FollowUp", "Q11FollowUp", "Q12FollowUp", "C1FollowUp", "C2FollowUp", "C3FollowUp", "DateFollowUp", "W1FollowUp", "B1FollowUp", "S1Pre", "BTaskPre", "B2Pre", "B3Pre", "S1Post", "C1Post", "C2Post", "C3Post", "BTaskPost", "B2Post", "B3Post", "W1Post", "W1Pre", "D6", "S1FollowUp", "BTaskFollowUp", "B2FollowUp", "B3FollowUp", "ppol_raw", "ppol", "ppol_num", "ppol_cat")
 
-    ## Removing 515 duplicates...
+    ## Removing 11 duplicates...
 
-    ## # A tibble: 16,586 x 83
-    ##    id    OMID  AccessCode AssessmentVersi~ AssessmentsDone Q1Pre Q2Pre
+    ## # A tibble: 16,805 x 83
+    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
     ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
-    ##  1 rec0~ 4616~ GottlickU~                4 2                  40    60
-    ##  2 rec0~ 4001~ PotterYCI~                4 1                  NA    NA
-    ##  3 rec0~ 3465~ LittleUGA~                4 2                  30    36
-    ##  4 rec0~ 8406~ Jayawickr~                4 2                  50    50
-    ##  5 rec0~ 8721~ BurmanCha~                4 2                  NA    NA
-    ##  6 rec0~ 7194~ Jayawickr~                4 2                  80    45
-    ##  7 rec0~ 5743~ ZipayUOre~                4 2                  78    34
-    ##  8 rec0~ 5717~ TalpashWi~                4 3                  56    54
-    ##  9 rec0~ 5370~ Individua~                4 2                  50    37
-    ## 10 rec0~ 6459~ BursonInd~                4 2                  50    50
-    ## # ... with 16,576 more rows, and 76 more variables: Q3Pre <dbl>,
+    ##  1 rec0… 4616… GottlickU…                4 2                  40    60
+    ##  2 rec0… 4001… PotterYCI…                4 1                  NA    NA
+    ##  3 rec0… 3465… LittleUGA…                4 2                  30    36
+    ##  4 rec0… 8406… Jayawickr…                4 2                  50    50
+    ##  5 rec0… 8721… BurmanCha…                4 2                  NA    NA
+    ##  6 rec0… 7194… Jayawickr…                4 2                  80    45
+    ##  7 rec0… 5743… ZipayUOre…                4 2                  78    34
+    ##  8 rec0… 5717… TalpashWi…                4 3                  56    54
+    ##  9 rec0… 5370… Individua…                4 2                  50    37
+    ## 10 rec0… 6459… BursonInd…                4 2                  50    50
+    ## # … with 16,795 more rows, and 76 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
@@ -533,7 +533,7 @@ dat.ass %>%
   select(Question, Response, Type, variable_code)
 ```
 
-    ## # A tibble: 769,545 x 4
+    ## # A tibble: 756,720 x 4
     ##    Question Response Type  variable_code
     ##    <chr>       <dbl> <chr> <chr>        
     ##  1 Q1Pre          40 Pre   Q1           
@@ -546,7 +546,7 @@ dat.ass %>%
     ##  8 Q1Pre          56 Pre   Q1           
     ##  9 Q1Pre          50 Pre   Q1           
     ## 10 Q1Pre          50 Pre   Q1           
-    ## # ... with 769,535 more rows
+    ## # … with 756,710 more rows
 
 # openmindR Analysis Functions
 
@@ -559,8 +559,6 @@ This section introduces the openmindR analysis functions.
   - [om\_mix\_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
 
 ## `om_summarize_comparisons`
-
-TODO; CLEANED LONG DATASET
 
 This is a higher-level function that uses “om\_compare”,
 “bind\_questions” and “summarize\_comparison” to calculate t-tests and
@@ -576,9 +574,10 @@ latter is the default).
 ``` r
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
+  om_rescale() %>% 
   om_construct_measures() %>%
   remove_dups() %>%  
-  om_gather(q_c_strings) 
+  om_gather(q_c_strings)
 
 gathered_dat %>% 
   om_summarize_comparisons(aversion = "V4",
@@ -589,17 +588,17 @@ gathered_dat %>%
     ## # A tibble: 37 x 11
     ##    Outcome Question_txt cohend tstat    pvalue    df percentimproved
     ##    <chr>   <chr>         <dbl> <dbl>     <dbl> <dbl>           <dbl>
-    ##  1 Ingrou~ Ingroup-Out~  0.510 27.5  1.74e-148  2917           0.639
-    ##  2 Ingrou~ Ingroup-Out~  0.483  6.77 1.51e- 10   195           0.622
-    ##  3 Liking~ Liking for ~  0.452 24.4  3.64e-120  2917           0.607
-    ##  4 Intell~ Intellectua~  0.366 25.4  7.59e-134  4818           0.587
-    ##  5 Liking~ Liking for ~  0.358  5.01 1.24e-  6   195           0.571
-    ##  6 Affect~ Affective P~  0.397 27.5  3.98e-155  4814           0.552
-    ##  7 Intell~ Intellectua~  0.249  6.20 1.02e-  9   618           0.544
-    ##  8 Affect~ Affective P~  0.278  5.08 6.34e-  7   332           0.520
-    ##  9 Affect~ How do you ~  0.218 15.1  1.95e- 50  4814           0.484
-    ## 10 Affect~ How do you ~  0.179  3.26 1.23e-  3   332           0.468
-    ## # ... with 27 more rows, and 4 more variables: variable_code <chr>,
+    ##  1 Ingrou… Ingroup-Out…  0.510 27.5  1.74e-148  2917           0.643
+    ##  2 Ingrou… Ingroup-Out…  0.483  6.77 1.51e- 10   195           0.622
+    ##  3 Liking… Liking for …  0.452 24.4  3.64e-120  2917           0.607
+    ##  4 Intell… Intellectua…  0.366 25.4  7.59e-134  4818           0.602
+    ##  5 Liking… Liking for …  0.358  5.01 1.24e-  6   195           0.571
+    ##  6 Intell… Intellectua…  0.249  6.20 1.02e-  9   618           0.559
+    ##  7 Affect… Affective P…  0.397 27.5  3.98e-155  4814           0.556
+    ##  8 Affect… Affective P…  0.278  5.08 6.34e-  7   332           0.520
+    ##  9 Affect… How do you …  0.218 15.1  1.95e- 50  4814           0.484
+    ## 10 Affect… How do you …  0.179  3.26 1.23e-  3   332           0.468
+    ## # … with 27 more rows, and 4 more variables: variable_code <chr>,
     ## #   Comparison <chr>, moderates <chr>, Variant <chr>
 
 ## `om_label_stats`
@@ -614,19 +613,19 @@ om_label_stats(gathered_dat, aversion = "V4")
 ```
 
     ## # A tibble: 60 x 8
-    ##    Type         N Response     sd      se     ci variable_code Variant
-    ##    <fct>    <dbl>    <dbl>  <dbl>   <dbl>  <dbl> <chr>         <chr>  
-    ##  1 FollowUp   337    62.3  12.2   0.664   1.31   Q1            V4     
-    ##  2 Post      4937    61.6  10.9   0.156   0.305  Q1            V4     
-    ##  3 Pre       8031    61.7   8.73  0.0974  0.191  Q1            V4     
-    ##  4 FollowUp   337    50.9  11.6   0.632   1.24   Q2            V4     
-    ##  5 Post      4937    51.6  10.6   0.151   0.297  Q2            V4     
-    ##  6 Pre       8031    48.6   8.50  0.0948  0.186  Q2            V4     
-    ##  7 FollowUp   622     3.60  1.18  0.0473  0.0928 Q3            V4     
-    ##  8 Post      4820     3.61  1.08  0.0155  0.0304 Q3            V4     
-    ##  9 Pre       8672     3.42  0.838 0.00899 0.0176 Q3            V4     
-    ## 10 FollowUp   622     4.00  1.19  0.0478  0.0939 Q4            V4     
-    ## # ... with 50 more rows
+    ##    Type         N Response     sd       se      ci variable_code Variant
+    ##    <fct>    <dbl>    <dbl>  <dbl>    <dbl>   <dbl> <chr>         <chr>  
+    ##  1 FollowUp   337    0.623 0.122  0.00664  0.0131  Q1            V4     
+    ##  2 Post      4937    0.616 0.109  0.00156  0.00305 Q1            V4     
+    ##  3 Pre       8030    0.617 0.0873 0.000974 0.00191 Q1            V4     
+    ##  4 FollowUp   337    0.509 0.116  0.00632  0.0124  Q2            V4     
+    ##  5 Post      4937    0.516 0.106  0.00151  0.00297 Q2            V4     
+    ##  6 Pre       8030    0.486 0.0850 0.000949 0.00186 Q2            V4     
+    ##  7 FollowUp   622    0.600 0.196  0.00788  0.0155  Q3            V4     
+    ##  8 Post      4820    0.601 0.180  0.00259  0.00507 Q3            V4     
+    ##  9 Pre       8671    0.569 0.140  0.00150  0.00294 Q3            V4     
+    ## 10 FollowUp   622    0.666 0.199  0.00797  0.0156  Q4            V4     
+    ## # … with 50 more rows
 
 # Analyzing mixed effects
 

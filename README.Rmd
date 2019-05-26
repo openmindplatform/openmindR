@@ -325,8 +325,6 @@ This section introduces the openmindR analysis functions.
 
 ## `om_summarize_comparisons`
 
-TODO; CLEANED LONG DATASET
-
 This is a higher-level function that uses "om_compare", "bind_questions" and "summarize_comparison" to calculate t-tests and Cohen's d using long-format Assessment data.
 
 The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
