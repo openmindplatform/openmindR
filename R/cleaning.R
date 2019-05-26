@@ -543,6 +543,14 @@ remove_dups <- function(cleaned_dat) {
         condition = is.character(cleaned_dat$AssessmentVersion),
         call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
     ) %>%
+    openmindR::do_if(.,
+                     condition = is.numeric(cleaned_dat$AssessmentsDone),
+                     call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.numeric(AssessmentsDone))}
+    ) %>%
+    openmindR::do_if(.,
+                     condition = is.character(cleaned_dat$AssessmentsDone),
+                     call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.character(AssessmentsDone))}
+    ) %>%
     openmindR::coalesce_join(join = dplyr::left_join,
                              cleaned_dat %>%
                                dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%

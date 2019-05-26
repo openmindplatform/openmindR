@@ -336,9 +336,10 @@ With the `compare` argument you can specify either `"PrePost"`, `"PreFollow"` or
 ```{r}
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
+  om_rescale() %>% 
   om_construct_measures() %>%
   remove_dups() %>%  
-  om_gather(q_c_strings) 
+  om_gather(q_c_strings)
 
 gathered_dat %>% 
   om_summarize_comparisons(aversion = "V4",

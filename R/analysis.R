@@ -61,7 +61,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 #' @export
 bind_questions <- function(.data, ...) {
 
-  # .data <- compare_dat_prefollow
+  # .data <- compare_dat_prepost
 
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
@@ -77,20 +77,6 @@ bind_questions <- function(.data, ...) {
       openmindR::summarize_comparison(...,
                            q14_q17 = T)
   )
-}
-
-#' Pipable if workflow
-#'
-#' This function allows to create if statements within a pipe workflow
-#' @param .x dataset
-#' @param if_true logical statement
-#' @param pipe_work A function that will be performed on \code{TRUE}
-#' @export
-if_flow <- function(.x, if_true, pipe_work) {
-  {if (if_true) {
-    .x %>% pipe_work
-    }
-  }
 }
 
 
@@ -251,6 +237,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
 om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c("PrePost", "PreFollow")) {
 
   # Variant <- "V5"
+  # aversion <- "V4"
 
   gathered_dat <- gathered_dat %>%
     openmindR::do_if(.data = .,
