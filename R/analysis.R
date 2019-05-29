@@ -17,22 +17,84 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
     WaveType <- "FollowUp"
   }
 
+  vars <- x %>% select(variable_code) %>% distinct() %>% pull()
+
+  withinSE <- function(variable, WaveType) {
+
+    # variable <- "C1"
+
+    SEdat <- x %>%
+      filter(variable_code == variable)
+
+    var <- SEdat %>% distinct(variable_code) %>% pull(variable_code)
+
+    if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
+
+      # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
+
+      return(tibble(variable_code = variable))
+
+    }
+
+
+    SEdat <- summarySEwithin(data = SEdat,
+        measurevar = "Response",
+        withinvars = "Type",
+        idvar = "OMID", na.rm = T) %>%
+      spread(Type, Response) %>%
+      mutate(variable_code = variable)
+
+    if (nrow(SEdat) == 2) {
+
+      if ("Post" %in% colnames(SEdat)) {
+        SEdat <- SEdat %>%
+          fill(Pre) %>%
+          fill(Post, .direction = "up")%>%
+          fill(Pre, .direction = "up") %>%
+          fill(Post) %>%
+          slice(1)
+      }
+
+      if ("FollowUp" %in%  colnames(SEdat)) {
+        SEdat <- SEdat %>%
+          fill(Pre) %>%
+          fill(FollowUp, .direction = "up")%>%
+          fill(Pre, .direction = "up") %>%
+          fill(FollowUp) %>%
+          slice(1)
+      }
+
+    }
+
+    SEdat <- SEdat %>%
+      select(variable_code, everything())
+
+    return(SEdat)
+  }
+
+  within_stats <- vars %>% map_dfr(~withinSE(.x, WaveType = WaveType))
+
   ## This is one direction
   if (q14_q17) {
     final_dat <- x %>% dplyr::summarize(
       cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1]),
-      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2]),
+      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]),
       tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
       pvalue = t.test(Response~Type, paired=TRUE)$p.value,
       df = t.test(Response~Type, paired=TRUE)$parameter,
       # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
       percentimproved = sum((Response[Type == "Pre"] > Response[Type == WaveType])==TRUE)/(df+1)
-    )
+    ) %>%
+    left_join(within_stats)
 
     return(final_dat)
 
   }
+
+
+
+
 
   ## This is the other direction
   if (magrittr::not(q14_q17)) {
@@ -46,7 +108,8 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
       df = t.test(Response~Type, paired=TRUE)$parameter,
       # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
       percentimproved = sum((Response[Type == "Pre"] < Response[Type == WaveType])==TRUE)/(df+1)
-    )
+    ) %>%
+    left_join(within_stats)
 
     return(final_dat)
   }
@@ -63,18 +126,23 @@ bind_questions <- function(.data, ...) {
 
   # .data <- compare_dat_prepost
 
+  # ## Just Q14 and Q17
+  # x <- .data %>%
+  # dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
+  # dplyr::group_by(variable_code)
+
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
     .data %>%
       dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      openmindR::summarize_comparison(...,
+      summarize_comparison(...,
                            q14_q17 = F),
     ## Just Q14 and Q17
     .data %>%
       dplyr::filter(variable_code %in% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      openmindR::summarize_comparison(...,
+      summarize_comparison(...,
                            q14_q17 = T)
   )
 }
@@ -147,7 +215,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
     moderate_dat_prepost <- compare_dat_prepost %>%
       dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
       ## PrePost
-      openmindR::bind_questions(waves = "PrePost") %>%
+      bind_questions(waves = "PrePost") %>%
       dplyr::mutate(Comparison = "PrePost") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithModerates") %>%
@@ -160,7 +228,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PrePost
-      openmindR::bind_questions(waves = "PrePost") %>%
+      bind_questions(waves = "PrePost") %>%
       dplyr::mutate(Comparison = "PrePost") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithoutModerates")
@@ -184,7 +252,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
     moderate_dat_prefollow <- compare_dat_prefollow %>%
       dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
       ## PreFollow
-      openmindR::bind_questions(waves = "PreFollow") %>%
+      bind_questions(waves = "PreFollow") %>%
       dplyr::mutate(Comparison = "PreFollow") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithModerates") %>%
@@ -198,7 +266,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PreFollow
-      openmindR::bind_questions(waves = "PreFollow") %>%
+      bind_questions(waves = "PreFollow") %>%
       dplyr::mutate(Comparison = "PreFollow") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithoutModerates")
@@ -257,7 +325,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
 
 
   basicsummarystats <- gathered_dat %>%
-    openmindR::om_compare(compare) %>%
+    om_compare(compare) %>%
     openmindR::do_if(.data = .,
           condition = aversion == "V5/V5.1",
           call = ~{
@@ -302,7 +370,8 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
       variable_code == "Q18" ~  'Intellectual Humility Measure',
       T ~ Construct
     )) %>%
-    dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code, Comparison, moderates, Variant) %>%
+    dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code,
+                  N, sd, se, ci, Pre, Post, FollowUp, Comparison, moderates, Variant) %>%
     tidyr::drop_na(Outcome)
 
   return(basicsummarystats)
