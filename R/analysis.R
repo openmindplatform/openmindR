@@ -1,3 +1,56 @@
+withinSE <- function(variable, WaveType) {
+
+  # variable <- "C1"
+
+  SEdat <- x %>%
+    filter(variable_code == variable)
+
+  var <- SEdat %>% distinct(variable_code) %>% pull(variable_code)
+
+  if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
+
+    # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
+
+    return(tibble(variable_code = variable))
+
+  }
+
+
+  SEdat <- summarySEwithin(data = SEdat,
+                           measurevar = "Response",
+                           withinvars = "Type",
+                           idvar = "OMID", na.rm = T) %>%
+    spread(Type, Response) %>%
+    mutate(variable_code = variable)
+
+  if (nrow(SEdat) == 2) {
+
+    if ("Post" %in% colnames(SEdat)) {
+      SEdat <- SEdat %>%
+        fill(Pre) %>%
+        fill(Post, .direction = "up")%>%
+        fill(Pre, .direction = "up") %>%
+        fill(Post) %>%
+        slice(1)
+    }
+
+    if ("FollowUp" %in%  colnames(SEdat)) {
+      SEdat <- SEdat %>%
+        fill(Pre) %>%
+        fill(FollowUp, .direction = "up")%>%
+        fill(Pre, .direction = "up") %>%
+        fill(FollowUp) %>%
+        slice(1)
+    }
+
+  }
+
+  SEdat <- SEdat %>%
+    select(variable_code, everything())
+
+  return(SEdat)
+}
+
 #' Conducts t-tests and calculates Cohen's d
 #'
 #' This is lower-level function that belongs to om_summarize_comparisons. This function is not meant to be used outside of om_summarize_comparisons.
@@ -19,58 +72,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 
   vars <- x %>% select(variable_code) %>% distinct() %>% pull()
 
-  withinSE <- function(variable, WaveType) {
 
-    # variable <- "C1"
-
-    SEdat <- x %>%
-      filter(variable_code == variable)
-
-    var <- SEdat %>% distinct(variable_code) %>% pull(variable_code)
-
-    if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
-
-      # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
-
-      return(tibble(variable_code = variable))
-
-    }
-
-
-    SEdat <- summarySEwithin(data = SEdat,
-        measurevar = "Response",
-        withinvars = "Type",
-        idvar = "OMID", na.rm = T) %>%
-      spread(Type, Response) %>%
-      mutate(variable_code = variable)
-
-    if (nrow(SEdat) == 2) {
-
-      if ("Post" %in% colnames(SEdat)) {
-        SEdat <- SEdat %>%
-          fill(Pre) %>%
-          fill(Post, .direction = "up")%>%
-          fill(Pre, .direction = "up") %>%
-          fill(Post) %>%
-          slice(1)
-      }
-
-      if ("FollowUp" %in%  colnames(SEdat)) {
-        SEdat <- SEdat %>%
-          fill(Pre) %>%
-          fill(FollowUp, .direction = "up")%>%
-          fill(Pre, .direction = "up") %>%
-          fill(FollowUp) %>%
-          slice(1)
-      }
-
-    }
-
-    SEdat <- SEdat %>%
-      select(variable_code, everything())
-
-    return(SEdat)
-  }
 
   within_stats <- vars %>% map_dfr(~withinSE(.x, WaveType = WaveType))
 
