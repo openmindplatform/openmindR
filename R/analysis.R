@@ -1,4 +1,4 @@
-withinSE <- function(variable, WaveType) {
+withinSE <- function(x, variable, WaveType) {
 
   # variable <- "C1"
 
@@ -74,7 +74,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 
 
 
-  within_stats <- vars %>% map_dfr(~withinSE(.x, WaveType = WaveType))
+  within_stats <- vars %>% map_dfr(~withinSE(x, variable = .x, WaveType = WaveType))
 
   ## This is one direction
   if (q14_q17) {
