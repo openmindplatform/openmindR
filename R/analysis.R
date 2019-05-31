@@ -7,13 +7,13 @@ withinSE <- function(x, variable, WaveType) {
 
   var <- SEdat %>% distinct(variable_code) %>% pull(variable_code)
 
-  if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
-
-    # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
-
-    return(tibble(variable_code = variable))
-
-  }
+  # if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
+  #
+  #   # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
+  #
+  #   return(tibble(variable_code = variable))
+  #
+  # }
 
 
   SEdat <- summarySEwithin(data = SEdat,
@@ -75,12 +75,16 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 
   # vars <- "C1"
 
-  if (any(vars %in% c("C1", "C2", "C3") & WaveType == "Post")) {
+  if (any(c("C1", "C2", "C3") %in% vars) & WaveType == "Post") {
     x <- x %>%
       filter(variable_code %nin% c("C1", "C2", "C3"))
+
+    vars <- x %>% select(variable_code) %>% distinct() %>% pull()
   }
 
   within_stats <- vars %>% map_dfr(~withinSE(x, variable = .x, WaveType = WaveType))
+
+  # withinSE(x, "Q18", WaveType)
 
   ## This is one direction
   if (q14_q17) {
@@ -132,19 +136,21 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 #' @export
 bind_questions <- function(.data, ...) {
 
-  # .data <- compare_dat_prepost
+  # .data <- moderate_dat_prePostfollow
 
   # ## Just Q14 and Q17
-  # x <- .data %>%
+  # x <-    .data %>%
   # dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
-  # dplyr::group_by(variable_code)
+    # dplyr::group_by(variable_code) #%>%
+    # summarize_comparison(#...,
+      # q14_q17 = F),
 
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
     .data %>%
       dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      summarize_comparison(...,
+      summarize_comparison(#...,
                            q14_q17 = F),
     ## Just Q14 and Q17
     .data %>%
@@ -205,18 +211,20 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
   # gathered_dat <- n3v4long
 
+  compare = c("PrePost", "PreFollow", "PrePostFollow")
+
   if ("PrePostFollow" %in% compare) {
     ## PrePost Data
     compare_dat_prepostfollow <- gathered_dat %>%
       dplyr::filter(Type %in% c("Pre", "Post", "FollowUp")) %>%
       tidyr::drop_na(Response) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
+      # dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
       ## count OMIDs and PrePost Type
       dplyr::add_count(OMID, variable_code) %>%
       ## only keep cases where Pre and Post exist
       dplyr::filter(n == 3)
 
-    # debugonce(bind_questions)
+    # debugonce(withinSE)
 
     ## Calculate Scores for all data
     moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
@@ -225,7 +233,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
-      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollowT1T2") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithModerates") %>%
       ## Deal with Culture Vars
@@ -233,13 +241,14 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
       dplyr::mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
 
     ## Calculate scores where Moderates need to be excluded
-    no_moderate_dat_prePostfollow <- compare_dat_prepost %>%
+    no_moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
       dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
-      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollowT1T2") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithoutModerates")
 
@@ -248,9 +257,10 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     moderate_dat_prepostFollow <- compare_dat_prepostfollow %>%
       dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
       dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
-      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollowT1T3") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithModerates") %>%
       ## Deal with Culture Vars
@@ -261,11 +271,12 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prepostFollow <- compare_dat_prepostfollow  %>%
       dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
-      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollowT1T3") %>%
       ## add indicator
       dplyr::mutate(moderates = "WithoutModerates")
 
@@ -353,14 +364,17 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
   }
 
   ## if both PrePost and PreFollow are given
-  if (all(c("PrePost" ,"PreFollow") %in% compare)) {
+  if (all(c("PrePost" ,"PreFollow", "PrePostFollow") %in% compare)) {
 
-    final_compared <- final_compared_prepost %>% dplyr::bind_rows(final_compared_prefollow)
+    final_compared <- final_compared_prepost %>%
+      dplyr::bind_rows(final_compared_prefollow) %>%
+      dplyr::bind_rows(final_compared_prepostfollow)
 
   }
 
   if (all("PrePost" == compare)) final_compared <- final_compared_prepost
   if (all("PreFollow" == compare)) final_compared <- final_compared_prefollow
+  if (all("PrePostFollow" == compare)) final_compared <- final_compared_prepostfollow
 
   final_compared <- final_compared %>%
     dplyr::mutate(cohendCIlow2 = ifelse(cohendCIhi < cohendCIlow, cohendCIhi, cohendCIlow)) %>%
