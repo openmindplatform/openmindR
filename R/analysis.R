@@ -70,9 +70,15 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
     WaveType <- "FollowUp"
   }
 
+
   vars <- x %>% select(variable_code) %>% distinct() %>% pull()
 
+  # vars <- "C1"
 
+  if (any(vars %in% c("C1", "C2", "C3") & WaveType == "Post")) {
+    x <- x %>%
+      filter(variable_code %nin% c("C1", "C2", "C3"))
+  }
 
   within_stats <- vars %>% map_dfr(~withinSE(x, variable = .x, WaveType = WaveType))
 
@@ -195,9 +201,79 @@ do_if <- function(.data, condition, call){
 #' @param gathered_dat Assessment data as long format
 #' @param  compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
 #' @export
-om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow")) {
+om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePostFollow")) {
 
   # gathered_dat <- n3v4long
+
+  if ("PrePostFollow" %in% compare) {
+    ## PrePost Data
+    compare_dat_prepostfollow <- gathered_dat %>%
+      dplyr::filter(Type %in% c("Pre", "Post", "FollowUp")) %>%
+      tidyr::drop_na(Response) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
+      ## count OMIDs and PrePost Type
+      dplyr::add_count(OMID, variable_code) %>%
+      ## only keep cases where Pre and Post exist
+      dplyr::filter(n == 3)
+
+    debugonce(bind_questions)
+
+    ## Calculate Scores for all data
+    moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+      ## PrePost
+      bind_questions(waves = "PrePost") %>%
+      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      ## add indicator
+      dplyr::mutate(moderates = "WithModerates") %>%
+      ## Deal with Culture Vars
+      dplyr::filter(!is.nan(cohend)) %>%
+      dplyr::mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
+
+    ## Calculate scores where Moderates need to be excluded
+    no_moderate_dat_prePostfollow <- compare_dat_prepost %>%
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      tidyr::drop_na(ppol_cat) %>%
+      ## PrePost
+      bind_questions(waves = "PrePost") %>%
+      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      ## add indicator
+      dplyr::mutate(moderates = "WithoutModerates")
+
+
+    ## Calculate Scores for all data
+    moderate_dat_prepostFollow <- compare_dat_prepostfollow %>%
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      ## PreFollow
+      bind_questions(waves = "PreFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      ## add indicator
+      dplyr::mutate(moderates = "WithModerates") %>%
+      ## Deal with Culture Vars
+      dplyr::filter(!is.nan(cohend)) %>%
+      dplyr::mutate(moderates = ifelse(variable_code %in% c("C1", "C2", "C3"), "CultureVars", moderates))
+
+
+    ## Calculate scores where Moderates need to be excluded
+    no_moderate_dat_prepostFollow <- compare_dat_prepostfollow  %>%
+      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      tidyr::drop_na(ppol_cat) %>%
+      ## PreFollow
+      bind_questions(waves = "PreFollow") %>%
+      dplyr::mutate(Comparison = "PrePostFollow") %>%
+      ## add indicator
+      dplyr::mutate(moderates = "WithoutModerates")
+
+    final_compared_prePostfollow <- moderate_dat_prePostfollow %>% dplyr::bind_rows(no_moderate_dat_prePostfollow)
+    final_compared_prepostFollow <- moderate_dat_prepostFollow %>% dplyr::bind_rows(no_moderate_dat_prepostFollow)
+
+    final_compared_prepostfollow <- dplyr::bind_rows(final_compared_prePostfollow, final_compared_prepostFollow)
+  }
 
   ## this is the higher level function which
   ## brings together bind_questions and summarize_comparison
