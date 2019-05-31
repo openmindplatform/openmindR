@@ -216,7 +216,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
       ## only keep cases where Pre and Post exist
       dplyr::filter(n == 3)
 
-    debugonce(bind_questions)
+    # debugonce(bind_questions)
 
     ## Calculate Scores for all data
     moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
