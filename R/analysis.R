@@ -1,3 +1,9 @@
+#' Get Within Standard Errors
+#'
+#' @importFrom Rmisc summarySEwithin
+#' @param x data
+#' @param variable specify which variable you want to calculate
+#' @param WaveType which wave you want to compare (should be "Post" or "FollowUp")
 withinSE <- function(x, variable, WaveType) {
 
   # variable <- "C1"
@@ -16,7 +22,7 @@ withinSE <- function(x, variable, WaveType) {
   # }
 
 
-  SEdat <- summarySEwithin(data = SEdat,
+  SEdat <- Rmisc::summarySEwithin(data = SEdat,
                            measurevar = "Response",
                            withinvars = "Type",
                            idvar = "OMID", na.rm = T) %>%
@@ -173,7 +179,7 @@ bind_questions <- function(.data, ...) {
 #' @param condition logical test
 #' @param call a formula descibing a pipe to be evaluated if condition is \code{code}
 #' @examples
-#' any_condition <- T
+#' any_condition <- TRUE
 #'
 #' mtcars %>%
 #' do_if(any_condition, ~{

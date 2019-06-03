@@ -6,6 +6,13 @@
 \usage{
 db_append(path, tbl, data)
 }
+\arguments{
+\item{path}{path to SQL database}
+
+\item{tbl}{name of the table in SQL database}
+
+\item{data}{the object dataframe that goes into the SQL database}
+}
 \description{
 This is a helper function that will write a dataframe to a SQL database
 }

@@ -1,2 +1,7 @@
 ^openmindR\.Rproj$
 ^\.Rproj\.user$
+^\.png
+^\.Rmd
+README_files
+images
+^\.txt

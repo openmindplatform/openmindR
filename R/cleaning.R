@@ -17,8 +17,8 @@
 #'@export
 om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
 
-  if (tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
-    message("Warning: Should be one of the following: c('AssessmentV4', 'AssessmentV5','AccessCodes','ParticipantProgress','InstructorSurvey', 'TechnicalInquiries')\n")
+  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"))) {
+    stop("Warning: Should be one of the following: c('AssessmentV4', 'AssessmentV5','AccessCodes','ParticipantProgress','InstructorSurvey', 'TechnicalInquiries')\n")
   }
 
   cat("Seting up key\n")
@@ -248,8 +248,7 @@ om_rescale <- function(.data) {
 
 
   .data %>%
-    openmindR::do_if(
-      !vars_numeric,
+    do_if(!vars_numeric,
       ~{.x %>%
           dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), readr::parse_number)
         }
@@ -476,27 +475,27 @@ om_construct_measures <- function(x){
   if (stringr::str_detect(cols, "Pre")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      openmindR::polar_measures(Q1Pre, Q2Pre) %>%
+      polar_measures(Q1Pre, Q2Pre) %>%
       #compute intellectual humility factor score
-      openmindR::calc_ih("Pre")
+      calc_ih("Pre")
   }
 
   ## If Post vars are found
   if (stringr::str_detect(cols, "Post")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      openmindR::polar_measures(Q1Post, Q2Post) %>%
+      polar_measures(Q1Post, Q2Post) %>%
       #compute intellectual humility factor score
-      openmindR::calc_ih("Post")
+      calc_ih("Post")
   }
 
   ## If FollowUp vars are found
   if (stringr::str_detect(cols, "FollowUp")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      openmindR::polar_measures(Q1FollowUp, Q2FollowUp)  %>%
+      polar_measures(Q1FollowUp, Q2FollowUp)  %>%
       #compute intellectual humility factor score
-      openmindR::calc_ih("FollowUp")
+      calc_ih("FollowUp")
   }
 
   return(final_dat)
@@ -535,26 +534,26 @@ remove_dups <- function(cleaned_dat) {
     dplyr::group_by(OMID) %>%
     dplyr::slice(1) %>%
     dplyr::ungroup() %>%
-    openmindR::do_if(.,
+    do_if(.,
         condition = is.numeric(cleaned_dat$AssessmentVersion),
         call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))}
     ) %>%
-    openmindR::do_if(.,
+    do_if(.,
         condition = is.character(cleaned_dat$AssessmentVersion),
         call = ~{.x %>% dplyr::mutate(AssessmentVersion = as.character(AssessmentVersion))}
     ) %>%
-    openmindR::do_if(.,
-                     condition = is.numeric(cleaned_dat$AssessmentsDone),
-                     call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.numeric(AssessmentsDone))}
+    do_if(.,
+          condition = is.numeric(cleaned_dat$AssessmentsDone),
+          call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.numeric(AssessmentsDone))}
     ) %>%
-    openmindR::do_if(.,
-                     condition = is.character(cleaned_dat$AssessmentsDone),
-                     call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.character(AssessmentsDone))}
+    do_if(.,
+          condition = is.character(cleaned_dat$AssessmentsDone),
+          call = ~{.x %>% dplyr::mutate(AssessmentsDone = as.character(AssessmentsDone))}
     ) %>%
-    openmindR::coalesce_join(join = dplyr::left_join,
-                             cleaned_dat %>%
-                               dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
-                               dplyr::filter(OMID %in% dups)) %>%
+    coalesce_join(join = dplyr::left_join,
+                  cleaned_dat %>%
+                    dplyr::mutate(createdTime = lubridate::as_datetime(createdTime)) %>%
+                    dplyr::filter(OMID %in% dups)) %>%
     dplyr::mutate(AssessmentVersion = as.numeric(AssessmentVersion))
 
   message(stringr::str_glue("Removing {round(length(dups))} duplicates...\n"))
@@ -648,7 +647,10 @@ om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
 #'
 #' This is just a helper function because it will be deprecated from dplyr at some point and we would like to keep it.
 #'
-#'
+#' @param x dataseet
+#' @param vars which variable to count
+#' @param wt weights
+#' @param sort Boolean. Sort by count.
 #' @export
 om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
   vars <- dplyr:::compat_lazy_dots(vars, rlang::caller_env())
@@ -661,7 +663,9 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
 #'
 #' This is a helper function that will write a dataframe to a SQL database
 #'
-#'
+#' @param path path to SQL database
+#' @param tbl name of the table in SQL database
+#' @param data the object dataframe that goes into the SQL database
 #' @export
 db_append <- function(path, tbl, data) {
   con <- DBI::dbConnect(RSQLite::SQLite(), path)
@@ -680,7 +684,8 @@ db_append <- function(path, tbl, data) {
 #'
 #' This is a helper function that will retreive a dataframe to a SQL database
 #'
-#'
+#' @param tbl_dat which table from the SQL database do you want to retrieve
+#' @param path path to database
 #' @export
 db_get_data <- function(tbl_dat, path = "sql_data/omdata.db") {
   # con <- dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")

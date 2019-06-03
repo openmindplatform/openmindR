@@ -17,7 +17,7 @@ do_if(.data, condition, call)
 This function allows to create an if statement that can be used within a pipable workflow
 }
 \examples{
-any_condition <- T
+any_condition <- TRUE
 
 mtcars \%>\%
 do_if(any_condition, ~{
