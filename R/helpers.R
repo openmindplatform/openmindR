@@ -23,6 +23,8 @@ install_openmindR <- function(...) {
 
   devtools::install_github("openmindplatform/openmindR", ...)
 
+  library(openmindR)
+
 }
 
 
