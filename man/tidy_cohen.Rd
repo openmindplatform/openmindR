@@ -6,6 +6,9 @@
 \usage{
 tidy_cohen(cohendat)
 }
+\arguments{
+\item{cohendat}{results from Cohen's D}
+}
 \description{
 This function creates a tidy dataframe from effsize::cohend.d
 }
