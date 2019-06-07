@@ -4,7 +4,7 @@
 \alias{bind_questions}
 \title{Conducts t-tests and calculates Cohen's d for Q14 and Q17 seperately}
 \usage{
-bind_questions(.data, ...)
+bind_questions(.data, waves)
 }
 \arguments{
 \item{...}{other arguments passed to summarize_comparison}

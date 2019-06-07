@@ -4,7 +4,7 @@
 \alias{summarize_comparison}
 \title{Conducts t-tests and calculates Cohen's d}
 \usage{
-summarize_comparison(x, waves = "PrePost", q14_q17 = F)
+summarize_comparison(x, waves = NULL, q14_q17 = F)
 }
 \arguments{
 \item{x}{data}

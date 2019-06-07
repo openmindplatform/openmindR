@@ -152,7 +152,7 @@ withinSE <- function(x, variable, WaveType) {
 #' @param waves either PrePost or PreFollow
 #' @param q14_q17 logical, Q14 and Q17 are coded seperately
 #' @export
-summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
+summarize_comparison <- function(x, waves = NULL, q14_q17 = F) {
 
   ## this function calculates ttests and cohens d
 
@@ -227,7 +227,7 @@ summarize_comparison <- function(x, waves = "PrePost", q14_q17 = F) {
 #' @param .data
 #' @param ... other arguments passed to summarize_comparison
 #' @export
-bind_questions <- function(.data, ...) {
+bind_questions <- function(.data, waves) {
 
   # .data <- moderate_dat_prePostfollow
 
@@ -243,13 +243,13 @@ bind_questions <- function(.data, ...) {
     .data %>%
       dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      summarize_comparison(#...,
+      summarize_comparison(waves = waves,
                            q14_q17 = F),
     ## Just Q14 and Q17
     .data %>%
       dplyr::filter(variable_code %in% c("Q14", "Q17")) %>%
       dplyr::group_by(variable_code) %>%
-      summarize_comparison(...,
+      summarize_comparison(waves = waves,
                            q14_q17 = T)
   )
 }
@@ -304,7 +304,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
   # gathered_dat <- n3v4long
 
-  compare = c("PrePost", "PreFollow", "PrePostFollow")
+  # compare = c("PrePost", "PreFollow", "PrePostFollow")
 
   if ("PrePostFollow" %in% compare) {
     ## PrePost Data
@@ -556,7 +556,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
       T ~ Construct
     )) %>%
     dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code,
-                  N, sd, se, ci, Pre, Post, FollowUp, Comparison, moderates, Variant) %>%
+                  N, sd = SD, se = SE, ci = CI, Pre:Comparison, moderates, Variant) %>%
     tidyr::drop_na(Outcome)
 
   return(basicsummarystats)
