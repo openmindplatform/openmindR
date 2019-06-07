@@ -87,7 +87,6 @@ collapse_and_norm = function(data, measurevar, idvar, withinvars, betweenvars= N
 
 #' Get Within Standard Errors
 #'
-#' @importFrom Rmisc summarySEwithin
 #' @param x data
 #' @param variable specify which variable you want to calculate
 #' @param WaveType which wave you want to compare (should be "Post" or "FollowUp")
@@ -618,7 +617,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
 
   plot_dat <- dplyr::bind_rows(
     openmindR::q_strings_seps %>%
-      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
+      purrr::map_dfr(~summary_se_within(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
@@ -626,7 +625,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
       dplyr::mutate(Variant = aversion) ,
 
     openmindR::c_strings_seps %>%
-      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat, variable_code == .x),
+      purrr::map_dfr(~summary_se_within(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
@@ -634,7 +633,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
       mutate(Variant = aversion) ,
 
     c("Q15", "Q16", "Q17") %>%
-      purrr::map_dfr(~Rmisc::summarySEwithin(subset(gathered_dat %>% tidyr::drop_na(ppol_cat), variable_code == .x),
+      purrr::map_dfr(~summary_se_within(subset(gathered_dat %>% tidyr::drop_na(ppol_cat), variable_code == .x),
                                              measurevar = "Response",
                                              withinvars = "Type",
                                              idvar = "OMID", na.rm = T) %>%
