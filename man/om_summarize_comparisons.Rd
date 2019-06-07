@@ -5,7 +5,7 @@
 \title{Conduct t-tests and calculate Cohen's d}
 \usage{
 om_summarize_comparisons(gathered_dat, aversion = "All",
-  compare = c("PrePost", "PreFollow"))
+  compare = c("PrePost", "PreFollow", "PrePostFollow"))
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}
