@@ -110,9 +110,9 @@ withinSE <- function(x, variable, WaveType) {
 
 
   SEdat <- summary_se_within(data = SEdat,
-                           measurevar = "Response",
-                           withinvars = "Type",
-                           idvar = "OMID") %>%
+                             measurevar = "Response",
+                             withinvars = "Type",
+                             idvar = "OMID") %>%
     spread(Type, Response) %>%
     mutate(variable_code = variable)
 
@@ -152,7 +152,7 @@ withinSE <- function(x, variable, WaveType) {
 #' @param waves either PrePost or PreFollow
 #' @param q14_q17 logical, Q14 and Q17 are coded seperately
 #' @export
-summarize_comparison <- function(x, waves = NULL, q14_q17 = F) {
+summarize_comparison <- function(x, waves, q14_q17 = F) {
 
   ## this function calculates ttests and cohens d
 
@@ -179,6 +179,12 @@ summarize_comparison <- function(x, waves = NULL, q14_q17 = F) {
 
   # withinSE(x, "Q18", WaveType)
 
+  # print(head(x %>% select(variable_code, Response)))
+
+  print(count(x, Type))
+  print(vars)
+  # print(x)
+
   ## This is one direction
   if (q14_q17) {
     final_dat <- x %>% dplyr::summarize(
@@ -191,7 +197,7 @@ summarize_comparison <- function(x, waves = NULL, q14_q17 = F) {
       # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
       percentimproved = sum((Response[Type == "Pre"] > Response[Type == WaveType])==TRUE)/(df+1)
     ) %>%
-    left_join(within_stats)
+      left_join(within_stats)
 
     return(final_dat)
 
@@ -214,7 +220,7 @@ summarize_comparison <- function(x, waves = NULL, q14_q17 = F) {
       # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
       percentimproved = sum((Response[Type == "Pre"] < Response[Type == WaveType])==TRUE)/(df+1)
     ) %>%
-    left_join(within_stats)
+      left_join(within_stats)
 
     return(final_dat)
   }
@@ -234,9 +240,9 @@ bind_questions <- function(.data, waves) {
   # ## Just Q14 and Q17
   # x <-    .data %>%
   # dplyr::filter(variable_code %nin% c("Q14", "Q17")) %>%
-    # dplyr::group_by(variable_code) #%>%
-    # summarize_comparison(#...,
-      # q14_q17 = F),
+  # dplyr::group_by(variable_code) #%>%
+  # summarize_comparison(#...,
+  # q14_q17 = F),
 
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
@@ -321,7 +327,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "C1", "C2", "C3")) %>%
       dplyr::filter(Type %in% c("Pre", "Post")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
       ## PrePost
@@ -348,7 +354,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prepostFollow <- compare_dat_prepostfollow %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "C1", "C2", "C3")) %>%
       dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
       ## PreFollow
@@ -373,8 +379,30 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
       ## add indicator
       dplyr::mutate(moderates = "WithoutModerates")
 
+    ## Calculate scores for C1, C2 and C3
+    culture_vars <- gathered_dat %>%
+      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::filter(variable_code %in% c("C1", "C2", "C3")) %>%
+      tidyr::drop_na(Response) %>%
+      # dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
+      ## count OMIDs and PrePost Type
+      dplyr::add_count(OMID, variable_code) %>%
+      ## only keep cases where Pre and Post exist
+      dplyr::filter(n == 2) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))  %>%
+      dplyr::group_by(variable_code) %>%
+      ## PreFollow
+      summarize_comparison(waves = "PreFollow",
+                           q14_q17 = F) %>%
+      dplyr::mutate(Comparison = "PrePostFollowT1T3") %>%
+      ## add indicator
+      dplyr::mutate(moderates = "CultureVars") %>%
+      ## Deal with Culture Vars
+      dplyr::filter(!is.nan(cohend))
+
+
     final_compared_prePostfollow <- moderate_dat_prePostfollow %>% dplyr::bind_rows(no_moderate_dat_prePostfollow)
-    final_compared_prepostFollow <- moderate_dat_prepostFollow %>% dplyr::bind_rows(no_moderate_dat_prepostFollow)
+    final_compared_prepostFollow <- moderate_dat_prepostFollow %>% dplyr::bind_rows(no_moderate_dat_prepostFollow) %>% dplyr::bind_rows(culture_vars)
 
     final_compared_prepostfollow <- dplyr::bind_rows(final_compared_prePostfollow, final_compared_prepostFollow)
   }
@@ -474,7 +502,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     dplyr::mutate(cohendCIhi2 = ifelse(cohendCIhi < cohendCIlow, cohendCIlow, cohendCIhi)) %>%
     dplyr::select(-cohendCIlow, -cohendCIhi) %>%
     dplyr::rename(cohendCIlow = cohendCIlow2,
-           cohendCIhi = cohendCIhi2)
+                  cohendCIhi = cohendCIhi2)
 
 
   return(final_compared)
@@ -487,20 +515,20 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 #' @param compare With the `compare` argument you can specify either \code{"PrePost"}, \code{"PreFollow"} or both \code{c("PrePost", "PreFollow")} comparisons (the latter is the default).
 #' @param aversion AssessmentVersion should be one of \code{"V4"}, \code{"V5/V5.1"} or \code{"All"}
 #' @export
-om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c("PrePost", "PreFollow")) {
+om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c("PrePost", "PreFollow", "PrePostFollow")) {
 
   # Variant <- "V5"
   # aversion <- "V4"
 
   gathered_dat <- gathered_dat %>%
-    openmindR::do_if(.data = .,
+    do_if(.data = .,
           condition = aversion == "V4",
           call = ~{
             .x %>%
               dplyr::filter(AssessmentVersion == 4)
           }
     ) %>%
-    openmindR::do_if(.data = .,
+    do_if(.data = .,
           condition = aversion == "V5/V5.1",
           call = ~{
             .x %>%
@@ -511,32 +539,32 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
 
   basicsummarystats <- gathered_dat %>%
     om_compare(compare) %>%
-    openmindR::do_if(.data = .,
-          condition = aversion == "V5/V5.1",
-          call = ~{
-            .x %>%
-              dplyr::left_join(assessmentv5_codebook %>%
-              dplyr::rename(variable_code = Mapping)) %>%
-              dplyr::mutate(Variant = "V5/V5.1")
-          }
+    do_if(.data = .,
+           condition = aversion == "V5/V5.1",
+           call = ~{
+             .x %>%
+               dplyr::left_join(assessmentv5_codebook %>%
+                                  dplyr::rename(variable_code = Mapping)) %>%
+               dplyr::mutate(Variant = "V5/V5.1")
+                     }
     ) %>%
-    openmindR::do_if(.data = .,
+    do_if(.data = .,
           condition = aversion == "V4",
           call = ~{
             .x %>%
               dplyr::left_join(assessmentv4_codebook %>%
-              dplyr::rename(variable_code = Mapping)) %>%
+                                 dplyr::rename(variable_code = Mapping)) %>%
               dplyr::mutate(Variant = "V4")
-          }
+                     }
     ) %>%
-    openmindR::do_if(.data = .,
+    do_if(.data = .,
           condition = aversion == "All",
           call = ~{
             .x %>%
               dplyr::left_join(assessmentv5_codebook %>%
-              dplyr::rename(variable_code = Mapping)) %>%
+                                 dplyr::rename(variable_code = Mapping)) %>%
               dplyr::mutate(Variant = "All")
-          }
+                     }
     ) %>%
     dplyr::rename(Question_txt = Content) %>%
     dplyr::mutate(Question_txt = dplyr::case_when(
@@ -556,7 +584,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
       T ~ Construct
     )) %>%
     dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code,
-                  N, sd = SD, se = SE, ci = CI, Pre:Comparison, moderates, Variant) %>%
+                  N, sd = SD, se = SE, ci = CI, Pre, Post, FollowUp, Comparison, moderates, Variant) %>%
     tidyr::drop_na(Outcome)
 
   return(basicsummarystats)
@@ -821,7 +849,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
 #' @param title specify a title and y-label for the plot
 #' @export
 om_mix_complete <- function(experiment, title) {
-#todo: would be nice to be able to specify ALL, some, or just one of the outcome variables
+  #todo: would be nice to be able to specify ALL, some, or just one of the outcome variables
   # question <- "Q11"
 
   question <- dplyr::case_when(
@@ -833,10 +861,10 @@ om_mix_complete <- function(experiment, title) {
   )
 
   gg_dat <- openmindR::om_mix_models(experiment,
-                          question = question,
-                          plot_model = F,
-                          get_effects = T,
-                          get_tidy = T)
+                                     question = question,
+                                     plot_model = F,
+                                     get_effects = T,
+                                     get_tidy = T)
 
   openmindR::om_mix_plot(gg_dat$effects_dat, gg_dat$tidy_dat, title)
 
