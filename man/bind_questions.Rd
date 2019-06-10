@@ -7,7 +7,9 @@
 bind_questions(.data, waves)
 }
 \arguments{
-\item{...}{other arguments passed to summarize_comparison}
+\item{.data}{dataset}
+
+\item{waves}{which wave (passed to summarize_comparison)}
 }
 \description{
 This is lower-level function that belongs to om_summarize_comparisons. This function is not meant to be used outside of om_summarize_comparisons.

@@ -229,8 +229,8 @@ summarize_comparison <- function(x, waves, q14_q17 = F) {
 #'
 #' This is lower-level function that belongs to om_summarize_comparisons. This function is not meant to be used outside of om_summarize_comparisons.
 #'
-#' @param .data
-#' @param ... other arguments passed to summarize_comparison
+#' @param .data dataset
+#' @param waves which wave (passed to summarize_comparison)
 #' @export
 bind_questions <- function(.data, waves) {
 

@@ -6,6 +6,11 @@
 \usage{
 clean_fa_string(x)
 }
+\arguments{
+\item{x}{string}
+
+\item{row_dat}{dataset}
+}
 \description{
 Clean Feedback Answers
 }

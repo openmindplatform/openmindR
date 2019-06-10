@@ -6,6 +6,9 @@
 \usage{
 om_strsplit(x, split, type = "remove", perl = FALSE, ...)
 }
+\arguments{
+\item{x}{a string}
+}
 \description{
 This function allows you to split a string and keep the delimeter
 }

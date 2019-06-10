@@ -24,7 +24,7 @@ pipe_print <- function(data, message) {print(message); data}
 
 #' This function allows you to split a string and keep the delimeter
 #'
-#' @param x
+#' @param x a string
 #' @export
 om_strsplit <- function(x,
                      split,
@@ -410,8 +410,8 @@ assessment_parser <- function(data, labels = NA, verbose = F) {
 
 #' Spreads steps
 #'
-#'@param x
-#'@param row_dat
+#'@param x steps to be spread
+#'@param row_dat dataset
 #'@export
 spread_it <- function(x, row_dat) {
 
@@ -438,8 +438,8 @@ spread_it <- function(x, row_dat) {
 
 #' Clean Feedback Answers
 #'
-#'@param x
-#'@param row_dat
+#'@param x string
+#'@param row_dat dataset
 #'@export
 clean_fa_string <- function(x) {
   stringr::str_trim(x) %>%
@@ -451,32 +451,6 @@ clean_fa_string <- function(x) {
 
 
 
-#' Parse Lifehacks
-#'
-#'@param x
-#'@param var
-#'@export
-parse_lifehacks <- function(x, var) {
-
-  var_names <- paste0(var, 1:5)
-
-  if (is.na(x)) {
-    na_dat <- rep(NA, 5) %>%
-      tibble() %>% t() %>%
-      as_tibble() %>%
-      set_names(var_names)
-
-    return(na_dat)
-  }
-
-  x %>%
-    stringr::str_split(",") %>%
-    purrr::map(~stringr::str_remove_all(.x, "\\[|\\]")) %>%
-    purrr::map(stringr::str_trim) %>%
-    purrr::map(t) %>%
-    map_dfr(as_tibble) %>%
-    set_names(var_names)
-}
 
 
 #' This function parses feedback from AirTable (dat.par)

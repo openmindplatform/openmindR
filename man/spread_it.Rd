@@ -6,6 +6,11 @@
 \usage{
 spread_it(x, row_dat)
 }
+\arguments{
+\item{x}{steps to be spread}
+
+\item{row_dat}{dataset}
+}
 \description{
 Spreads steps
 }
