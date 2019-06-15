@@ -108,4 +108,20 @@ db_remove <- function(path, datasets = NULL, remove_cleaned_data = T) {
 }
 
 
+#' Get MailChimp Member List
+#'
+#' This function wraps the python module "mailchimp3" to get all members of a list through the Mailchimp API
+#'
+#' @param list_id unique id that denotes MailChimp list
+#' @export
+mailchimp_member_list <- function(list_id = "c7e9a42a8f") {
 
+  mc <- reticulate::import("mailchimp3")
+
+  client <- mc$MailChimp(Sys.getenv("MAILCHIMP_KEY"), 'OpenMind')
+
+  members_list <- client$lists$members$all(list_id, get_all = T, fields = "members.email_address,members.merge_fields,members.id")
+
+  return(members_list)
+
+}

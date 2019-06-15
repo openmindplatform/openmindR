@@ -211,13 +211,13 @@ summarize_comparison <- function(x, waves, q14_q17 = F) {
 
     final_dat <- x %>% dplyr::summarize(
       cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[1]),
-      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired=TRUE, conf.level = 0.95)$conf.int[2]),
-      tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
-      pvalue = t.test(Response~Type, paired=TRUE)$p.value,
-      df = t.test(Response~Type, paired=TRUE)$parameter,
+      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]),
+      tstat = abs(t.test(Response~Type, paired = TRUE)$statistic),
+      pvalue = t.test(Response~Type, paired = TRUE)$p.value,
+      df = t.test(Response~Type, paired = TRUE)$parameter,
       # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
-      percentimproved = sum((Response[Type == "Pre"] < Response[Type == WaveType])==TRUE)/(df+1)
+      percentimproved = sum((Response[Type == "Pre"] < Response[Type == WaveType]) == TRUE)/(df+1)
     ) %>%
       left_join(within_stats)
 

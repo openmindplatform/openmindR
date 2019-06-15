@@ -168,7 +168,7 @@ lh_reason <- function(lh_data, lifehack, lifehackcomplete, reason, step) {
     dplyr::mutate(total = sum(n))  %>%
     dplyr::arrange(desc(n)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(perc = paste0(specify_decimal((n/total*100),2), "%")) %>%
+    dplyr::mutate(perc = paste0(round((n/total*100)), "%")) %>%
     dplyr::select(LifeHacksReason, tidyselect::everything()) %>%
     purrr::set_names(c("LifeHacksReason", "LifeHack", "LifeHacksComplete", "LifeHacksReasonN", "LifeHacksReasonTotal", "LifeHacksReasonPerc")) %>%
     dplyr::mutate(Step = paste0("Step ", step)) %>%
