@@ -375,12 +375,13 @@ polar_measures <- function(final_dat, Q1, Q2) {
   return(final_dat)
 }
 
-#' Creates Intellectual Humility variable
+#' Creates Target variables
 #'
 #' This is lower-level function that belongs to om_construct measure. This function is not meant to be used outside of om_construct_measure.
-#' Creates the following measure
+#' Creates the following measures
 #' \itemize{
 #'   \item Q18: Intellectual Humility
+#'   \item Q19: Perspective-Taking
 #' }
 #' Function automatically accounts for Assessment Version 4 and 5/5.1.
 #'
@@ -388,7 +389,7 @@ polar_measures <- function(final_dat, Q1, Q2) {
 #' @param final_dat Assessment data from AirTable
 #' @param wave Specify wave ("Pre", "Post" or "FollowUp")
 #' @export
-calc_ih <- function(final_dat, wave) {
+calc_measures <- function(final_dat, wave) {
 
   ## if AssessmentVersion is not found then throw error
   if (magrittr::not(colnames(final_dat) %in% "AssessmentVersion" %>% any)) {
@@ -405,6 +406,12 @@ calc_ih <- function(final_dat, wave) {
         AssessmentVersion == 4 ~ (Q3Pre + Q6Pre + Q7Pre + Q8Pre)/4,
         AssessmentVersion >= 5 ~ (Q5Pre + Q7Pre + Q8Pre + Q9Pre)/4,
         T ~ NA_real_
+      )) %>%
+      ## Perspective-Taking for Pre
+      dplyr::mutate(Q19Pre = dplyr::case_when(
+        AssessmentVersion == 4 ~ Q4Pre,
+        AssessmentVersion >= 5 ~ Q6Pre,
+        T ~ NA_real_
       ))
   }
 
@@ -414,6 +421,12 @@ calc_ih <- function(final_dat, wave) {
       dplyr::mutate(Q18Post = dplyr::case_when(
         AssessmentVersion == 4 ~ (Q3Post + Q6Post + Q7Post + Q8Post)/4,
         AssessmentVersion >= 5 ~ (Q5Post + Q7Post + Q8Post + Q9Post)/4,
+        T ~ NA_real_
+      )) %>%
+      ## Perspective-Taking for Post
+      dplyr::mutate(Q19Post = dplyr::case_when(
+        AssessmentVersion == 4 ~ Q4Post,
+        AssessmentVersion >= 5 ~ Q6Post,
         T ~ NA_real_
       ))
   }
@@ -425,6 +438,12 @@ calc_ih <- function(final_dat, wave) {
         AssessmentVersion == 4 ~ (Q3FollowUp + Q6FollowUp + Q7FollowUp + Q8FollowUp)/4,
         AssessmentVersion >= 5 ~ (Q5FollowUp + Q7FollowUp + Q8FollowUp + Q9FollowUp)/4,
         T ~ NA_real_
+      )) %>%
+    ## Perspective-Taking for followup
+      dplyr::mutate(Q19FollowUp = dplyr::case_when(
+        AssessmentVersion == 4 ~ Q4FollowUp,
+        AssessmentVersion >= 5 ~ Q6FollowUp,
+        T ~ NA_real_
       ))
   }
 
@@ -435,7 +454,7 @@ calc_ih <- function(final_dat, wave) {
 #' Constructs measures
 #'
 #'
-#' This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_ih}} to construct various measures.
+#' This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_measures}} to construct various measures.
 #' Creates the following variables:
 #' \itemize{
 #'   \item Q14: Affective Polarization
@@ -443,6 +462,7 @@ calc_ih <- function(final_dat, wave) {
 #'   \item Q16: Outgroup
 #'   \item Q17: Ingroup vs. Outgroup Affective Polarization
 #'   \item Q18: Intellectual Humility
+#'   \item Q19: Perspective-Taking
 #' }
 #'
 #' Function automatically accounts for Assessment Version 4 and 5/5.1.
@@ -480,7 +500,7 @@ om_construct_measures <- function(x){
       ## Compute Polarization Measures
       polar_measures(Q1Pre, Q2Pre) %>%
       #compute intellectual humility factor score
-      calc_ih("Pre")
+      calc_measures("Pre")
   }
 
   ## If Post vars are found
@@ -489,7 +509,7 @@ om_construct_measures <- function(x){
       ## Compute Polarization Measures
       polar_measures(Q1Post, Q2Post) %>%
       #compute intellectual humility factor score
-      calc_ih("Post")
+      calc_measures("Post")
   }
 
   ## If FollowUp vars are found
@@ -498,7 +518,7 @@ om_construct_measures <- function(x){
       ## Compute Polarization Measures
       polar_measures(Q1FollowUp, Q2FollowUp)  %>%
       #compute intellectual humility factor score
-      calc_ih("FollowUp")
+      calc_measures("FollowUp")
   }
 
   return(final_dat)

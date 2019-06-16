@@ -10,7 +10,7 @@ om_construct_measures(x)
 \item{x}{Assessment data from AirTable}
 }
 \description{
-This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_ih}} to construct various measures.
+This is a higher-level function that uses both \code{\link{polar_measures}} and \code{\link{calc_measures}} to construct various measures.
 Creates the following variables:
 \itemize{
   \item Q14: Affective Polarization

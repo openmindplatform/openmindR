@@ -572,6 +572,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
       variable_code == "Q16" ~ "Liking for Outgroup",
       variable_code == "Q17" ~ "Ingroup-Outgroup Polarization",
       variable_code == "Q18" ~ "Intellectual Humility",
+      variable_code == "Q19" ~ "Perspective-Taking",
       T ~ Question_txt
     )) %>%
     dplyr::mutate(Outcome = dplyr::case_when(
@@ -580,6 +581,7 @@ om_summarize_comparisons <- function(gathered_dat, aversion = "All", compare = c
       variable_code == "Q16" ~  'Liking of Outgroup',
       variable_code == "Q17" ~  'Ingroup-Outgroup Polarization Measure',
       variable_code == "Q18" ~  'Intellectual Humility Measure',
+      variable_code == "Q19" ~ "Perspective-Taking",
       T ~ Construct
     )) %>%
     dplyr::select(Outcome, Question_txt, cohend:percentimproved, variable_code,
