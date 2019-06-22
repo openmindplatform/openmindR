@@ -339,7 +339,7 @@ om_clean_ppol <- function(app.dat) {
 #' @param Q1 Q1 variable
 #' @param Q2 Q2 variable
 #' @export
-polar_measures <- function(final_dat, Q1, Q2) {
+polar_measures <- function(final_dat, Q1, Q2, Q3, Q4, Q10) {
 
   ## if ppol_cat is not found then throw error
   if (magrittr::not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
@@ -356,6 +356,9 @@ polar_measures <- function(final_dat, Q1, Q2) {
   ## lazy evaluation
   Q1 <- dplyr::enquo(Q1)
   Q2 <- dplyr::enquo(Q2)
+  Q3 <- dplyr::enquo(Q3)
+  Q4 <- dplyr::enquo(Q4)
+  Q10 <- dplyr::enquo(Q10)
 
 
   final_dat <- final_dat %>%
@@ -366,11 +369,28 @@ polar_measures <- function(final_dat, Q1, Q2) {
     # compute liking for ingroup vs. disliking for outgroup
     ## my ingroup
     dplyr::mutate(Q15 = ifelse(ppol_cat == "Progressives", !!Q1, !!Q2)) %>%
+    ## Social Distance Ingroup
+    dplyr::mutate(DistanceIn = dplyr::case_when(
+      AssessmentVersion == 4 ~ NA_real_,
+      AssessmentVersion >= 5 ~ ifelse(ppol_cat == "Progressives", !!Q3, !!Q4),
+      T ~ NA_real_
+    )) %>%
     # my outgroup
     dplyr::mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
+    ## Social Distance Outgroup
+    dplyr::mutate(DistanceOut = dplyr::case_when(
+      AssessmentVersion == 4 ~ NA_real_,
+      AssessmentVersion >= 5 ~ ifelse(ppol_cat == "Progressives", !!Q4, !!Q3),
+      T ~ NA_real_
+    )) %>%
     # compute ingroup v outgroup affective polarization
     dplyr::mutate(Q17 = abs(Q15 - Q16)) %>%
-    dplyr::rename_at(dplyr::vars(Q14:Q17), ~paste0(.x, wave))
+    # compute ingroup v outgroup social distance
+    dplyr::mutate(Q20 = dplyr::case_when(
+      AssessmentVersion == 4 ~ !!Q10,
+      AssessmentVersion >= 5 ~ 1 - abs(DistanceOut - DistanceIn)
+    )) %>%
+    dplyr::rename_at(dplyr::vars(Q14:Q17, Q20, DistanceIn, DistanceOut), ~paste0(.x, wave))
 
   return(final_dat)
 }
@@ -412,7 +432,15 @@ calc_measures <- function(final_dat, wave) {
         AssessmentVersion == 4 ~ Q4Pre,
         AssessmentVersion >= 5 ~ Q6Pre,
         T ~ NA_real_
-      ))
+      )) #%>%
+      # ## Social Distance for Pre
+      # dplyr::mutate(Q20Pre = dplyr::case_when(
+      #   AssessmentVersion == 4 ~ Q4Pre,
+      #   AssessmentVersion >= 5 ~ Q6Pre,
+      #   T ~ NA_real_
+      # ))
+
+
   }
 
   ## intellectual humility for post
@@ -498,7 +526,7 @@ om_construct_measures <- function(x){
   if (stringr::str_detect(cols, "Pre")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Pre, Q2Pre) %>%
+      polar_measures(Q1Pre, Q2Pre, Q3Pre, Q4Pre, Q10Pre) %>%
       #compute intellectual humility factor score
       calc_measures("Pre")
   }
@@ -507,7 +535,7 @@ om_construct_measures <- function(x){
   if (stringr::str_detect(cols, "Post")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1Post, Q2Post) %>%
+      polar_measures(Q1Post, Q2Post, Q3Post, Q4Post, Q10Post) %>%
       #compute intellectual humility factor score
       calc_measures("Post")
   }
@@ -516,7 +544,7 @@ om_construct_measures <- function(x){
   if (stringr::str_detect(cols, "FollowUp")) {
     final_dat <- final_dat %>%
       ## Compute Polarization Measures
-      polar_measures(Q1FollowUp, Q2FollowUp)  %>%
+      polar_measures(Q1FollowUp, Q2FollowUp, Q3FollowUp, Q4FollowUp, Q10FollowUp)  %>%
       #compute intellectual humility factor score
       calc_measures("FollowUp")
   }
