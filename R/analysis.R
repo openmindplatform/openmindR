@@ -243,6 +243,8 @@ bind_questions <- function(.data, waves) {
   # summarize_comparison(#...,
   # q14_q17 = F),
 
+  ##IMPORTANT: This function is needed because Q14 and Q17 are coded in different directions.
+
   dplyr::bind_rows(
     ## All variables that are not Q14 or Q17
     .data %>%
@@ -326,7 +328,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "C1", "C2", "C3")) %>%
+      ## remove vars that depend on moderates being excluded (Q20 only for AV4)
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
       dplyr::filter(Type %in% c("Pre", "Post")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
       ## PrePost
@@ -340,7 +343,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
-      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
       dplyr::filter(Type %in% c("Pre", "Post")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
       tidyr::drop_na(ppol_cat) %>%
@@ -353,7 +357,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prepostFollow <- compare_dat_prepostfollow %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "C1", "C2", "C3")) %>%
+      ## remove vars that depend on moderates being excluded (Q20 only for AV4)
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
       dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
       ## PreFollow
@@ -370,7 +375,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     no_moderate_dat_prepostFollow <- compare_dat_prepostfollow  %>%
       dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
       dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
-      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
@@ -422,7 +428,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prepost <- compare_dat_prepost %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      ## remove vars that depend on moderates being excluded (Q20 only for AV4)
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
       dplyr::mutate(Comparison = "PrePost") %>%
@@ -434,7 +441,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prepost <- compare_dat_prepost %>%
-      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
@@ -459,7 +467,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate Scores for all data
     moderate_dat_prefollow <- compare_dat_prefollow %>%
-      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17")) %>%
+      ## remove vars that depend on moderates being excluded (Q20 only for AV4)
+      dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
       dplyr::mutate(Comparison = "PreFollow") %>%
@@ -472,7 +481,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prefollow <- compare_dat_prefollow  %>%
-      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17")) %>%
+      ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
+      dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
