@@ -13,14 +13,14 @@ parse_lifehacks <- function(x, var) {
 
   if (!is.na(x)) {
     if (nchar(x) == 0) {
-      x <- NA
+      x <- NA_character_
     }
   }
 
   var_names <- paste0(var, 1:5)
 
   if (is.na(x)) {
-    na_dat <- rep(NA, 5) %>%
+    na_dat <- rep(NA_character_, 5) %>%
       tibble::tibble() %>% t() %>%
       tibble::as_tibble() %>%
       purrr::set_names(var_names)
