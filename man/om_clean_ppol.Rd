@@ -16,6 +16,7 @@ Creates the following measures of Political Orientation
   \item ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
+  \item ppol_catmod: a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 }
 }
 \section{Workflow}{

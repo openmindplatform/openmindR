@@ -291,6 +291,7 @@ om_rescale <- function(.data) {
 #'   \item ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
 #'   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
 #'   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
+#'   \item ppol_catmod: a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 #' }
 #'
 #' @section Workflow:
@@ -338,7 +339,16 @@ om_clean_ppol <- function(app.dat) {
       T ~ NA_character_
     )) %>%
     dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
-                                              "Conservatives")))
+                                              "Conservatives"))) %>%
+    dplyr::mutate(ppol_catmod = dplyr::case_when(
+      ppol_num %in% c(1:3) ~ "Progressives",
+      ppol_num %in% c(5:7) ~ "Conservatives",
+      ppol_num == 4 ~ "Moderates",
+      T ~ NA_character_
+    )) %>%
+    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
+                                                              "Moderates",
+                                                              "Conservatives")))
   # TODO: For future make more ppol variants
 }
 
