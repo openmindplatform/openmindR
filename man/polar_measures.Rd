@@ -4,7 +4,7 @@
 \alias{polar_measures}
 \title{Creates Political Polarization variables}
 \usage{
-polar_measures(final_dat, Q1, Q2)
+polar_measures(final_dat, Q1, Q2, Q3, Q4, Q10)
 }
 \arguments{
 \item{final_dat}{Assessment data from AirTable}

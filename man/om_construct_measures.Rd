@@ -18,6 +18,7 @@ Creates the following variables:
   \item Q16: Outgroup
   \item Q17: Ingroup vs. Outgroup Affective Polarization
   \item Q18: Intellectual Humility
+  \item Q19: Perspective-Taking
 }
 }
 \details{

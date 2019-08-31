@@ -17,8 +17,8 @@
 #'@export
 om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
 
-  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"))) {
-    stop("Warning: Should be one of the following: c('AssessmentV4', 'AssessmentV5','AccessCodes','ParticipantProgress','InstructorSurvey', 'TechnicalInquiries')\n")
+  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
+    stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurvey, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
   }
 
   cat("Seting up key\n")
@@ -46,6 +46,25 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     final_list$dat.ass5 <- dat.ass.1$AssessmentV5$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. AssessmentV5 Data has ", nrow(final_list$dat.ass5), " rows\n"))
   }
+
+  if ("AssessmentV6" %in% tables) {
+    cat("Download AssessmentV6 Data\n")
+    final_list$dat.ass6 <- dat.ass.1$AssessmentV6$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. AssessmentV6 Data has ", nrow(final_list$dat.ass6), " rows\n"))
+  }
+
+  if ("AssessmentV6DiD" %in% tables) {
+    cat("Download AssessmentV6DiD Data\n")
+    final_list$dat.ass6did <- dat.ass.1$AssessmentV6DiD$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. AssessmentV6DiD Data has ", nrow(final_list$dat.ass6did), " rows\n"))
+  }
+
+  if ("DiDProgress" %in% tables) {
+    cat("Download DiDProgress Data\n")
+    final_list$didprogress <- dat.ass.1$DiDProgress$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. DiDProgress Data has ", nrow(final_list$didprogress), " rows\n"))
+  }
+
 
   if ("AccessCodes" %in% tables) {
     cat("Download AccessCodes Data\n")
