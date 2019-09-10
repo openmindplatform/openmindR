@@ -19,6 +19,9 @@ devtools::install_github("openmindplatform/openmindR")
 knitr::opts_chunk$set(message = F, 
                       warning = F)
 
+# AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
+# 
+# usethis::use_data(AssessmentV6Codebook)
 ```
 
 
