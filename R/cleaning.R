@@ -368,7 +368,7 @@ om_clean_ppol <- function(app.dat) {
 #' @param Q1 Q1 variable
 #' @param Q2 Q2 variable
 #' @export
-polar_measures <- function(final_dat, Q1, Q2, Q3, Q4, Q10) {
+polar_measures <- function(final_dat, ProgTemp, ConTemp) {
 
   ## if ppol_cat is not found then throw error
   if (magrittr::not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
@@ -377,49 +377,38 @@ polar_measures <- function(final_dat, Q1, Q2, Q3, Q4, Q10) {
 
   ## check which wave
   wave <- dplyr::case_when(
-    stringr::str_detect(lazyeval::expr_find(Q1), "Pre") ~ "Pre",
-    stringr::str_detect(lazyeval::expr_find(Q1), "Post") ~ "Post",
-    stringr::str_detect(lazyeval::expr_find(Q1), "FollowUp") ~ "FollowUp"
+    stringr::str_detect(lazyeval::expr_find(ProgTemp), "Pre") ~ "Pre",
+    stringr::str_detect(lazyeval::expr_find(ProgTemp), "Post") ~ "Post",
+    stringr::str_detect(lazyeval::expr_find(ProgTemp), "FollowUp") ~ "FollowUp"
   )
 
   ## lazy evaluation
-  Q1 <- dplyr::enquo(Q1)
-  Q2 <- dplyr::enquo(Q2)
-  Q3 <- dplyr::enquo(Q3)
-  Q4 <- dplyr::enquo(Q4)
-  Q10 <- dplyr::enquo(Q10)
+  ProgTemp <- dplyr::enquo(ProgTemp)
+  ConTemp <- dplyr::enquo(ConTemp)
+  # Q3 <- dplyr::enquo(Q3)
+  # Q4 <- dplyr::enquo(Q4)
+  # Q10 <- dplyr::enquo(Q10)
 
 
   final_dat <- final_dat %>%
     # make sure vars are numeric
-    dplyr::mutate_at(dplyr::vars(!!Q1, !!Q2), as.numeric) %>%
+    dplyr::mutate_at(dplyr::vars(!!ProgTemp, !!ConTemp), as.numeric) %>%
     # compute affective polarization
-    dplyr::mutate(Q14 = abs(!!Q1 - !!Q2)) %>%
+    dplyr::mutate(AffPol1 = abs(!!ProgTemp - !!ConTemp)) %>%
     # compute liking for ingroup vs. disliking for outgroup
     ## my ingroup
-    dplyr::mutate(Q15 = ifelse(ppol_cat == "Progressives", !!Q1, !!Q2)) %>%
-    ## Social Distance Ingroup
-    dplyr::mutate(DistanceIn = dplyr::case_when(
-      AssessmentVersion == 4 ~ NA_real_,
-      AssessmentVersion >= 5 ~ ifelse(ppol_cat == "Progressives", !!Q3, !!Q4),
-      T ~ NA_real_
-    )) %>%
+    dplyr::mutate(IngroupLiking = case_when(
+      ppol_cat == "Progressives" ~ !!ProgTemp,
+      ppol_cat == "Conservatives" ~ !!ConTemp
+      )) %>%
     # my outgroup
-    dplyr::mutate(Q16 = ifelse(ppol_cat == "Progressives", !!Q2, !!Q1)) %>%
-    ## Social Distance Outgroup
-    dplyr::mutate(DistanceOut = dplyr::case_when(
-      AssessmentVersion == 4 ~ NA_real_,
-      AssessmentVersion >= 5 ~ ifelse(ppol_cat == "Progressives", !!Q4, !!Q3),
-      T ~ NA_real_
+    dplyr::mutate(OutgroupLiking = case_when(
+      ppol_cat == "Conservatives" ~ !!ProgTemp,
+      ppol_cat == "Progressives" ~ !!ConTemp
     )) %>%
     # compute ingroup v outgroup affective polarization
-    dplyr::mutate(Q17 = abs(Q15 - Q16)) %>%
-    # compute ingroup v outgroup social distance
-    dplyr::mutate(Q20 = dplyr::case_when(
-      AssessmentVersion == 4 ~ !!Q10,
-      AssessmentVersion >= 5 ~ 1 - abs(DistanceOut - DistanceIn)
-    )) %>%
-    dplyr::rename_at(dplyr::vars(Q14:Q17, Q20, DistanceIn, DistanceOut), ~paste0(.x, wave))
+    dplyr::mutate(AffPol2 = abs(IngroupLiking - OutgroupLiking)) %>%
+    dplyr::rename_at(dplyr::vars(AffPol1, AffPol2, IngroupLiking, OutgroupLiking), ~paste0(.x, wave))
 
   return(final_dat)
 }
