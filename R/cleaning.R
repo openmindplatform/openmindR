@@ -424,6 +424,67 @@ polar_measures <- function(final_dat, Q1, Q2, Q3, Q4, Q10) {
   return(final_dat)
 }
 
+
+#' Creates Motivation Atrribution Asymmetry variables
+#'
+#' This is lower-level function that belongs to om_construct measure. This function is not meant to be used outside of om_construct_measure.
+#' Creates the following measures of Political Polarization
+#' \itemize{
+#'   \item Q14: Affective Polarization
+#'   \item Q15: Ingroup
+#'   \item Q16: Outgroup
+#'   \item Q17: Ingroup vs. Outgroup Affective Polarization
+#' }
+#'
+#'
+#' @param final_dat Assessment data from AirTable
+#' @param Q1 Q1 variable
+#' @param Q2 Q2 variable
+#' @export
+motivation_measures <- function(final_dat, MotivationProg1, MotivationCon1, MotivationProg2, MotivationCon2) {
+
+  ## if ppol_cat is not found then throw error
+  if (magrittr::not(colnames(final_dat) %in% "ppol_cat" %>% any)) {
+    stop("Input data is missing column `ppol_cat`. Please make sure to run om_clean_ppol before you run om_construct_measures.\n")
+  }
+
+  ## check which wave
+  wave <- dplyr::case_when(
+    stringr::str_detect(lazyeval::expr_find(MotivationProg1), "Pre") ~ "Pre",
+    stringr::str_detect(lazyeval::expr_find(MotivationProg1), "Post") ~ "Post",
+    stringr::str_detect(lazyeval::expr_find(MotivationProg1), "FollowUp") ~ "FollowUp"
+  )
+
+  ## lazy evaluation
+  MotivationProg1 <- dplyr::enquo(MotivationProg1)
+  MotivationCon1 <- dplyr::enquo(MotivationCon1)
+  MotivationProg2 <- dplyr::enquo(MotivationProg2)
+  MotivationCon2 <- dplyr::enquo(MotivationCon2)
+
+
+  final_dat <- final_dat %>%
+    dplyr::mutate(IngroupMotivation1 = ifelse(ppol_cat == "Progressives",
+                                              !!MotivationProg1,
+                                              !!MotivationCon1)) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivation1 = ifelse(ppol_cat == "Progressives",
+                                               !!MotivationCon1,
+                                               !!MotivationProg1)) %>%
+    dplyr::mutate(IngroupMotivation2 = ifelse(ppol_cat == "Progressives",
+                                              !!MotivationProg2,
+                                              !!MotivationCon2)) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivation2 = ifelse(ppol_cat == "Progressives",
+                                               !!MotivationCon2,
+                                               !!MotivationProg2)) %>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAA1 = abs(IngroupMotivation1 - OutgroupMotivation1)) %>%
+    dplyr::mutate(MAA2 = abs(IngroupMotivation2 - OutgroupMotivation2)) %>%
+    dplyr::rename_at(dplyr::vars(IngroupMotivation1:MAA2), ~paste0(.x, wave))
+
+  return(final_dat)
+}
+
 #' Creates Target variables
 #'
 #' This is lower-level function that belongs to om_construct measure. This function is not meant to be used outside of om_construct_measure.
