@@ -419,12 +419,16 @@ spread_it <- function(x, row_dat) {
 
   check_it <- selected_dat %>% .[1,2] %>% dplyr::pull(1)
 
+
+  is_zero <- check_it %>% magrittr::equals("0")
+
   is_one <- check_it %>% magrittr::equals("1")
   is_two <- check_it %>% magrittr::equals("2")
   is_three <- check_it %>% magrittr::equals("3")
   is_four <- check_it %>% magrittr::equals("4")
   is_five <- check_it %>% magrittr::equals("5")
 
+  if (is_zero) return(NULL)
   if (is_one) selected_dat[,1] <- c("Step1", paste0("Step1_Q", 1:5))
   if (is_two) selected_dat[,1] <- c("Step2", paste0("Step2_Q", 1:5))
   if (is_three) selected_dat[,1] <- c("Step3", paste0("Step3_Q", 1:5))
@@ -459,8 +463,7 @@ clean_fa_string <- function(x) {
 #'@export
 parse_feedback_at <- function(raw_input) {
 
-  # raw_input <- "[1, (not asked), 10, (not asked), ||, ||], [2, (not asked), 10, (not asked), ||, ||], [3, (not asked), 10, (not asked), ||, ||], [4, (not asked), 10, (not asked), ||, ||], [5, (not asked), 10, (not asked), ||, ||]"
-
+  # raw_input <- "[2, (not asked), 10, (not asked), |How it is interactive|, |Videos|], [2, (not asked), 8, (not asked), |The research about mindsets|, |Videos|], [3, (not asked), 10, (not asked), |The examples|, |Videos|], [4, (not asked), 10, (not asked), |It’s interactive|, |Videos|], [5, (not asked), 10, (not asked), |How it’s interactive|, |Videos|]"
   # if (is.na(raw_input)) return(tibble(Step1 = NA))
 
   if (is.na(raw_input)) {
@@ -502,6 +505,8 @@ parse_feedback_at <- function(raw_input) {
 
   ## Remove duplicate steps
   row_dat <- row_dat[,!(row_dat[1, ] %>% purrr::transpose() %>% duplicated())]
+  row_dat <- row_dat[,!(row_dat %>% slice(1) %>% unlist() %>% as.vector() %>% duplicated())]
+
 
   ## Remove steps outside of 1 to 5 and Step
   # row_dat <- row_dat[, row_dat[1, ] %>% transpose() %>% .[,1] %>% is_in(c(1:5, "Step"))]
@@ -509,7 +514,7 @@ parse_feedback_at <- function(raw_input) {
   final_dat <- row_dat %>%
     colnames() %>%
     purrr::discard(. == "colnames") %>%
-    purrr::map_dfc(~openmindR::spread_it(.x, row_dat)) %>%
+    purrr::map_dfc(~spread_it(.x, row_dat)) %>%
     dplyr::as_tibble()
 
   return(final_dat)
