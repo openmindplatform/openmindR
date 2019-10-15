@@ -463,8 +463,8 @@ clean_fa_string <- function(x) {
 #'@export
 parse_feedback_at <- function(raw_input) {
 
-  # raw_input <- "[2, (not asked), 10, (not asked), |How it is interactive|, |Videos|], [2, (not asked), 8, (not asked), |The research about mindsets|, |Videos|], [3, (not asked), 10, (not asked), |The examples|, |Videos|], [4, (not asked), 10, (not asked), |It’s interactive|, |Videos|], [5, (not asked), 10, (not asked), |How it’s interactive|, |Videos|]"
-  # if (is.na(raw_input)) return(tibble(Step1 = NA))
+  raw_input <- "[1, (not asked), 9, (not asked), The elephant analogy, Dropping Facebook as an example setting to engage. There are such strong feelings about that platform that it skews how someone would respond, [2, (not asked), 10, (not asked), There wasn’t really a favorite, It’s good as is, [3, (not asked), 10, (not asked), Thinking about the scenarios, It’s pretty solid, [4, (not asked), 10, (not asked), Looking at scenarios, Making the scenarios more interactive—putting the user in the situation more—like the trolly problems, [5, (not asked), 9, (not asked), Scenarios, More practice scenarios"
+    # if (is.na(raw_input)) return(tibble(Step1 = NA))
 
   if (is.na(raw_input)) {
     return(dplyr::tibble(no_data = 1))

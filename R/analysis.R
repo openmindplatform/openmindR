@@ -321,7 +321,7 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
       # dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
       ## count OMIDs and PrePost Type
       dplyr::add_count(OMID, variable_code) %>%
-      ## only keep cases where Pre and Post exist
+      ## only keep cases where Pre, Post and FollowUp exist
       dplyr::filter(n == 3)
 
     # debugonce(withinSE)

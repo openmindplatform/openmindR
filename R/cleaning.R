@@ -324,12 +324,12 @@ om_clean_ppol <- function(app.dat) {
     )) %>%
     #reorder political orientation into sensible continuum
     dplyr::mutate(ppol = factor(ppol_raw, levels = c("Very Progressive/left",
-                                              "Progressive/left",
-                                              "Slightly Progressive/left",
-                                              "Moderate/Middle-of-the-road",
-                                              "Slightly Conservative/right",
-                                              "Conservative/right",
-                                              "Very Conservative/right"))) %>%
+                                                     "Progressive/left",
+                                                     "Slightly Progressive/left",
+                                                     "Moderate/Middle-of-the-road",
+                                                     "Slightly Conservative/right",
+                                                     "Conservative/right",
+                                                     "Very Conservative/right"))) %>%
     ## clean politics variable / make it numeric / only use valid cases
     dplyr::mutate(ppol_num = as.numeric(ppol)) %>%
     # dplyr::select(ppol, ppol_num, D4) %>%
@@ -339,7 +339,7 @@ om_clean_ppol <- function(app.dat) {
       T ~ NA_character_
     )) %>%
     dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
-                                              "Conservatives"))) %>%
+                                                              "Conservatives"))) %>%
     dplyr::mutate(ppol_catmod = dplyr::case_when(
       ppol_num %in% c(1:3) ~ "Progressives",
       ppol_num %in% c(5:7) ~ "Conservatives",
@@ -790,3 +790,11 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
   dplyr::count(x, !!!vars, wt = !!wt, sort = sort)
 }
 
+#' Parse a Character and turn it to Datetime
+#'
+#'
+#' @param date date (chr)
+#' @export
+chr_to_datetime <- function(date) {
+  stringr::str_remove_all(date, "th,|rd,|st,|nd,|,") %>% lubridate::mdy_hm()
+}
