@@ -463,7 +463,7 @@ clean_fa_string <- function(x) {
 #'@export
 parse_feedback_at <- function(raw_input) {
 
-  raw_input <- "[1, (not asked), 9, (not asked), The elephant analogy, Dropping Facebook as an example setting to engage. There are such strong feelings about that platform that it skews how someone would respond, [2, (not asked), 10, (not asked), There wasn’t really a favorite, It’s good as is, [3, (not asked), 10, (not asked), Thinking about the scenarios, It’s pretty solid, [4, (not asked), 10, (not asked), Looking at scenarios, Making the scenarios more interactive—putting the user in the situation more—like the trolly problems, [5, (not asked), 9, (not asked), Scenarios, More practice scenarios"
+  raw_input <- "[5, (not asked), 9, (not asked), |Practical tools for respectful disagreement.|, |Replace the elephant and rider with another metaphor or clear language. It was hard to keep clear the meaning of elephant and rider. The reference got confused with the pink elephant in the introduction. And I couldn’t figure out why a non-partisan environment was so full of elephants without a single donkey reference. Can you put the rider on a donkey?|]"
     # if (is.na(raw_input)) return(tibble(Step1 = NA))
 
   if (is.na(raw_input)) {
@@ -505,7 +505,7 @@ parse_feedback_at <- function(raw_input) {
 
   ## Remove duplicate steps
   row_dat <- row_dat[,!(row_dat[1, ] %>% purrr::transpose() %>% duplicated())]
-  row_dat <- row_dat[,!(row_dat %>% slice(1) %>% unlist() %>% as.vector() %>% duplicated())]
+  row_dat <- row_dat[,!(row_dat %>% dplyr::slice(1) %>% unlist() %>% as.vector() %>% duplicated())]
 
 
   ## Remove steps outside of 1 to 5 and Step
