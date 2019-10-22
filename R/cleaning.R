@@ -15,7 +15,7 @@
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
 #'@export
-om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, path = NULL, v6.1 = F) {
+om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
 
   if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
     stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurvey, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
@@ -104,7 +104,7 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
 
     if (!is.null(path)) {
 
-      readr::write_csv(final_list$dat.ass6, file = path)
+      readr::write_csv(x = final_list$dat.ass6, path = file)
 
     }
 
