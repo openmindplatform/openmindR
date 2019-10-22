@@ -15,7 +15,7 @@
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
 #'@export
-om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries")) {
+om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, file = NULL) {
 
   if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
     stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurvey, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
@@ -51,6 +51,58 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     cat("Download AssessmentV6 Data\n")
     final_list$dat.ass6 <- dat.ass.1$AssessmentV6$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. AssessmentV6 Data has ", nrow(final_list$dat.ass6), " rows\n"))
+
+    if (clean) {
+
+      final_list$dat.ass6 <- final_list$dat.ass6 %>%
+        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
+        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
+        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
+        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked)"), NA_character_, .x)) %>%
+        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x))  %>%
+        dplyr::select(sort(tidyselect::peek_vars(), decreasing = T)) %>%
+        dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
+               D1, D2, D3, D4, D5, D6, D7, D8,
+               dplyr::everything()) %>%
+        # select(contains("Trait"))
+        dplyr::mutate_at(dplyr::vars(AssessmentVersion,
+                       AssessmentsDone,
+                       D1,
+                       dplyr::contains("Motivation"),
+                       dplyr::contains("GBSS"),
+                       dplyr::contains("CIHS_LIO"),
+                       dplyr::contains("Temp"),
+                       dplyr::contains("C1"),
+                       dplyr::contains("C2"),
+                       dplyr::contains("C3"),
+                       dplyr::contains("C4"),
+                       dplyr::contains("C5"),
+                       dplyr::contains("C6"),
+                       dplyr::contains("HowImportantIssue"),
+                       dplyr::contains("SoughtOutDifferent"),
+                       dplyr::contains("Preparedness"),
+                       dplyr::contains("GrowthMindset"),
+                       dplyr::contains("Trait"),
+                       dplyr::contains("Upset"),
+                       dplyr::contains("HowLeastLikedGroup"),
+                       dplyr::contains("PoliticalTolerance"),
+                       dplyr::contains("IssueQ"),
+                       dplyr::contains("ROV_NE"),
+                       dplyr::contains("TalkToDifferent"),
+                       dplyr::contains("Trait")
+        ), ~as.character(.x) %>% readr::parse_number())
+
+
+
+    }
+
+
+    if (!is.null(file)) {
+
+      readr::write_csv(final_list$dat.ass6, file = file)
+
+    }
+
   }
 
   if ("AssessmentV6DiD" %in% tables) {
@@ -798,3 +850,29 @@ om_count_ <- function (x, vars, wt = NULL, sort = FALSE) {
 chr_to_datetime <- function(date) {
   stringr::str_remove_all(date, "th,|rd,|st,|nd,|,") %>% lubridate::mdy_hm()
 }
+
+
+#' Get Assessment V6.1
+#'
+#'
+#' @export
+get_assessmentv6.1 <- function(clean_assessment) {
+
+  pre_vars <- c("ProgTemp", "ConTemp", "MotivationProg1", "MotivationProg2", "MotivationCon1", "MotivationCon2", "CIHS_LIO1", "CIHS_LIO2", "CIHS_LIO3", "CIHS_LIO4", "GrowthMindset", "IssueDisplay", "HowImportantIssue", "IHText", "Preparedness3", "SoughtOutDifferent", "FeedbackAssessment", "GBSS1", "GBSS2", "GBSS3")
+
+  assessment61 <- clean_assessment %>%
+    dplyr::select(
+      c("id", "OMID", "AccessCode", "AssessmentVersion", "AssessmentsDone"),
+      c("D1", "D2", "D3", "D4", "D6",
+        paste0(pre_vars, "Pre"),
+        paste0(pre_vars, "Post")
+      )
+    )
+
+  return(assessment61)
+
+}
+
+
+
+

@@ -6,7 +6,7 @@
 \usage{
 om_download_at(key, tables = c("AssessmentV4", "AssessmentV5",
   "AccessCodes", "ParticipantProgress", "InstructorSurvey",
-  "TechnicalInquiries"))
+  "TechnicalInquiries"), clean = F, file = NULL)
 }
 \arguments{
 \item{key}{key for AirTable API}
