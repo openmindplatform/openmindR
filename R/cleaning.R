@@ -15,7 +15,7 @@
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
 #'@export
-om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, file = NULL) {
+om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, path = NULL, v6.1 = F) {
 
   if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
     stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurvey, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
@@ -50,6 +50,7 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
   if ("AssessmentV6" %in% tables) {
     cat("Download AssessmentV6 Data\n")
     final_list$dat.ass6 <- dat.ass.1$AssessmentV6$select_all() %>% tibble::as_tibble()
+
     cat(paste0("Done. AssessmentV6 Data has ", nrow(final_list$dat.ass6), " rows\n"))
 
     if (clean) {
@@ -96,10 +97,14 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
 
     }
 
+    if (v6.1) {
+      final_list$dat.ass6 <- get_assessmentv6.1(final_list$dat.ass6)
+    }
 
-    if (!is.null(file)) {
 
-      readr::write_csv(final_list$dat.ass6, file = file)
+    if (!is.null(path)) {
+
+      readr::write_csv(final_list$dat.ass6, file = path)
 
     }
 
