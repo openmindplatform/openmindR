@@ -463,7 +463,7 @@ clean_fa_string <- function(x) {
 #'@export
 parse_feedback_at <- function(raw_input) {
 
-  raw_input <- "[5, (not asked), 9, (not asked), |Practical tools for respectful disagreement.|, |Replace the elephant and rider with another metaphor or clear language. It was hard to keep clear the meaning of elephant and rider. The reference got confused with the pink elephant in the introduction. And I couldn’t figure out why a non-partisan environment was so full of elephants without a single donkey reference. Can you put the rider on a donkey?|]"
+  # raw_input <- "[5, (not asked), 9, (not asked), |Practical tools for respectful disagreement.|, |Replace the elephant and rider with another metaphor or clear language. It was hard to keep clear the meaning of elephant and rider. The reference got confused with the pink elephant in the introduction. And I couldn’t figure out why a non-partisan environment was so full of elephants without a single donkey reference. Can you put the rider on a donkey?|]"
     # if (is.na(raw_input)) return(tibble(Step1 = NA))
 
   if (is.na(raw_input)) {
