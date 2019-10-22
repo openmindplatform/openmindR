@@ -102,7 +102,7 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     }
 
 
-    if (!is.null(path)) {
+    if (!is.null(file)) {
 
       readr::write_csv(x = final_list$dat.ass6, path = file)
 
