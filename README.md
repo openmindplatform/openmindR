@@ -23,6 +23,103 @@ library(openmindR)
 library(dplyr)
 ```
 
+# New Functions
+
+  - [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
+  - [merge\_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
+  - [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
+
+## `om_parse_lifehacks`
+
+This function The input dataset needs to have the four following
+columns: `LifeHacksChosen`, `LifeHacksComplete`, `LifeHacksUseful` and
+`LifeHacksReason`. You can find them in the ParticipantProgress table in
+Airtable. The function will parse these four columns into 4 x 5 Steps
+variables (so 20 in total):
+
+  - `LifeHack1` - `LifeHack5`: Which Lifehack was chosen
+  - `LifeHacksComplete1` - `LifeHacksComplete5`: Did the user complete
+    the lifehack
+  - `LifeHacksUseful1` - `LifeHacksUseful5`: Did the user find
+    completing the lifehack useful
+  - `LifeHacksReason1` - `LifeHacksReason5`: Why didn’t the user
+    complete the lifehack
+
+<!-- end list -->
+
+``` r
+## get key
+key <- read_lines("../../Keys/airtabler.txt")
+
+## download participant progress data
+pp_dat <- om_download_at(key, tables = "ParticipantProgress")
+
+
+## this parses all Lifehack data so far
+parsed_lh <-  om_parse_lifehacks(pp_dat)
+
+
+## if you want just the newest life hack data you can filter by OpenMind version
+parsed_lh <-  pp_dat %>%
+  ## making sure OpenMindVersion is numeric
+  mutate(OpenMindVersion = as.numeric(OpenMindVersion)) %>% 
+  ## Only include OM Version 3 and above
+  filter(OpenMindVersion >= 3) %>% 
+  ## parse Life hacks
+  om_parse_lifehacks()
+
+## just select the OMID and all LifeHack data (remove all other PP variables)
+parsed_lh %>% 
+  select(OMID, LifeHack1:LifeHacksReason5)
+```
+
+## `merge_assessments`
+
+This function merges assessment v4, v5 and v6 data and only keeps common
+variables.
+
+``` r
+## get previous assessment dat
+v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv") 
+v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv") 
+
+## get key
+key <- readr::read_lines("../../Keys/airtabler.txt")
+
+## get (clean) assessment v6 data
+v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+
+
+## merge all three datasets and only keep comman variables
+merge_assessments(v4, v5, v6)
+```
+
+## `om_download_at`
+
+`openmindR` can download and clean data directly from Airtable. There
+are three new arguments for Assessment v6:
+
+  - `clean`: Whether to return “clean” data (i.e. numeric data is
+    numeric and minors or opt-outs are `NA` (`TRUE`/`FALSE`)
+  - `file`: give a file path to where the downloaded data should be
+    stored
+  - `v6.1`: filter down the dataset to only include Assessment V6.1
+    (`TRUE/FALSE`)
+
+Here is a code example that will download Assessment V6, clean it, save
+it into a folder called “Data” under Research and filter down to only
+include V6.1 data.
+
+``` r
+key <- readr::read_lines("../../Keys/airtabler.txt")
+
+assessmentv6 <- om_download_at(key, 
+                            tables = "AssessmentV6", 
+                            clean = TRUE, 
+                            file = "../../../Data/assessmentv6.1.csv",
+                            v6.1 = TRUE)
+```
+
 # openmindR Cleaning Functions
 
 The following functions are meant to turn AirTable (and GuidedTrack)
@@ -109,37 +206,44 @@ dat.ass %>%
   )
 ```
 
-    ## # A tibble: 653 x 78
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0… 5717… TalpashWi… 4                              3 56    54   
-    ##  2 rec0… 1101… ThomasWil… 4                              2 70    40   
-    ##  3 rec0… 1430… MaykWilke… 4                              2 50    50   
-    ##  4 rec0… 1144… SuszkoWil… 4                              2 31    65   
-    ##  5 rec0… 4351… WilliamsW… 4                              3 77    25   
-    ##  6 rec0… 2247… PradoWilk… 4                              2 19    100  
-    ##  7 rec0… 3909… VosikPeka… 4                              2 50    58   
-    ##  8 rec0… 3873… BalesterW… 4                              2 63    85   
-    ##  9 rec1… 7625… BalesterW… 4                              2 73    30   
-    ## 10 rec1… 6771… KarimiWil… 4                              3 90    20   
-    ## # … with 643 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
-    ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
-    ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
-    ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   DatePre <chr>, Q1Post <chr>, Q2Post <chr>, Q3Post <chr>, Q4Post <chr>,
-    ## #   Q5Post <chr>, Q6Post <chr>, Q7Post <chr>, Q8Post <chr>, Q9Post <chr>,
-    ## #   Q10Post <chr>, Q11Post <chr>, Q12Post <chr>, DatePost <chr>,
-    ## #   B1Pre <chr>, B1Post <chr>, Q1FollowUp <chr>, Q2FollowUp <chr>,
-    ## #   Q3FollowUp <chr>, Q4FollowUp <chr>, Q5FollowUp <chr>,
-    ## #   Q6FollowUp <chr>, Q7FollowUp <chr>, Q8FollowUp <chr>,
-    ## #   Q9FollowUp <chr>, Q10FollowUp <chr>, Q11FollowUp <chr>,
-    ## #   Q12FollowUp <chr>, C1FollowUp <chr>, C2FollowUp <chr>,
-    ## #   C3FollowUp <chr>, DateFollowUp <chr>, W1FollowUp <chr>,
-    ## #   B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <chr>, C2Post <chr>,
-    ## #   C3Post <chr>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>,
-    ## #   W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>
+    ## # A tibble: 654 x 111
+    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
+    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
+    ##  1 2.53e12 college  PradoWilk…                4               2  0.5   0.5 
+    ##  2 9.56e12 college  TalpashWi…                4               3  0.54  0.53
+    ##  3 3.88e12 college  PradoWilk…                4               2  0.8   0.2 
+    ##  4 9.94e12 college  TalpashWi…                4               2  0.5   0.5 
+    ##  5 4.59e12 college  TalpashWi…                4               1  0.7   0.33
+    ##  6 2.35e12 college  PradoWilk…                4               2 NA    NA   
+    ##  7 1.38e12 college  TalpashWi…                4               2  0.5   0.5 
+    ##  8 6.60e12 college  KarimiWil…                4               2  0.86  0.15
+    ##  9 2.98e12 college  HudsonWil…                4               3  0.5   0.5 
+    ## 10 1.10e12 college  HudsonWil…                4               2  0.5   0.5 
+    ## # … with 644 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
+    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
+    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
+    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
+    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
+    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
+    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
+    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
+    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
+    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
+    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
+    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
+    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
+    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
+    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
+    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
+    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
+    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
+    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
+    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
+    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 This dataset was filtered down to only AccessCodes that include
 “Wilkes”. The `accesscode` argument is not case-sensitive and can
@@ -156,37 +260,44 @@ dat.ass %>%
   )
 ```
 
-    ## # A tibble: 31 x 78
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0… 1144… SuszkoWil… 4                              2 31    65   
-    ##  2 rec1… 6771… KarimiWil… 4                              3 90    20   
-    ##  3 rec5… 5923… SuszkoWil… 4                              2 50    50   
-    ##  4 rec5… 1915… KarimiWil… 4                              2 35    5    
-    ##  5 rec7… 1018… SuszkoWil… 4                              2 30    85   
-    ##  6 recA… 1326… KarimiWil… 4                              2 70    45   
-    ##  7 recE… 3793… KarimiWil… 4                              2 100   30   
-    ##  8 recH… 2939… SuszkoWil… 4                              2 <NA>  <NA> 
-    ##  9 recL… 7456… SuszkoWil… 4                              2 25    75   
-    ## 10 recT… 3521… KarimiWil… 4                              2 25    67   
-    ## # … with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
-    ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
-    ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
-    ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   DatePre <chr>, Q1Post <chr>, Q2Post <chr>, Q3Post <chr>, Q4Post <chr>,
-    ## #   Q5Post <chr>, Q6Post <chr>, Q7Post <chr>, Q8Post <chr>, Q9Post <chr>,
-    ## #   Q10Post <chr>, Q11Post <chr>, Q12Post <chr>, DatePost <chr>,
-    ## #   B1Pre <chr>, B1Post <chr>, Q1FollowUp <chr>, Q2FollowUp <chr>,
-    ## #   Q3FollowUp <chr>, Q4FollowUp <chr>, Q5FollowUp <chr>,
-    ## #   Q6FollowUp <chr>, Q7FollowUp <chr>, Q8FollowUp <chr>,
-    ## #   Q9FollowUp <chr>, Q10FollowUp <chr>, Q11FollowUp <chr>,
-    ## #   Q12FollowUp <chr>, C1FollowUp <chr>, C2FollowUp <chr>,
-    ## #   C3FollowUp <chr>, DateFollowUp <chr>, W1FollowUp <chr>,
-    ## #   B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <chr>, C2Post <chr>,
-    ## #   C3Post <chr>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>,
-    ## #   W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>
+    ## # A tibble: 31 x 111
+    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
+    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
+    ##  1 6.60e12 college  KarimiWil…                4               2  0.86  0.15
+    ##  2 2.52e12 college  KarimiWil…                4               2 NA    NA   
+    ##  3 6.77e12 college  KarimiWil…                4               3  0.9   0.2 
+    ##  4 9.14e12 college  KarimiWil…                4               2  0.5   0.5 
+    ##  5 7.56e12 college  KarimiWil…                4               2 NA    NA   
+    ##  6 3.79e11 college  KarimiWil…                4               2  1     0.3 
+    ##  7 6.09e12 college  KarimiWil…                4               2  0.5   0.5 
+    ##  8 8.15e12 college  KarimiWil…                4               2  0.54  0.55
+    ##  9 1.92e11 college  KarimiWil…                4               2  0.35  0.05
+    ## 10 4.26e12 college  KarimiWil…                4               3  1     0.3 
+    ## # … with 21 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
+    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
+    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
+    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
+    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
+    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
+    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
+    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
+    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
+    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
+    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
+    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
+    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
+    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
+    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
+    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
+    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
+    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
+    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
+    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
+    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 And individual strings:
 
@@ -201,37 +312,44 @@ dat.ass %>%
   )
 ```
 
-    ## # A tibble: 31 x 78
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>      <chr>                      <dbl> <chr> <chr>
-    ##  1 rec0… 1144… SuszkoWil… 4                              2 31    65   
-    ##  2 rec1… 6771… KarimiWil… 4                              3 90    20   
-    ##  3 rec5… 5923… SuszkoWil… 4                              2 50    50   
-    ##  4 rec5… 1915… KarimiWil… 4                              2 35    5    
-    ##  5 rec7… 1018… SuszkoWil… 4                              2 30    85   
-    ##  6 recA… 1326… KarimiWil… 4                              2 70    45   
-    ##  7 recE… 3793… KarimiWil… 4                              2 100   30   
-    ##  8 recH… 2939… SuszkoWil… 4                              2 <NA>  <NA> 
-    ##  9 recL… 7456… SuszkoWil… 4                              2 25    75   
-    ## 10 recT… 3521… KarimiWil… 4                              2 25    67   
-    ## # … with 21 more rows, and 71 more variables: Q3Pre <chr>, Q4Pre <chr>,
-    ## #   Q5Pre <chr>, Q6Pre <chr>, Q7Pre <chr>, Q8Pre <chr>, Q9Pre <chr>,
-    ## #   Q10Pre <chr>, Q11Pre <chr>, Q12Pre <chr>, C1Pre <chr>, C2Pre <chr>,
-    ## #   C3Pre <chr>, D1 <chr>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   DatePre <chr>, Q1Post <chr>, Q2Post <chr>, Q3Post <chr>, Q4Post <chr>,
-    ## #   Q5Post <chr>, Q6Post <chr>, Q7Post <chr>, Q8Post <chr>, Q9Post <chr>,
-    ## #   Q10Post <chr>, Q11Post <chr>, Q12Post <chr>, DatePost <chr>,
-    ## #   B1Pre <chr>, B1Post <chr>, Q1FollowUp <chr>, Q2FollowUp <chr>,
-    ## #   Q3FollowUp <chr>, Q4FollowUp <chr>, Q5FollowUp <chr>,
-    ## #   Q6FollowUp <chr>, Q7FollowUp <chr>, Q8FollowUp <chr>,
-    ## #   Q9FollowUp <chr>, Q10FollowUp <chr>, Q11FollowUp <chr>,
-    ## #   Q12FollowUp <chr>, C1FollowUp <chr>, C2FollowUp <chr>,
-    ## #   C3FollowUp <chr>, DateFollowUp <chr>, W1FollowUp <chr>,
-    ## #   B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <chr>, C2Post <chr>,
-    ## #   C3Post <chr>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>,
-    ## #   W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>
+    ## # A tibble: 31 x 111
+    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
+    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
+    ##  1 6.60e12 college  KarimiWil…                4               2  0.86  0.15
+    ##  2 2.52e12 college  KarimiWil…                4               2 NA    NA   
+    ##  3 6.77e12 college  KarimiWil…                4               3  0.9   0.2 
+    ##  4 9.14e12 college  KarimiWil…                4               2  0.5   0.5 
+    ##  5 7.56e12 college  KarimiWil…                4               2 NA    NA   
+    ##  6 3.79e11 college  KarimiWil…                4               2  1     0.3 
+    ##  7 6.09e12 college  KarimiWil…                4               2  0.5   0.5 
+    ##  8 8.15e12 college  KarimiWil…                4               2  0.54  0.55
+    ##  9 1.92e11 college  KarimiWil…                4               2  0.35  0.05
+    ## 10 4.26e12 college  KarimiWil…                4               3  1     0.3 
+    ## # … with 21 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
+    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
+    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
+    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
+    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
+    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
+    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
+    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
+    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
+    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
+    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
+    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
+    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
+    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
+    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
+    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
+    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
+    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
+    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
+    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
+    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
+    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
+    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
+    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
+    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 ## `om_clean_par`
 
@@ -261,29 +379,33 @@ dat.par %>%
   om_clean_par(parse_feedback = T) 
 ```
 
-    ## # A tibble: 17,219 x 36
+    ## # A tibble: 23,723 x 52
     ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
     ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
     ##  1 7806… <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
     ##  2 1000… <NA>      1, 1, 1, 1, 1        0.75         1            0.833
     ##  3 1945… <NA>      1, 1, 1, 1, 1        0.667        1            0.667
-    ##  4 7858… <NA>      1, 0, 0, 0, 0        0.833       NA           NA    
-    ##  5 9277… <NA>      1, 1, 1, 1, 1        1            1            1    
-    ##  6 6750… <NA>      1, 1, 1, 1, 1        1            1            1    
-    ##  7 4023… <NA>      1, 1, 1, 1, 1        0.833        1            0.667
-    ##  8 1000… <NA>      1, 1, 1, 1, 1        0.625        1            0.667
-    ##  9 2458… <NA>      1, 1, 1, 1, 0        1            1            1    
-    ## 10 9406… <NA>      1, 1, 0, 0, 0        1            1           NA    
-    ## # … with 17,209 more rows, and 30 more variables: StepCorrect4 <dbl>,
+    ##  4 5803… 27.7 min… 1, 1, 1, 1, 1        0.833        1            0.667
+    ##  5 3646… 10.07 mi… 1, 1, 1, 0, 0        0.667        1            0.833
+    ##  6 7858… <NA>      1, 0, 0, 0, 0        0.833       NA           NA    
+    ##  7 9277… <NA>      1, 1, 1, 1, 1        1            1            1    
+    ##  8 4988… 47.5 min… 1, 1, 1, 1, 1        1            1            1    
+    ##  9 6750… <NA>      1, 1, 1, 1, 1        1            1            1    
+    ## 10 4023… <NA>      1, 1, 1, 1, 1        0.833        1            0.667
+    ## # … with 23,713 more rows, and 46 more variables: StepCorrect4 <dbl>,
     ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
     ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
     ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
     ## #   Step1_Q5 <chr>, Step2 <chr>, Step2_Q1 <chr>, Step2_Q2 <chr>,
-    ## #   Step2_Q3 <chr>, Step2_Q4 <chr>, Step2_Q5 <chr>, Step5 <chr>,
+    ## #   Step2_Q3 <chr>, Step2_Q4 <chr>, Step2_Q5 <chr>, Step3 <chr>,
+    ## #   Step3_Q1 <chr>, Step3_Q2 <chr>, Step3_Q3 <chr>, Step3_Q4 <chr>,
+    ## #   Step3_Q5 <chr>, Step4 <chr>, Step4_Q1 <chr>, Step4_Q2 <chr>,
+    ## #   Step4_Q3 <chr>, Step4_Q4 <chr>, Step4_Q5 <chr>, Step5 <chr>,
     ## #   Step5_Q1 <chr>, Step5_Q2 <chr>, Step5_Q3 <chr>, Step5_Q4 <chr>,
     ## #   Step5_Q5 <chr>, FeedbackAnswers <chr>,
     ## #   FeedbackAnswersVariableNames <chr>, AppRating <dbl>,
-    ## #   AppRecommend <chr>, at_date <chr>
+    ## #   AppRecommend <chr>, LifeHacksChosen <chr>, LifeHacksComplete <chr>,
+    ## #   LifeHacksUseful <chr>, LifeHacksReason <chr>, at_date <chr>
 
 ## `om_rescale`
 
@@ -298,38 +420,6 @@ on the same scale.**
 dat.ass %>% 
   om_rescale()
 ```
-
-    ## # A tibble: 16,816 x 78
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
-    ##  1 rec0… 4616… GottlickU… 4                2                0.4   0.6 
-    ##  2 rec0… 4001… PotterYCI… 4                1               NA    NA   
-    ##  3 rec0… 3465… LittleUGA… 4                2                0.3   0.36
-    ##  4 rec0… 8406… Jayawickr… 4                2                0.5   0.5 
-    ##  5 rec0… 8721… BurmanCha… 4                2               NA    NA   
-    ##  6 rec0… 7194… Jayawickr… 4                2                0.8   0.45
-    ##  7 rec0… 5743… ZipayUOre… 4                2                0.78  0.34
-    ##  8 rec0… 5717… TalpashWi… 4                3                0.56  0.54
-    ##  9 rec0… 5370… Individua… 4                2                0.5   0.37
-    ## 10 rec0… 6459… BursonInd… 4                2                0.5   0.5 
-    ## # … with 16,806 more rows, and 71 more variables: Q3Pre <dbl>,
-    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
-    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
-    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
-    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
-    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
-    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
-    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
-    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
-    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>,
-    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
-    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
-    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>
 
 ## `om_construct_measures`
 
@@ -378,42 +468,7 @@ Creates the following measures of Political Orientation
 ``` r
 dat.ass <- dat.ass %>% 
   om_clean_ppol()
-
-dat.ass
 ```
-
-    ## # A tibble: 16,816 x 82
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>      <chr>            <chr>           <dbl> <dbl>
-    ##  1 rec0… 4616… GottlickU… 4                2                  40    60
-    ##  2 rec0… 4001… PotterYCI… 4                1                  NA    NA
-    ##  3 rec0… 3465… LittleUGA… 4                2                  30    36
-    ##  4 rec0… 8406… Jayawickr… 4                2                  50    50
-    ##  5 rec0… 8721… BurmanCha… 4                2                  NA    NA
-    ##  6 rec0… 7194… Jayawickr… 4                2                  80    45
-    ##  7 rec0… 5743… ZipayUOre… 4                2                  78    34
-    ##  8 rec0… 5717… TalpashWi… 4                3                  56    54
-    ##  9 rec0… 5370… Individua… 4                2                  50    37
-    ## 10 rec0… 6459… BursonInd… 4                2                  50    50
-    ## # … with 16,806 more rows, and 75 more variables: Q3Pre <dbl>,
-    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
-    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
-    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
-    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
-    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
-    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
-    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
-    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
-    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>,
-    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
-    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
-    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
-    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>
 
 Now `om_construct_measures` will work\!
 
@@ -421,43 +476,6 @@ Now `om_construct_measures` will work\!
 dat.ass %>% 
   om_construct_measures()
 ```
-
-    ## # A tibble: 16,816 x 97
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
-    ##  1 rec0… 4616… GottlickU…                4 2                  40    60
-    ##  2 rec0… 4001… PotterYCI…                4 1                  NA    NA
-    ##  3 rec0… 3465… LittleUGA…                4 2                  30    36
-    ##  4 rec0… 8406… Jayawickr…                4 2                  50    50
-    ##  5 rec0… 8721… BurmanCha…                4 2                  NA    NA
-    ##  6 rec0… 7194… Jayawickr…                4 2                  80    45
-    ##  7 rec0… 5743… ZipayUOre…                4 2                  78    34
-    ##  8 rec0… 5717… TalpashWi…                4 3                  56    54
-    ##  9 rec0… 5370… Individua…                4 2                  50    37
-    ## 10 rec0… 6459… BursonInd…                4 2                  50    50
-    ## # … with 16,806 more rows, and 90 more variables: Q3Pre <dbl>,
-    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
-    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
-    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
-    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
-    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
-    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
-    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
-    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
-    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <chr>, S1Pre <chr>,
-    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
-    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
-    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
-    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
-    ## #   Q14Pre <dbl>, Q15Pre <dbl>, Q16Pre <dbl>, Q17Pre <dbl>, Q18Pre <dbl>,
-    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
-    ## #   Q18Post <dbl>, Q14FollowUp <dbl>, Q15FollowUp <dbl>,
-    ## #   Q16FollowUp <dbl>, Q17FollowUp <dbl>, Q18FollowUp <dbl>
 
 ## `remove_dups`
 
@@ -469,43 +487,49 @@ dat.ass %>%
   remove_dups()
 ```
 
-    ## Joining, by = c("OMID", "createdTime", "AssessmentVersion", "AssessmentsDone", "id", "AccessCode", "Q1Pre", "Q2Pre", "Q3Pre", "Q4Pre", "Q5Pre", "Q6Pre", "Q7Pre", "Q8Pre", "Q9Pre", "Q10Pre", "Q11Pre", "Q12Pre", "C1Pre", "C2Pre", "C3Pre", "D1", "D2", "D3", "D4", "D5", "DatePre", "Q1Post", "Q2Post", "Q3Post", "Q4Post", "Q5Post", "Q6Post", "Q7Post", "Q8Post", "Q9Post", "Q10Post", "Q11Post", "Q12Post", "DatePost", "B1Pre", "B1Post", "Q1FollowUp", "Q2FollowUp", "Q3FollowUp", "Q4FollowUp", "Q5FollowUp", "Q6FollowUp", "Q7FollowUp", "Q8FollowUp", "Q9FollowUp", "Q10FollowUp", "Q11FollowUp", "Q12FollowUp", "C1FollowUp", "C2FollowUp", "C3FollowUp", "DateFollowUp", "W1FollowUp", "B1FollowUp", "S1Pre", "BTaskPre", "B2Pre", "B3Pre", "S1Post", "C1Post", "C2Post", "C3Post", "BTaskPost", "B2Post", "B3Post", "W1Post", "W1Pre", "D6", "S1FollowUp", "BTaskFollowUp", "B2FollowUp", "B3FollowUp", "ppol_raw", "ppol", "ppol_num", "ppol_cat")
+    ## Joining, by = c("OMID", "createdTime", "AssessmentVersion", "AssessmentsDone", "UserType", "AccessCode", "Q1Pre", "Q2Pre", "Q3Pre", "Q4Pre", "Q5Pre", "Q6Pre", "Q7Pre", "Q8Pre", "Q9Pre", "Q10Pre", "Q11Pre", "Q12Pre", "C1Pre", "C2Pre", "C3Pre", "D1", "D2", "D3", "D4", "D5", "B1Pre", "DatePre", "Q1Post", "Q2Post", "Q3Post", "Q4Post", "Q5Post", "Q6Post", "Q7Post", "Q8Post", "Q9Post", "Q10Post", "Q11Post", "Q12Post", "B1Post", "DatePost", "Q1FollowUp", "Q2FollowUp", "Q3FollowUp", "Q4FollowUp", "Q5FollowUp", "Q6FollowUp", "Q7FollowUp", "Q8FollowUp", "Q9FollowUp", "Q10FollowUp", "Q11FollowUp", "Q12FollowUp", "C1FollowUp", "C2FollowUp", "C3FollowUp", "B1FollowUp", "DateFollowUp", "W1FollowUp", "ppol_raw", "ppol", "ppol_num", "ppol_cat", "Q14Pre", "Q15Pre", "Q16Pre", "Q17Pre", "Q20Pre", "Q18Pre", "Q19Pre", "Q14Post", "Q15Post", "Q16Post", "Q17Post", "Q20Post", "Q18Post", "Q19Post", "Q14FollowUp", "Q15FollowUp", "Q16FollowUp", "Q17FollowUp", "Q20FollowUp", "Q18FollowUp", "Q19FollowUp", "gender", "ethnic", "ethnic_num", "id", "S1Pre", "BTaskPre", "B2Pre", "B3Pre", "S1Post", "C1Post", "C2Post", "C3Post", "BTaskPost", "B2Post", "B3Post", "D6", "S1FollowUp", "BTaskFollowUp", "B2FollowUp", "B3FollowUp", "DistanceInPre", "DistanceOutPre", "DistanceInPost", "DistanceOutPost", "DistanceInFollowUp", "DistanceOutFollowUp")
 
-    ## Removing 11 duplicates...
+    ## Removing 0 duplicates...
 
-    ## # A tibble: 16,805 x 83
-    ##    id    OMID  AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##    <chr> <chr> <chr>                 <dbl> <chr>           <dbl> <dbl>
-    ##  1 rec0… 4616… GottlickU…                4 2                  40    60
-    ##  2 rec0… 4001… PotterYCI…                4 1                  NA    NA
-    ##  3 rec0… 3465… LittleUGA…                4 2                  30    36
-    ##  4 rec0… 8406… Jayawickr…                4 2                  50    50
-    ##  5 rec0… 8721… BurmanCha…                4 2                  NA    NA
-    ##  6 rec0… 7194… Jayawickr…                4 2                  80    45
-    ##  7 rec0… 5743… ZipayUOre…                4 2                  78    34
-    ##  8 rec0… 5717… TalpashWi…                4 3                  56    54
-    ##  9 rec0… 5370… Individua…                4 2                  50    37
-    ## 10 rec0… 6459… BursonInd…                4 2                  50    50
-    ## # … with 16,795 more rows, and 76 more variables: Q3Pre <dbl>,
+    ## # A tibble: 21,058 x 112
+    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
+    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
+    ##  1 6.20e12 orgadult Individua…                4               1 0.83  0.9  
+    ##  2 9.05e12 college  LangeAriz…                4               2 0.75  0.75 
+    ##  3 2.47e12 orgstud… Rhodos2018                4               2 0.8   0.3  
+    ##  4 5.44e12 college  Individua…                4               1 0.580 0.580
+    ##  5 8.82e12 college  Individua…                4               1 0.5   0.52 
+    ##  6 6.18e12 college  Individua…                4               1 0.4   0.7  
+    ##  7 9.17e12 orgadult Individua…                4               1 0.8   0.4  
+    ##  8 6.16e12 orgadult Individua…                4               3 0.83  0.3  
+    ##  9 6.84e12 orgadult Individua…                4               1 0.81  0.9  
+    ## 10 5.52e11 orgadult Individua…                4               1 0.8   0.290
+    ## # … with 21,048 more rows, and 105 more variables: Q3Pre <dbl>,
     ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
     ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
     ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
-    ## #   D5 <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   DatePost <chr>, B1Pre <chr>, B1Post <chr>, Q1FollowUp <dbl>,
+    ## #   D5 <chr>, B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>,
+    ## #   Q3Post <dbl>, Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>,
+    ## #   Q8Post <dbl>, Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>,
+    ## #   Q12Post <dbl>, B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>,
     ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
     ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
     ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
     ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
-    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, B1FollowUp <chr>, createdTime <dttm>, S1Pre <chr>,
-    ## #   BTaskPre <chr>, B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <dbl>,
-    ## #   C2Post <dbl>, C3Post <dbl>, BTaskPost <chr>, B2Post <chr>,
-    ## #   B3Post <chr>, W1Post <chr>, W1Pre <chr>, D6 <chr>, S1FollowUp <chr>,
-    ## #   BTaskFollowUp <chr>, B2FollowUp <chr>, B3FollowUp <chr>,
-    ## #   ppol_raw <chr>, ppol <fct>, ppol_num <dbl>, ppol_cat <fct>,
-    ## #   count_na <dbl>
+    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, B1FollowUp <chr>,
+    ## #   DateFollowUp <chr>, W1FollowUp <chr>, createdTime <dttm>,
+    ## #   ppol_raw <chr>, ppol <chr>, ppol_num <dbl>, ppol_cat <chr>,
+    ## #   Q14Pre <dbl>, Q15Pre <dbl>, Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>,
+    ## #   Q18Pre <dbl>, Q19Pre <dbl>, Q14Post <dbl>, Q15Post <dbl>,
+    ## #   Q16Post <dbl>, Q17Post <dbl>, Q20Post <dbl>, Q18Post <dbl>,
+    ## #   Q19Post <dbl>, Q14FollowUp <dbl>, Q15FollowUp <dbl>,
+    ## #   Q16FollowUp <dbl>, Q17FollowUp <dbl>, Q20FollowUp <dbl>,
+    ## #   Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>, ethnic <chr>,
+    ## #   ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>, B2Pre <chr>,
+    ## #   B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>, C3Post <lgl>,
+    ## #   BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
+    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
+    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 ## `om_gather`
 
@@ -532,21 +556,6 @@ dat.ass %>%
   ## select just the relevant vars as showcase
   select(Question, Response, Type, variable_code)
 ```
-
-    ## # A tibble: 756,720 x 4
-    ##    Question Response Type  variable_code
-    ##    <chr>       <dbl> <chr> <chr>        
-    ##  1 Q1Pre          40 Pre   Q1           
-    ##  2 Q1Pre          NA Pre   Q1           
-    ##  3 Q1Pre          30 Pre   Q1           
-    ##  4 Q1Pre          50 Pre   Q1           
-    ##  5 Q1Pre          NA Pre   Q1           
-    ##  6 Q1Pre          80 Pre   Q1           
-    ##  7 Q1Pre          78 Pre   Q1           
-    ##  8 Q1Pre          56 Pre   Q1           
-    ##  9 Q1Pre          50 Pre   Q1           
-    ## 10 Q1Pre          50 Pre   Q1           
-    ## # … with 756,710 more rows
 
 # openmindR Analysis Functions
 
@@ -585,22 +594,6 @@ gathered_dat %>%
   arrange(desc(percentimproved))
 ```
 
-    ## # A tibble: 37 x 11
-    ##    Outcome Question_txt cohend tstat    pvalue    df percentimproved
-    ##    <chr>   <chr>         <dbl> <dbl>     <dbl> <dbl>           <dbl>
-    ##  1 Ingrou… Ingroup-Out…  0.510 27.5  1.74e-148  2917           0.643
-    ##  2 Ingrou… Ingroup-Out…  0.483  6.77 1.51e- 10   195           0.622
-    ##  3 Liking… Liking for …  0.452 24.4  3.64e-120  2917           0.607
-    ##  4 Intell… Intellectua…  0.366 25.4  7.59e-134  4818           0.602
-    ##  5 Liking… Liking for …  0.358  5.01 1.24e-  6   195           0.571
-    ##  6 Intell… Intellectua…  0.249  6.20 1.02e-  9   618           0.559
-    ##  7 Affect… Affective P…  0.397 27.5  3.98e-155  4814           0.556
-    ##  8 Affect… Affective P…  0.278  5.08 6.34e-  7   332           0.520
-    ##  9 Affect… How do you …  0.218 15.1  1.95e- 50  4814           0.484
-    ## 10 Affect… How do you …  0.179  3.26 1.23e-  3   332           0.468
-    ## # … with 27 more rows, and 4 more variables: variable_code <chr>,
-    ## #   Comparison <chr>, moderates <chr>, Variant <chr>
-
 ## `om_label_stats`
 
 Prepare paired data for plot with within subject error term.
@@ -611,21 +604,6 @@ perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
 ``` r
 om_label_stats(gathered_dat, aversion = "V4")
 ```
-
-    ## # A tibble: 60 x 8
-    ##    Type         N Response     sd       se      ci variable_code Variant
-    ##    <fct>    <dbl>    <dbl>  <dbl>    <dbl>   <dbl> <chr>         <chr>  
-    ##  1 FollowUp   337    0.623 0.122  0.00664  0.0131  Q1            V4     
-    ##  2 Post      4937    0.616 0.109  0.00156  0.00305 Q1            V4     
-    ##  3 Pre       8030    0.617 0.0873 0.000974 0.00191 Q1            V4     
-    ##  4 FollowUp   337    0.509 0.116  0.00632  0.0124  Q2            V4     
-    ##  5 Post      4937    0.516 0.106  0.00151  0.00297 Q2            V4     
-    ##  6 Pre       8030    0.486 0.0850 0.000949 0.00186 Q2            V4     
-    ##  7 FollowUp   622    0.600 0.196  0.00788  0.0155  Q3            V4     
-    ##  8 Post      4820    0.601 0.180  0.00259  0.00507 Q3            V4     
-    ##  9 Pre       8671    0.569 0.140  0.00150  0.00294 Q3            V4     
-    ## 10 FollowUp   622    0.666 0.199  0.00797  0.0156  Q4            V4     
-    ## # … with 50 more rows
 
 # Analyzing mixed effects
 
@@ -698,8 +676,6 @@ plot of the model:
 Q11_dat$ggmod
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
-
 The argument `get_effects = T` will give us marginal effects of the
 model:
 
@@ -707,13 +683,6 @@ model:
 Q11_dat$effects_dat %>% 
   knitr::kable()
 ```
-
-| x        | predicted | std.error |  conf.low | conf.high | group | Condition | Type |
-| :------- | --------: | --------: | --------: | --------: | :---- | :-------- | :--- |
-| Article  | 0.3266667 | 0.0432821 | 0.2416908 | 0.4116425 | Pre   | Article   | Pre  |
-| OpenMind | 0.6655844 | 0.0167022 | 0.6327930 | 0.6983759 | Pre   | OpenMind  | Pre  |
-| Article  | 0.2966667 | 0.0418379 | 0.2145263 | 0.3788070 | Post  | Article   | Post |
-| OpenMind | 0.7537879 | 0.0160937 | 0.7221911 | 0.7853846 | Post  | OpenMind  | Post |
 
 The argument `get_tidy = T` will give us coefficients and pseudo cohen’s
 d values of the model as a tidy dataframe:
@@ -723,41 +692,12 @@ Q11_dat$tidy_dat %>%
   knitr::kable()
 ```
 
-| term                       |    estimate | std.error |   statistic | group | n\_coef | n\_dat |         d |
-| :------------------------- | ----------: | --------: | ----------: | :---- | ------: | -----: | --------: |
-| (Intercept)                |   0.3266667 | 0.0432821 |   7.5473825 | fixed |       4 |    358 | 0.4011389 |
-| ConditionOpenMind          |   0.3389177 | 0.0463929 |   7.3053734 | fixed |       4 |    358 | 0.3882762 |
-| TypePost                   | \-0.0300000 | 0.0407868 | \-0.7355312 | fixed |       4 |    358 | 0.0390930 |
-| ConditionOpenMind:TypePost |   0.1182035 | 0.0439730 |   2.6880905 | fixed |       4 |    358 | 0.1428704 |
-
 Finally, by default `om_mixed_models` produces the raw `lme4` object
 containing the model:
 
 ``` r
 Q11_dat$lme_dat
 ```
-
-    ## Linear mixed model fit by maximum likelihood  ['lmerMod']
-    ## Formula: 
-    ## Response ~ Condition * Type + (1 + Condition | OMID) + (1 + Type |  
-    ##     OMID)
-    ##    Data: .TeMpVaR
-    ##      AIC      BIC   logLik deviance df.resid 
-    ## 173.7359 224.0464 -75.8679 151.7359      705 
-    ## Random effects:
-    ##  Groups   Name              Std.Dev. Corr 
-    ##  OMID     (Intercept)       0.1972        
-    ##           ConditionOpenMind 0.1247   -0.47
-    ##  OMID.1   (Intercept)       0.1809        
-    ##           TypePost          0.1976   -0.63
-    ##  Residual                   0.1485        
-    ## Number of obs: 716, groups:  OMID, 358
-    ## Fixed Effects:
-    ##                (Intercept)           ConditionOpenMind  
-    ##                     0.3267                      0.3389  
-    ##                   TypePost  ConditionOpenMind:TypePost  
-    ##                    -0.0300                      0.1182  
-    ## convergence code 0; 2 optimizer warnings; 0 lme4 warnings
 
 ## `om_mix_plot`
 
@@ -784,8 +724,6 @@ om_mix_plot(effects_dat = Q11_dat$effects_dat,
             show_stats = T)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
 ## `om_mix_complete`
 
 This function allows to run **and** plot a mixed model. It makes use of
@@ -806,8 +744,6 @@ following (at the moment):
 ``` r
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
-
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 # openmindR ggplot2 theme
 
@@ -847,7 +783,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -873,7 +809,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -892,7 +828,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

@@ -887,4 +887,52 @@ get_assessmentv6.1 <- function(clean_assessment) {
 
 
 
+#' Merge Assessments
+#'
+#' @param v4 v4 data
+#' @param v5 v5 data
+#' @param v6 v6 data
+#' @export
+merge_assessments <- function(v4, v5, v6) {
 
+  suppressMessages(
+    suppressWarnings(
+      v4_v5 <- v4 %>%
+        bind_rows(v5) %>%
+        mutate(OMID = as.character(OMID)) %>%
+        mutate(AffPol1Pre = Q14Pre) %>%
+        mutate(AffPol1Post = Q14Post) %>%
+        mutate(OutgroupLikingPre = Q16Pre) %>%
+        mutate(OutgroupLikingPost = Q16Post) %>%
+        mutate(AffPol2Pre = Q17Pre) %>%
+        mutate(AffPol2Post = Q17Post) %>%
+        mutate(IHPre = Q18Pre) %>%
+        mutate(IHPost = Q18Post) %>%
+        mutate(GrowthMindsetPre = Q11Pre) %>%
+        mutate(GrowthMindsetPost = Q11Post) %>%
+        select(OMID, AssessmentVersion, ppol_cat, AffPol1Pre:IHPost, GrowthMindsetPre, GrowthMindsetPost)
+    )
+  )
+
+  suppressMessages(
+    suppressWarnings(
+      v6 <- v6 %>%
+        om_clean_ppol() %>%
+        polar_measures(ProgTempPre, ConTempPre) %>%
+        polar_measures(ProgTempPost, ConTempPost) %>%
+        select(-IngroupLikingPre, -IngroupLikingPost) %>%
+        mutate(IHPre = (CIHS_LIO1Pre+CIHS_LIO2Pre+CIHS_LIO3Pre+CIHS_LIO4Pre)/4) %>%
+        mutate(IHPost = (CIHS_LIO1Post+CIHS_LIO2Post+CIHS_LIO3Post+CIHS_LIO4Post)/4) %>%
+        select(OMID, AssessmentVersion, ppol_cat, AffPol1Pre:IHPost, GrowthMindsetPre, GrowthMindsetPost) %>%
+        mutate_at(vars(AffPol1Pre:GrowthMindsetPost), ~tidytemplate::range01(.x))
+    )
+  )
+
+  suppressMessages(
+    master_data <- v4_v5 %>%
+      bind_rows(v6)
+  )
+
+  return(master_data)
+
+}

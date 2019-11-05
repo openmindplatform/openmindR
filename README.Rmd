@@ -33,6 +33,90 @@ library(dplyr)
 
 ```
 
+# New Functions
+
++ [om_parse_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
++ [merge_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
++ [om_download_at](https://github.com/openmindplatform/openmindR#om_download_at)
+
+
+## `om_parse_lifehacks`
+
+This function  The input dataset needs to have the four following columns: `LifeHacksChosen`, `LifeHacksComplete`, `LifeHacksUseful` and `LifeHacksReason`. You can find them in the ParticipantProgress table in Airtable. The function will parse these four columns into 4 x 5 Steps variables (so 20 in total):
+
++ `LifeHack1` - `LifeHack5`: Which Lifehack was chosen
++ `LifeHacksComplete1` - `LifeHacksComplete5`: Did the user complete the lifehack
++ `LifeHacksUseful1` - `LifeHacksUseful5`: Did the user find completing the lifehack useful
++ `LifeHacksReason1` - `LifeHacksReason5`: Why didn't the user complete the lifehack
+
+```{r, eval = F}
+## get key
+key <- read_lines("../../Keys/airtabler.txt")
+
+## download participant progress data
+pp_dat <- om_download_at(key, tables = "ParticipantProgress")
+
+
+## this parses all Lifehack data so far
+parsed_lh <-  om_parse_lifehacks(pp_dat)
+
+
+## if you want just the newest life hack data you can filter by OpenMind version
+parsed_lh <-  pp_dat %>%
+  ## making sure OpenMindVersion is numeric
+  mutate(OpenMindVersion = as.numeric(OpenMindVersion)) %>% 
+  ## Only include OM Version 3 and above
+  filter(OpenMindVersion >= 3) %>% 
+  ## parse Life hacks
+  om_parse_lifehacks()
+
+## just select the OMID and all LifeHack data (remove all other PP variables)
+parsed_lh %>% 
+  select(OMID, LifeHack1:LifeHacksReason5)
+```
+
+
+## `merge_assessments`
+
+This function merges assessment v4, v5 and v6 data and only keeps common variables. 
+
+```{r, eval= F}
+## get previous assessment dat
+v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv") 
+v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv") 
+
+## get key
+key <- readr::read_lines("../../Keys/airtabler.txt")
+
+## get (clean) assessment v6 data
+v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+
+
+## merge all three datasets and only keep comman variables
+merge_assessments(v4, v5, v6)
+
+```
+
+## `om_download_at`
+
+`openmindR` can download and clean data directly from Airtable. There are three new arguments for Assessment v6:
+
++ `clean`: Whether to return "clean" data (i.e. numeric data is numeric and minors or opt-outs are `NA` (`TRUE`/`FALSE`)
++ `file`: give a file path to where the downloaded data should be stored
++ `v6.1`: filter down the dataset to only include Assessment V6.1 (`TRUE/FALSE`)
+
+Here is a code example that will download Assessment V6, clean it, save it into a folder called "Data" under Research and filter down to only include V6.1 data.
+
+
+```{r, eval=F}
+key <- readr::read_lines("../../Keys/airtabler.txt")
+
+assessmentv6 <- om_download_at(key, 
+                            tables = "AssessmentV6", 
+                            clean = TRUE, 
+                            file = "../../../Data/assessmentv6.1.csv",
+                            v6.1 = TRUE)
+```
 
 
 # openmindR Cleaning Functions
@@ -104,7 +188,7 @@ gathered_dat <- om_gather(cleaned_dat, q_c_strings)
 ```{r, echo = F}
 
 db_get_data <- function(tbl_dat) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), "../om_metrics_report/sql_data/omdata.db")
+  con <- DBI::dbConnect(RSQLite::SQLite(), "../../Research/Projects/Current Projects/om_metrics_report/sql_data/omdata.db")
 
   out <- con %>%
     dplyr::tbl(tbl_dat) %>%
@@ -139,12 +223,20 @@ db_get_data <- function(tbl_dat) {
 # Read in data
 dat.acc <- db_get_data("dat.acc")
 dat.par <- db_get_data("dat.par")
-dat.ass4 <- db_get_data("dat.ass4")
-dat.ass5 <- db_get_data("dat.ass5")
+# dat.ass4 <- db_get_data("dat.ass4")
+# dat.ass5 <- db_get_data("dat.ass5")
+# dat.ass <- db_get_data("cleaned_dat")
 
-dat.ass <- dat.ass4 %>% 
-  dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
-  dplyr::bind_rows(dat.ass5)
+dat.ass <- readr::read_csv("../../Research/Data/2019-10-29_assessmentv4.csv") %>% 
+  dplyr::bind_rows(readr::read_csv("../../Research/Data/2019-10-29_assessmentv5.csv"))
+
+
+# dat.ass <- dat.ass4 %>% 
+#   dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
+#   mutate(OMID = as.character(OMID)) %>% 
+#   dplyr::bind_rows(dat.ass5 %>% 
+#                      mutate(AssessmentVersion = as.numeric(AssessmentVersion)) %>% 
+#                      mutate(AssessmentsDone = as.numeric(AssessmentsDone)))
 
 
 ```
@@ -226,7 +318,7 @@ Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divided by 6.
 **Should be run before any measures are constructed so that they are all on the same scale.**
 
 
-```{r}
+```{r, eval = F}
 dat.ass %>% 
   om_rescale()
 ```
@@ -248,7 +340,7 @@ Creates the following variables:
 Function automatically accounts for Assessment Version 4 and 5/5.1.
 
 
-```{r, eval=F}
+```{r, eval = F}
 dat.ass %>% 
   om_construct_measures()
 ```
@@ -267,17 +359,17 @@ Creates the following measures of Political Orientation
 + **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
 + **ppol_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 
-```{r}
+```{r, eval = F}
 
 dat.ass <- dat.ass %>% 
   om_clean_ppol()
 
-dat.ass
+
 ```
 
 Now `om_construct_measures` will work!
 
-```{r}
+```{r, eval = F}
 dat.ass %>% 
   om_construct_measures()
 ```
@@ -309,7 +401,7 @@ Takes the following arguments:
 + **which_strings** a string indicating which variables should be parsed out (`q_c_strings` indicates all Q and C questions)
 
 
-```{r}
+```{r, eval = F}
 dat.ass %>% 
   om_gather(q_c_strings) %>% 
   ## select just the relevant vars as showcase
@@ -334,7 +426,7 @@ The `aversion` argument specifies which Assessment version you want to perform m
 
 With the `compare` argument you can specify either `"PrePost"`, `"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the latter is the default).
 
-```{r}
+```{r, eval = F}
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
   om_rescale() %>% 
@@ -354,7 +446,7 @@ Prepare paired data for plot with within subject error term.
 
 The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
 
-```{r}
+```{r, eval = F}
 om_label_stats(gathered_dat, aversion = "V4")
 ```
 
@@ -363,7 +455,7 @@ om_label_stats(gathered_dat, aversion = "V4")
 
 Example workflow for Ann Miller experimental data
 
-```{r}
+```{r, eval = F}
 load("../om_parser/data/ann_miller_merged.Rdata")
 
 cleaned_data <- ann_miller_merged %>% 
@@ -407,7 +499,7 @@ Takes the following arguments:
 
 Lets perform a model on `Q11` with all arguments turned on.
 
-```{r}
+```{r, eval = F}
 Q11_dat <- om_mix_models(gathered_dat, 
               question = "Q11", 
               plot_model = T, 
@@ -419,13 +511,13 @@ Q11_dat <- om_mix_models(gathered_dat,
 
 For instance, the argument `plot_model = T` will give us a coefficient plot of the model:
 
-```{r, fig.width = 8, fig.height = 5}
+```{r, fig.width = 8, fig.height = 5, eval = F}
 Q11_dat$ggmod
 ```
 
 The argument `get_effects = T` will give us marginal effects of the model:
 
-```{r}
+```{r, eval = F}
 Q11_dat$effects_dat %>% 
   knitr::kable()
 ```
@@ -433,14 +525,14 @@ Q11_dat$effects_dat %>%
 
 The argument `get_tidy = T` will give us coefficients and pseudo cohen's d values of the model as a tidy dataframe:
 
-```{r}
+```{r, eval = F}
 Q11_dat$tidy_dat %>% 
   knitr::kable()
 ```
 
 Finally, by default `om_mixed_models` produces the raw `lme4` object containing the model:
 
-```{r}
+```{r, eval = F}
 Q11_dat$lme_dat
 ```
 
@@ -456,7 +548,7 @@ Takes the following arguments:
 + **var_label** supply a character that is plotted as title and y-axis
 + **show_stats** Show statistics on the bottom right. Only possible if you supply `tidy_dat`
 
-```{r, fig.width = 12, fig.height = 8.58}
+```{r, fig.width = 12, fig.height = 8.58, eval = F}
 om_mix_plot(effects_dat = Q11_dat$effects_dat, 
             tidy_dat = Q11_dat$tidy_dat, 
             var_label = "Growth Mindset",
@@ -476,7 +568,7 @@ Just specify data and title where the latter needs to be one of the following (a
 + `"Social Closeness"`
 + `"Perspective-Taking"`
 
-```{r, fig.width = 12, fig.height = 8.58}
+```{r, fig.width = 12, fig.height = 8.58, eval = F}
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
 

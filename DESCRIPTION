@@ -26,7 +26,6 @@ Imports:
     magrittr,
     lazyeval,
     lubridate,
-    rlang,
-    reticulate
+    rlang
 Suggests: 
     testthat (>= 2.1.0)
