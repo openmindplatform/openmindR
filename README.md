@@ -31,7 +31,7 @@ library(dplyr)
 
 ## `om_parse_lifehacks`
 
-This function The input dataset needs to have the four following
+This function parses and cleans the list variables that contain the lifehack data. The input dataset needs to have the four following
 columns: `LifeHacksChosen`, `LifeHacksComplete`, `LifeHacksUseful` and
 `LifeHacksReason`. You can find them in the ParticipantProgress table in
 Airtable. The function will parse these four columns into 4 x 5 Steps
