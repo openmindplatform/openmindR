@@ -59,7 +59,7 @@ pp_dat <- om_download_at(key, tables = "ParticipantProgress")
 parsed_lh <-  om_parse_lifehacks(pp_dat)
 
 
-## if you want just the newest life hack data you can filter by OpenMind version
+## if you just want the newest life hack data you can filter by OpenMind version
 parsed_lh <-  pp_dat %>%
   ## making sure OpenMindVersion is numeric
   mutate(OpenMindVersion = as.numeric(OpenMindVersion)) %>% 
