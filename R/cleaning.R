@@ -863,7 +863,14 @@ chr_to_datetime <- function(date) {
 #' @export
 get_assessmentv6.1 <- function(clean_assessment) {
 
-  pre_vars <- c("ProgTemp", "ConTemp", "MotivationProg1", "MotivationProg2", "MotivationCon1", "MotivationCon2", "CIHS_LIO1", "CIHS_LIO2", "CIHS_LIO3", "CIHS_LIO4", "GrowthMindset", "IssueDisplay", "HowImportantIssue", "IHText", "Preparedness3", "SoughtOutDifferent", "FeedbackAssessment", "GBSS1", "GBSS2", "GBSS3")
+  pre_vars <- c("ProgTemp", "ConTemp",
+                "MotivationProg1", "MotivationProg2",
+                "MotivationCon1", "MotivationCon2",
+                "CIHS_LIO1", "CIHS_LIO2", "CIHS_LIO3", "CIHS_LIO4",
+                "GrowthMindset", "IssueDisplay", "HowImportantIssue",
+                "IHText", "Preparedness3",
+                "SoughtOutDifferent", "FeedbackAssessment",
+                "GBSS1", "GBSS2", "GBSS3")
 
   assessment61 <- clean_assessment %>%
     dplyr::select(

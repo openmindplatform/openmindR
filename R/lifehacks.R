@@ -204,22 +204,31 @@ om_parse_lifehacks <- function(cleaned_dat) {
   ## TODO: Make lifehacks so that you can specify in top level functions which ones you want to provide
 
   step1_hacks <- c("Understand what's influencing your viewpoint",
-                   "Engage in perspective taking")
+                   "Engage in perspective taking",
+                   "Seek out diverse perspectives")
 
   step2_hacks <- c("Acknowledge that your abilities are fluid",
                    "View each mistake as a learning opportunity",
-                   "Challenge yourself to do things you haven't already mastered")
+                   "Challenge yourself to do things you haven't already mastered",
+                   "Approach disagreements like a detective",
+                   "Vanquish your fear of being wrong")
 
   step3_hacks <- c("Challenge your motivated reasoning",
                    "Challenge your confirmation bias")
 
+
+
   step4_hacks <- c("Analyze your own beliefs",
-                   "Dig deeper on disagreement")
+                   "Dig deeper on disagreement",
+                   "Mind travel",
+                   "Examine different moral matrices")
 
   step5_hacks <- c("Respect and understand other people's elephants",
                    "Be intellectually humble",
                    "Appeal to other people's elephants",
-                   "Appeal to others people's elephants")
+                   "Appeal to others people's elephants",
+                   "Challenge your assumptions")
+
 
   lifehacks_dat <- lifehacks_dat %>%
     dplyr::mutate(LifeHack1 = ifelse(LifeHack1 %in% step1_hacks | LifeHack1 == 0, LifeHack1, NA)) %>%
@@ -228,8 +237,8 @@ om_parse_lifehacks <- function(cleaned_dat) {
     dplyr::mutate(LifeHack4 = ifelse(LifeHack4 %in% step4_hacks | LifeHack4 == 0, LifeHack4, NA)) %>%
     dplyr::mutate(LifeHack5 = ifelse(LifeHack5 %in% step5_hacks | LifeHack5 == 0, LifeHack5, NA)) %>%
     dplyr::mutate(LifeHack5 = ifelse(LifeHack5 == "Appeal to others people's elephants",
-                              "Appeal to other people's elephants",
-                              LifeHack5))# %>% count(LifeHack5, sort = T)
+                                     "Appeal to other people's elephants",
+                                     LifeHack5))# %>% count(LifeHack5, sort = T)
 
 
   lh_data <- lifehacks_dat %>%
