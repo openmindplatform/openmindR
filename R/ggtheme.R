@@ -26,7 +26,10 @@ theme_om <- function(legend_position = c(.55, .93),
         axis.text.y = ggplot2::element_text(color = "grey20", size = axis_text_size),
         axis.title.x = ggplot2::element_text(color = "grey20", size = axis_title_size),
         axis.title.y = ggplot2::element_text(color = "grey20", size = axis_title_size),
-        text = ggplot2::element_text(family="Poppins",size=24, ...))
+        text = ggplot2::element_text(family="Poppins",size=24, ...),
+        panel.grid.major = element_line(size = 0.5, linetype = 'dashed', colour = "grey"),
+        panel.grid.minor = element_line(size = 0.25, linetype = 'dashed', colour = "grey")
+  )
 }
 
 
