@@ -90,7 +90,7 @@ key <- readr::read_lines("../../Keys/airtabler.txt")
 v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
 
 
-## merge all three datasets and only keep comman variables
+## merge all three datasets and only keep common variables
 merge_assessments(v4, v5, v6)
 ```
 
