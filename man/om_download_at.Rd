@@ -5,7 +5,7 @@
 \title{Download AirTable data}
 \usage{
 om_download_at(key, tables = c("AssessmentV4", "AssessmentV5",
-  "AccessCodes", "ParticipantProgress", "InstructorSurvey",
+  "AccessCodes", "ParticipantProgress", "InstructorSurveyV2",
   "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F)
 }
 \arguments{

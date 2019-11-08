@@ -15,10 +15,10 @@
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
 #'@export
-om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
+om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
 
-  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurvey", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
-    stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurvey, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
+  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
+    stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
   }
 
   cat("Seting up key\n")
@@ -136,9 +136,9 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     cat(paste0("Done. Participant Progress Data has ", nrow(final_list$dat.par), " rows\n"))
   }
 
-  if ("InstructorSurvey" %in% tables) {
+  if ("InstructorSurveyV2" %in% tables) {
     cat("Download Instructor Survey Data\n")
-    final_list$dat.ins <- dat.ass.1$InstructorSurvey$select_all() %>% tibble::as_tibble()
+    final_list$dat.ins <- dat.ass.1$InstructorSurveyV2$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Instructor Survey Data has ", nrow(final_list$dat.ins), " rows\n"))
   }
 
