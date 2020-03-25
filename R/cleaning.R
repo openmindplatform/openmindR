@@ -4,21 +4,26 @@
 #'
 #' @md
 #' @section Currently allowed input:
-#' + `"AssessmentV4"`
-#' + `"AssessmentV5"`
+#' + `"AssessmentV6"`
+#' + `"AssessmentV7"`
 #' + `"AccessCodes"`
 #' + `"ParticipantProgress"`
-#' + `"InstructorSurvey"`
+#' + `"ParticipantProgress2"`
+#' + `"InstructorSurveyV2"`
 #' + `"TechnicalInquiries"`
 #'
 #'@param key key for AirTable API
 #'@param tables specify which tables you want to download
 #'@return a list with (several) dataframe(s)
 #'@export
-om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
+om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
 
-  if (any(tables %nin% c("AssessmentV4", "AssessmentV5","AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV6DiD", "DiDProgress"))) {
-    stop("Warning: Should be one of the following: AssessmentV4, AssessmentV5,AccessCodes,ParticipantProgress,InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV6DiD, DiDProgress\n")
+  if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7"))) {
+    stop("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
+  }
+
+  if (any(tables %in% c("AssessmentV4","AssessmentV5","AssessmentV6DiD", "DiDProgress", "AssessmentV6DiD", "DiDProgress"))) {
+    stop("A Table you specified does not live in AirTable anymore!\n")
   }
 
   cat("Seting up key\n")
@@ -146,6 +151,18 @@ om_download_at <- function(key, tables = c("AssessmentV4", "AssessmentV5","Acces
     cat("Download Technial Inquiries Data\n")
     final_list$dat.tec <- dat.ass.1$TechnicalInquiries$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Technical Inquiries Data has ", nrow(final_list$dat.tec), " rows\n"))
+  }
+
+  if ("AssessmentV7" %in% tables) {
+    cat("Download AssessmentV7 Data\n")
+    final_list$dat.ass7 <- dat.ass.1$AssessmentV7$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. AssessmentV7 Data has ", nrow(final_list$dat.ass7), " rows\n"))
+  }
+
+  if ("ParticipantProgress2" %in% tables) {
+    cat("Download Participant Progress 2 Data\n")
+    final_list$dat.par2 <- dat.ass.1$ParticipantProgress2$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. Participant Progress Data 2 has ", nrow(final_list$dat.par2), " rows\n"))
   }
 
   if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()

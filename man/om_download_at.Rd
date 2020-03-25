@@ -4,9 +4,9 @@
 \alias{om_download_at}
 \title{Download AirTable data}
 \usage{
-om_download_at(key, tables = c("AssessmentV4", "AssessmentV5",
-  "AccessCodes", "ParticipantProgress", "InstructorSurveyV2",
-  "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F)
+om_download_at(key, tables = c("AccessCodes", "ParticipantProgress",
+  "InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL,
+  v6.1 = F)
 }
 \arguments{
 \item{key}{key for AirTable API}
@@ -22,11 +22,12 @@ This function downloads current AirTable data
 \section{Currently allowed input}{
 
 \itemize{
-\item \code{"AssessmentV4"}
-\item \code{"AssessmentV5"}
+\item \code{"AssessmentV6"}
+\item \code{"AssessmentV7"}
 \item \code{"AccessCodes"}
 \item \code{"ParticipantProgress"}
-\item \code{"InstructorSurvey"}
+\item \code{"ParticipantProgress2"}
+\item \code{"InstructorSurveyV2"}
 \item \code{"TechnicalInquiries"}
 }
 }
