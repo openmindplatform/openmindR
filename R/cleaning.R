@@ -923,6 +923,8 @@ get_assessmentv6.1 <- function(clean_assessment) {
 #' @export
 clean_assessment7 <- function(clean_assessment) {
 
+  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3")
+
   assessment7 <- clean_assessment %>%
     dplyr::filter(AccessCode != "Admin") %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
