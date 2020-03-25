@@ -12,6 +12,10 @@ om_download_at(key, tables = c("AccessCodes", "ParticipantProgress",
 \item{key}{key for AirTable API}
 
 \item{tables}{specify which tables you want to download}
+
+\item{clean}{clean dataset and construct measures (only work for Assessment V6 and V7)}
+
+\item{file}{specify path to download to (only work for Assessment V6 and V7)}
 }
 \value{
 a list with (several) dataframe(s)

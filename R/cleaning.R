@@ -14,6 +14,8 @@
 #'
 #'@param key key for AirTable API
 #'@param tables specify which tables you want to download
+#'@param clean clean dataset and construct measures (only work for Assessment V6 and V7)
+#'@param file specify path to download to (only work for Assessment V6 and V7)
 #'@return a list with (several) dataframe(s)
 #'@export
 om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
@@ -115,6 +117,25 @@ om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","
 
   }
 
+
+  if ("AssessmentV7" %in% tables) {
+    cat("Download AssessmentV7 Data\n")
+    final_list$dat.ass7 <- dat.ass.1$AssessmentV7$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. AssessmentV7 Data has ", nrow(final_list$dat.ass7), " rows\n"))
+
+    if (clean) {
+      final_list$dat.ass7 <- clean_assessment7(final_list$dat.ass7)
+    }
+
+
+    if (!is.null(file)) {
+
+      readr::write_csv(x = final_list$dat.ass7, path = file)
+
+    }
+
+  }
+
   if ("AssessmentV6DiD" %in% tables) {
     cat("Download AssessmentV6DiD Data\n")
     final_list$dat.ass6did <- dat.ass.1$AssessmentV6DiD$select_all() %>% tibble::as_tibble()
@@ -151,12 +172,6 @@ om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","
     cat("Download Technial Inquiries Data\n")
     final_list$dat.tec <- dat.ass.1$TechnicalInquiries$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Technical Inquiries Data has ", nrow(final_list$dat.tec), " rows\n"))
-  }
-
-  if ("AssessmentV7" %in% tables) {
-    cat("Download AssessmentV7 Data\n")
-    final_list$dat.ass7 <- dat.ass.1$AssessmentV7$select_all() %>% tibble::as_tibble()
-    cat(paste0("Done. AssessmentV7 Data has ", nrow(final_list$dat.ass7), " rows\n"))
   }
 
   if ("ParticipantProgress2" %in% tables) {
@@ -902,6 +917,177 @@ get_assessmentv6.1 <- function(clean_assessment) {
 
 }
 
+#' Get Assessment V7
+#'
+#'
+#' @export
+clean_assessment7 <- function(clean_assessment) {
+
+  assessment7 <- clean_assessment %>%
+    dplyr::filter(AccessCode != "Admin") %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Prefer not to say)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Blank)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "99"), NA_character_, .x)) %>%
+    dplyr::mutate_at(dplyr::vars(
+      dplyr::contains("Date"),
+      dplyr::contains("Time")
+    ), ~lubridate::as_datetime(.x)) %>%
+    dplyr::filter(!(AccessCode %in% test_acs)) %>%
+    dplyr::select(sort(tidyselect::peek_vars(), decreasing = F)) %>%
+    dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
+                  D1, D2, D3, D4, D5, D6,
+                  dplyr::everything()) %>%
+    dplyr::mutate_all(as.character) %>%
+    om_clean_ppol()  %>%
+    dplyr::mutate_at(dplyr::vars(AssessmentVersion,
+                                 AssessmentsDone,
+                                 D1,
+                                 dplyr::contains("Motivation"),
+                                 dplyr::contains("GBSS"),
+                                 dplyr::contains("Temp"),
+                                 dplyr::contains("IH"),
+                                 dplyr::contains("IntAnx"),
+                                 dplyr::contains("Avoidance"),
+                                 dplyr::contains("Tolerance"),
+                                 dplyr::contains("Attribution"),
+                                 dplyr::contains("SocialDistance"),
+                                 dplyr::contains("SE", ignore.case = F),
+                                 dplyr::contains("GM"),
+                                 dplyr::contains("Anxiety"),
+                                 dplyr::contains("Belong"),
+                                 dplyr::contains("Dissent"),
+                                 dplyr::contains("Age"),
+                                 dplyr::contains("NQuestions"),
+                                 dplyr::contains("SocialMediaUse")
+    ), ~as.character(.x) %>% readr::parse_number()) %>%
+    dplyr::mutate(Issue = readr::parse_number(Issue)) %>%
+    ## Temperature Questions
+    polar_measures(ProgTempPre, ConTempPre) %>%
+    polar_measures(ProgTempPost, ConTempPost) %>%
+    polar_measures(ProgTempFollowUp, ConTempFollowUp) %>%
+    ## Motivation Questions
+    dplyr::mutate(MotivationProgPre = (MotivationProg1Pre + (8 - MotivationProg2Pre)) / 2) %>%
+    dplyr::mutate(MotivationProgPost = (MotivationProg1Post + (8 - MotivationProg2Post)) / 2) %>%
+    dplyr::mutate(MotivationProgFollowUp = (MotivationProg1FollowUp + (8 - MotivationProg2FollowUp)) / 2) %>%
+    dplyr::mutate(MotivationConPre = (MotivationCon1Pre + (8 - MotivationCon2Pre)) / 2) %>%
+    dplyr::mutate(MotivationConPost = (MotivationCon1Post + (8 - MotivationCon2Post)) / 2) %>%
+    dplyr::mutate(MotivationConFollowUp = (MotivationCon1FollowUp + (8 - MotivationCon2FollowUp)) / 2) %>%
+    dplyr::mutate(IngroupMotivationPre = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgPre,
+      ppol_cat == "Conservatives" ~ MotivationConPre
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationPre = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgPre,
+      ppol_cat == "Progressives" ~ MotivationConPre
+    )) %>%
+    # my ingroup
+    dplyr::mutate(IngroupMotivationPost = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgPost,
+      ppol_cat == "Conservatives" ~ MotivationConPost
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationPost = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgPost,
+      ppol_cat == "Progressives" ~ MotivationConPost
+    )) %>%
+    # my ingroup
+    dplyr::mutate(IngroupMotivationFollowUp = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgFollowUp,
+      ppol_cat == "Conservatives" ~ MotivationConFollowUp
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationFollowUp = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgFollowUp,
+      ppol_cat == "Progressives" ~ MotivationConFollowUp
+    )) %>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAPre = abs(IngroupMotivationPre - OutgroupMotivationPre))%>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAPost = abs(IngroupMotivationPost - OutgroupMotivationPost)) %>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAFollowUp = abs(IngroupMotivationFollowUp - OutgroupMotivationFollowUp)) %>%
+    # GBSS
+    dplyr::mutate(GBSSPre = (GBSS1Pre+GBSS2Pre+GBSS3Pre)/3) %>%
+    dplyr::mutate(GBSSPost = (GBSS1Post+GBSS2Post+GBSS3Post)/3) %>%
+    dplyr::mutate(GBSSFollowUp = (GBSS1FollowUp+GBSS2FollowUp+GBSS3FollowUp)/3) %>%
+    ## Interaction Anxiety
+    dplyr::mutate(IntAnxPre = (IntAnx1Pre+IntAnx2Pre)/2) %>%
+    dplyr::mutate(IntAnxPost = (IntAnx1Post+IntAnx2Post)/2) %>%
+    dplyr::mutate(IntAnxFollowUp = (IntAnx1FollowUp+IntAnx2FollowUp)/2) %>%
+    ## Avoidance
+    dplyr::mutate(AvoidancePre = (Avoidance1Pre+Avoidance2Pre)/2) %>%
+    dplyr::mutate(AvoidancePost = (Avoidance1Post+Avoidance2Post)/2) %>%
+    dplyr::mutate(AvoidanceFollowUp = (Avoidance1FollowUp+Avoidance2FollowUp)/2) %>%
+    ## Tolerance
+    dplyr::mutate(TolerancePre = (Tolerance1Pre+Tolerance2Pre)/2) %>%
+    dplyr::mutate(TolerancePost = (Tolerance1Post+Tolerance2Post)/2) %>%
+    dplyr::mutate(ToleranceFollowUp = (Tolerance1FollowUp+Tolerance2FollowUp)/2) %>%
+    ## Attribution
+    dplyr::mutate(AttributionPre = (Attribution1Pre+Attribution2Pre)/2) %>%
+    dplyr::mutate(AttributionPost = (Attribution1Post+Attribution2Post)/2) %>%
+    dplyr::mutate(AttributionFollowUp = (Attribution1FollowUp+Attribution2FollowUp)/2) %>%
+    ## SocialDistance
+    dplyr::mutate(SocialDistancePre = (SocialDistance1Pre+SocialDistance2Pre)/2) %>%
+    dplyr::mutate(SocialDistancePost = (SocialDistance1Post+SocialDistance2Post)/2) %>%
+    dplyr::mutate(SocialDistanceFollowUp = (SocialDistance1FollowUp+SocialDistance2FollowUp)/2) %>%
+    ## IH - Subscale 1
+    dplyr::mutate(IHSub1Pre = (IH1Pre+IH2Pre)/2) %>%
+    dplyr::mutate(IHSub1Post = (IH1Post+IH2Post)/2) %>%
+    dplyr::mutate(IHSub1FollowUp = (IH1FollowUp+IH2FollowUp)/2) %>%
+    ## IH - Subscale 2
+    dplyr::mutate(IHSub2Pre = (IH3Pre+IH4Pre)/2) %>%
+    dplyr::mutate(IHSub2Post = (IH3Post+IH4Post)/2) %>%
+    dplyr::mutate(IHSub2FollowUp = (IH3FollowUp+IH4FollowUp)/2) %>%
+    ## IH - Subscale 3
+    dplyr::mutate(IHSub3Pre = (IH5Pre+IH6Pre)/2) %>%
+    dplyr::mutate(IHSub3Post = (IH5Post+IH6Post)/2) %>%
+    dplyr::mutate(IHSub3FollowUp = (IH5FollowUp+IH6FollowUp)/2) %>%
+    # GM
+    dplyr::mutate(GMPre = (GM1Pre+GM2Pre+GM3Pre)/3) %>%
+    dplyr::mutate(GMPost = (GM1Post+GM2Post+GM3Post)/3) %>%
+    dplyr::mutate(GMFollowUp = (GM1FollowUp+GM2FollowUp+GM3FollowUp)/3) %>%
+    # Belonging
+    dplyr::mutate(BelongPre = (Belong1Pre+Belong2Pre+Belong3Pre)/3) %>%
+    dplyr::mutate(BelongPost = (Belong1Post+Belong2Post+Belong3Post)/3) %>%
+    dplyr::mutate(BelongFollowUp = (Belong1FollowUp+Belong2FollowUp+Belong3FollowUp)/3) %>%
+    # Belonging
+    dplyr::mutate(BelongPre = (Belong1Pre+Belong2Pre+Belong3Pre)/3) %>%
+    dplyr::mutate(BelongPost = (Belong1Post+Belong2Post+Belong3Post)/3) %>%
+    dplyr::mutate(BelongFollowUp = (Belong1FollowUp+Belong2FollowUp+Belong3FollowUp)/3) %>%
+    # SE
+    dplyr::mutate(SEPre = (SE1Pre+SE2Pre+SE3Pre+SE4Pre)/4) %>%
+    dplyr::mutate(SEPost = (SE1Post+SE2Post+SE3Post+SE4Post)/4) %>%
+    dplyr::mutate(SEFollowUp = (SE1FollowUp+SE2FollowUp+SE3FollowUp+SE4FollowUp)/4) %>%
+    # Anxiety
+    dplyr::mutate(AnxietyPre = (Anxiety1Pre+Anxiety2Pre+Anxiety3Pre+Anxiety4Pre)/4) %>%
+    dplyr::mutate(AnxietyPost = (Anxiety1Post+Anxiety2Post+Anxiety3Post+Anxiety4Post)/4) %>%
+    dplyr::mutate(AnxietyFollowUp = (Anxiety1FollowUp+Anxiety2FollowUp+Anxiety3FollowUp+Anxiety4FollowUp)/4) %>%
+    # Dissent
+    dplyr::mutate(DissentPre = (Dissent1Pre+Dissent2Pre+Dissent3Pre+Dissent4Pre+Dissent5Pre)/5) %>%
+    dplyr::mutate(DissentPost = (Dissent1Post+Dissent2Post+Dissent3Post+Dissent4Post+Dissent5Post)/5) %>%
+    dplyr::mutate(DissentFollowUp = (Dissent1FollowUp+Dissent2FollowUp+Dissent3FollowUp+Dissent4FollowUp+Dissent5FollowUp)/5) %>%
+    ## IHCulture - Subscale 1
+    dplyr::mutate(IHCultureSub1Pre = (IHCulture1Pre+IHCulture2Pre)/2) %>%
+    dplyr::mutate(IHCultureSub1Post = (IHCulture1Post+IHCulture2Post)/2) %>%
+    dplyr::mutate(IHCultureSub1FollowUp = (IHCulture1FollowUp+IHCulture2FollowUp)/2) %>%
+    ## IHCulture - Subscale 2
+    dplyr::mutate(IHCultureSub2Pre = (IHCulture3Pre+IHCulture4Pre)/2) %>%
+    dplyr::mutate(IHCultureSub2Post = (IHCulture3Post+IHCulture4Post)/2) %>%
+    dplyr::mutate(IHCultureSub2FollowUp = (IHCulture3FollowUp+IHCulture4FollowUp)/2) %>%
+    ## IHCulture - Subscale 3
+    dplyr::mutate(IHCultureSub3Pre = (IHCulture5Pre+IHCulture6Pre)/2) %>%
+    dplyr::mutate(IHCultureSub3Post = (IHCulture5Post+IHCulture6Post)/2) %>%
+    dplyr::mutate(IHCultureSub3FollowUp = (IHCulture5FollowUp+IHCulture6FollowUp)/2)
+
+  return(assessment7)
+
+}
 
 
 #' Merge Assessments
