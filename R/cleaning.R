@@ -1008,25 +1008,25 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate(AttributionPost = (Attribution1Post+Attribution2Post)/2) %>%
     dplyr::mutate(AttributionFollowUp = (Attribution1FollowUp+Attribution2FollowUp)/2) %>%
     ## SocialDistance
-    dplyr::mutate(SocialDistancePre = (SocialDistance1Pre+SocialDistance2Pre)/2) %>%
-    dplyr::mutate(SocialDistancePost = (SocialDistance1Post+SocialDistance2Post)/2) %>%
-    dplyr::mutate(SocialDistanceFollowUp = (SocialDistance1FollowUp+SocialDistance2FollowUp)/2) %>%
+    dplyr::mutate(SocialDistancePre = ((8-SocialDistance1Pre)+(8-SocialDistance2Pre))/2) %>%
+    dplyr::mutate(SocialDistancePost = ((8-SocialDistance1Post)+(8-SocialDistance2Post))/2) %>%
+    dplyr::mutate(SocialDistanceFollowUp = ((8-SocialDistance1FollowUp)+(8-SocialDistance2FollowUp))/2) %>%
     ## IH - Subscale 1
     dplyr::mutate(IHSub1Pre = (IH1Pre+IH2Pre)/2) %>%
     dplyr::mutate(IHSub1Post = (IH1Post+IH2Post)/2) %>%
     dplyr::mutate(IHSub1FollowUp = (IH1FollowUp+IH2FollowUp)/2) %>%
     ## IH - Subscale 2
-    dplyr::mutate(IHSub2Pre = (IH3Pre+IH4Pre)/2) %>%
-    dplyr::mutate(IHSub2Post = (IH3Post+IH4Post)/2) %>%
-    dplyr::mutate(IHSub2FollowUp = (IH3FollowUp+IH4FollowUp)/2) %>%
+    dplyr::mutate(IHSub2Pre = ((8-IH3Pre)+(8-IH4Pre))/2) %>%
+    dplyr::mutate(IHSub2Post = ((8-IH3Post)+(8-IH4Post))/2) %>%
+    dplyr::mutate(IHSub2FollowUp = ((8-IH3FollowUp)+(8-IH4FollowUp))/2) %>%
     ## IH - Subscale 3
     dplyr::mutate(IHSub3Pre = (IH5Pre+IH6Pre)/2) %>%
     dplyr::mutate(IHSub3Post = (IH5Post+IH6Post)/2) %>%
     dplyr::mutate(IHSub3FollowUp = (IH5FollowUp+IH6FollowUp)/2) %>%
     # GM
-    dplyr::mutate(GMPre = (GM1Pre+GM2Pre+GM3Pre)/3) %>%
-    dplyr::mutate(GMPost = (GM1Post+GM2Post+GM3Post)/3) %>%
-    dplyr::mutate(GMFollowUp = (GM1FollowUp+GM2FollowUp+GM3FollowUp)/3) %>%
+    dplyr::mutate(GMPre = (GM1Pre+GM2Pre+(8-GM3Pre))/3) %>%
+    dplyr::mutate(GMPost = (GM1Post+GM2Post+(8-GM3Post))/3) %>%
+    dplyr::mutate(GMFollowUp = (GM1FollowUp+GM2FollowUp+(8-GM3FollowUp))/3) %>%
     # Belonging
     dplyr::mutate(BelongPre = (Belong1Pre+Belong2Pre+Belong3Pre)/3) %>%
     dplyr::mutate(BelongPost = (Belong1Post+Belong2Post+Belong3Post)/3) %>%
@@ -1036,25 +1036,25 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate(BelongPost = (Belong1Post+Belong2Post+Belong3Post)/3) %>%
     dplyr::mutate(BelongFollowUp = (Belong1FollowUp+Belong2FollowUp+Belong3FollowUp)/3) %>%
     # SE
-    dplyr::mutate(SEPre = (SE1Pre+SE2Pre+SE3Pre+SE4Pre)/4) %>%
-    dplyr::mutate(SEPost = (SE1Post+SE2Post+SE3Post+SE4Post)/4) %>%
-    dplyr::mutate(SEFollowUp = (SE1FollowUp+SE2FollowUp+SE3FollowUp+SE4FollowUp)/4) %>%
+    dplyr::mutate(SEPre = (SE1Pre+(8-SE2Pre)+SE3Pre+(8-SE4Pre))/4) %>%
+    dplyr::mutate(SEPost = (SE1Post+(8-SE2Post)+SE3Post+(8-SE4Post))/4) %>%
+    dplyr::mutate(SEFollowUp = (SE1FollowUp+(8-SE2FollowUp)+SE3FollowUp+(8-SE4FollowUp))/4) %>%
     # Anxiety
     dplyr::mutate(AnxietyPre = (Anxiety1Pre+Anxiety2Pre+Anxiety3Pre+Anxiety4Pre)/4) %>%
     dplyr::mutate(AnxietyPost = (Anxiety1Post+Anxiety2Post+Anxiety3Post+Anxiety4Post)/4) %>%
     dplyr::mutate(AnxietyFollowUp = (Anxiety1FollowUp+Anxiety2FollowUp+Anxiety3FollowUp+Anxiety4FollowUp)/4) %>%
     # Dissent
-    dplyr::mutate(DissentPre = (Dissent1Pre+Dissent2Pre+Dissent3Pre+Dissent4Pre+Dissent5Pre)/5) %>%
-    dplyr::mutate(DissentPost = (Dissent1Post+Dissent2Post+Dissent3Post+Dissent4Post+Dissent5Post)/5) %>%
-    dplyr::mutate(DissentFollowUp = (Dissent1FollowUp+Dissent2FollowUp+Dissent3FollowUp+Dissent4FollowUp+Dissent5FollowUp)/5) %>%
+    dplyr::mutate(DissentPre = (Dissent1Pre+Dissent2Pre+Dissent3Pre+Dissent4Pre+(8-Dissent5Pre))/5) %>%
+    dplyr::mutate(DissentPost = (Dissent1Post+Dissent2Post+Dissent3Post+Dissent4Post+(8-Dissent5Post))/5) %>%
+    dplyr::mutate(DissentFollowUp = (Dissent1FollowUp+Dissent2FollowUp+Dissent3FollowUp+Dissent4FollowUp+(8-Dissent5FollowUp))/5) %>%
     ## IHCulture - Subscale 1
     dplyr::mutate(IHCultureSub1Pre = (IHCulture1Pre+IHCulture2Pre)/2) %>%
     dplyr::mutate(IHCultureSub1Post = (IHCulture1Post+IHCulture2Post)/2) %>%
     dplyr::mutate(IHCultureSub1FollowUp = (IHCulture1FollowUp+IHCulture2FollowUp)/2) %>%
     ## IHCulture - Subscale 2
-    dplyr::mutate(IHCultureSub2Pre = (IHCulture3Pre+IHCulture4Pre)/2) %>%
-    dplyr::mutate(IHCultureSub2Post = (IHCulture3Post+IHCulture4Post)/2) %>%
-    dplyr::mutate(IHCultureSub2FollowUp = (IHCulture3FollowUp+IHCulture4FollowUp)/2) %>%
+    dplyr::mutate(IHCultureSub2Pre = ((8-IHCulture3Pre)+(8-IHCulture4Pre))/2) %>%
+    dplyr::mutate(IHCultureSub2Post = ((8-IHCulture3Post)+(8-IHCulture4Post))/2) %>%
+    dplyr::mutate(IHCultureSub2FollowUp = ((8-IHCulture3FollowUp)+(8-IHCulture4FollowUp))/2) %>%
     ## IHCulture - Subscale 3
     dplyr::mutate(IHCultureSub3Pre = (IHCulture5Pre+IHCulture6Pre)/2) %>%
     dplyr::mutate(IHCultureSub3Post = (IHCulture5Post+IHCulture6Post)/2) %>%
@@ -1238,3 +1238,30 @@ merge_assessments <- function(v4, v5, v6) {
 
 }
 
+
+#' Reverse Code items
+#'
+#' Reverse codes items and adds them at the end of the dataset with a "_Rev" at the end.
+#'
+#' @param assessment v7 data
+#' @export
+om_reverse_code <- function(assessment) {
+
+  reverse <- c("IH3", "IH4", "GM3", "SE2", "SE4", "Belong3", "Dissent5", "IHCulture3", "IHCulture4", "SocialDistance1", "SocialDistance2")
+
+  reversePre <- reverse %>%
+    paste0(., "Pre")
+  reversePost <- reverse %>%
+    paste0(., "Post")
+  reverseFollowUp <- reverse %>%
+    paste0(., "FollowUp")
+
+  reverse <- c(reversePre, reversePost, reverseFollowUp)
+
+  final <- assessment  %>%
+    dplyr::mutate_at(dplyr::vars(reverse),  .funs = list(Rev = ~ 8 - .))
+
+
+  return(final)
+
+}
