@@ -117,6 +117,41 @@ assessmentv6 <- om_download_at(key,
                             file = "../../../Data/assessmentv6.1.csv",
                             v6.1 = TRUE)
 
+# assessmentv7 <- om_download_at(key, 
+#                             tables = "AssessmentV7", 
+#                             clean = TRUE)
+# 
+# 
+# 
+# 
+# wide_dat <- assessmentv7 %>% 
+#   select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
+#   janitor::remove_empty()
+# 
+# v7_strings <- wide_dat %>% 
+#   colnames() %>% 
+#   keep(~str_detect(.x, "Pre|Post")) %>% 
+#   str_remove("Pre|Post") %>% 
+#   unique() %>% 
+#   paste0(collapse = "|")
+# 
+# # debugonce(om_ttest)
+# 
+# wide_dat %>% 
+#   om_gather(which_strings = v7_strings)  %>%
+#   drop_na() %>% 
+#   # filter(is.na(variable_code))
+#   # dplyr::count(variable_code, sort = T) %>% 
+#   split(.$variable_code) %>% 
+#       # .[[21]] #%>%
+#       # om_ttest("PrePost")
+#   map_dfr(~{om_ttest(.x, "PrePost")}) %>% 
+#   mutate(Variant = "7") %>% 
+#   mutate(Comparison = "PrePost") %>% 
+#   select(variable_code, cohend, pvalue, N, Pre, Post, percentimproved) %>% 
+#   arrange(desc(cohend)) %>% 
+#   View()
+
 ```
 
 

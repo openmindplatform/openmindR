@@ -882,3 +882,137 @@ om_mix_complete <- function(experiment, title) {
   openmindR::om_mix_plot(gg_dat$effects_dat, gg_dat$tidy_dat, title)
 
 }
+
+
+#' Run T-Tests on Long Format data
+#'
+#' This function performs t-tests on v6 and v7 data
+#' @param gathered_dat Long format data
+#' @param comparison "PrePost, PreFollowUpT1T2 o rPreFollowUpT1T3
+#' @export
+om_ttest <- function(gathered_dat, comparison) {
+
+  if (comparison == "PrePost"){
+    gathered_dat <- gathered_dat %>%
+      filter(Type %in% c("Pre", "Post")) %>%
+      mutate(Type = fct_relevel(Type, c("Pre", "Post"))) %>%
+      filter(variable_code %nin% c("C1", "C5", "C6"))
+
+    if(nrow(gathered_dat)==0){
+      return(NULL)
+    }
+
+    T2 <- "Post"
+  }
+  if (comparison == "PreFollowUpT1T2"){
+    gathered_dat <- gathered_dat %>%
+      dplyr::mutate(Type = as.factor(Type)) %>%
+      dplyr::mutate(OMID = as.factor(OMID)) %>%
+      tidyr::drop_na(Response) %>%
+      dplyr::add_count(OMID) %>%
+      dplyr::filter(n == 3) %>%
+      filter(Type %in% c("Pre", "Post")) %>%
+      mutate(Type = fct_relevel(Type, c("Pre", "Post"))) %>%
+      filter(variable_code %nin% c("C1", "C5", "C6"))
+
+    if(nrow(gathered_dat)==0){
+      return(NULL)
+    }
+
+    T2 <- "Post"
+  }
+  if (comparison == "PreFollowUpT1T3"){
+    var <- gathered_dat %>%
+      slice(1) %>%
+      pull(variable_code)
+
+    OMID_n <- 3
+    if(var %in% c("C1", "C5", "C6")){
+      OMID_n <- 2
+    }
+
+    gathered_dat <- gathered_dat %>%
+      dplyr::mutate(Type = as.factor(Type)) %>%
+      dplyr::mutate(OMID = as.factor(OMID)) %>%
+      tidyr::drop_na(Response) %>%
+      dplyr::add_count(OMID) %>%
+      dplyr::filter(n == OMID_n) %>%
+      filter(Type %in% c("Pre", "FollowUp")) %>%
+      mutate(Type = fct_relevel(Type, c("Pre", "FollowUp")))
+
+    T2 <- "FollowUp"
+  }
+
+  ttest_dat <-  gathered_dat %>%
+    dplyr::mutate(Type = as.factor(Type)) %>%
+    dplyr::mutate(OMID = as.factor(OMID)) %>%
+    tidyr::drop_na(Response) %>%
+    dplyr::add_count(OMID) %>%
+    dplyr::filter(n == 2)  %>%
+    dplyr::mutate(var_code = variable_code) %>%
+    group_by(variable_code) %>%
+    dplyr::summarize(
+      cohend = abs(
+        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate
+      )
+      ,
+      cohendCIlow = abs(
+        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]
+      ),
+      cohendCIhi = abs(
+        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]
+      ),
+      tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
+      pvalue = t.test(Response~Type, paired=TRUE)$p.value,
+      df = t.test(Response~Type, paired=TRUE)$parameter,
+      percentimproved = perc_improved(Response[Type == "Pre"],
+                                      Response[Type == T2],
+                                      (df+1),
+                                      .data$var_code[1])
+
+
+    )
+
+  vars <- gathered_dat %>% select(variable_code) %>% distinct() %>% pull()
+
+  within_stats <- vars %>% map_dfr(~openmindR:::withinSE(gathered_dat, variable = .x, WaveType = NULL))
+
+
+  final <- ttest_dat %>%
+    left_join(within_stats)
+
+  return(final)
+
+}
+
+#' Helper function to calculate percent of people who improved
+#'
+#' This function calculates percent of people who improved from pre to post/followup
+#' @param all_pre Pre Data
+#' @param all_post Post data
+#' @param total N
+#' @param variable_code variable code
+#' @export
+perc_improved <- function(all_pre, all_post, total, variable_code){
+
+  ups <- c("GrowthMindset", "CIHS_LIO",
+           "OutgroupLiking", "OutgroupMotivation",
+           "Preparedness", "C1", "C6",
+           "IntellectualHumility", "GM", "IHSub1", "IHSub2", "IHSub3",
+           "IHCultureSub1", "IHCultureSub2", "IHCultureSub3", "SE",
+           "Belong", "Dissent", "Tolerance", "IngroupLiking", "IngroupMotivation",
+           "OutgroupLiking", "OutgroupMotivation", "MotivationCon", "MotivationProg")
+
+  downs <- c("AffPol1", "AffPol2",
+             "GBSS", "MAA", "C5", "Anxiety", "Attribution", "IntAnx", "SocialDistance", "Avoidance")
+
+  if (variable_code %in% ups) {
+    p_improv <- sum((all_pre < all_post)==TRUE)/total
+  }
+
+  if (variable_code %in% downs) {
+    p_improv <- sum((all_pre > all_post)==TRUE)/total
+  }
+
+  return(p_improv)
+}
