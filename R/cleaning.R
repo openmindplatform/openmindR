@@ -486,12 +486,12 @@ polar_measures <- function(final_dat, ProgTemp, ConTemp) {
     dplyr::mutate(AffPol1 = abs(!!ProgTemp - !!ConTemp)) %>%
     # compute liking for ingroup vs. disliking for outgroup
     ## my ingroup
-    dplyr::mutate(IngroupLiking = case_when(
+    dplyr::mutate(IngroupLiking = dplyr::case_when(
       ppol_cat == "Progressives" ~ !!ProgTemp,
       ppol_cat == "Conservatives" ~ !!ConTemp
       )) %>%
     # my outgroup
-    dplyr::mutate(OutgroupLiking = case_when(
+    dplyr::mutate(OutgroupLiking = dplyr::case_when(
       ppol_cat == "Conservatives" ~ !!ProgTemp,
       ppol_cat == "Progressives" ~ !!ConTemp
     )) %>%
@@ -923,10 +923,11 @@ get_assessmentv6.1 <- function(clean_assessment) {
 #' @export
 clean_assessment7 <- function(clean_assessment) {
 
-  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3")
+  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3", "TEST2020")
 
   assessment7 <- clean_assessment %>%
     dplyr::filter(AccessCode != "Admin") %>%
+    select(-MisclickPre, -MisclickPost, -MisclickFollowUp) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
