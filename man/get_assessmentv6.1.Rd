@@ -4,7 +4,7 @@
 \alias{get_assessmentv6.1}
 \title{Get Assessment V6.1}
 \usage{
-get_assessmentv6.1(clean_assessment)
+get_assessmentv6.1(assessment)
 }
 \description{
 Get Assessment V6.1

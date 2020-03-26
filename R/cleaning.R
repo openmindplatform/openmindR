@@ -14,8 +14,8 @@
 #'
 #'@param key key for AirTable API
 #'@param tables specify which tables you want to download
-#'@param clean clean dataset and construct measures (only work for Assessment V6 and V7)
-#'@param file specify path to download to (only work for Assessment V6 and V7)
+#'@param clean clean dataset and construct measures (only works for Assessment V6 and V7)
+#'@param file specify path to download to (only works for Assessment V6 and V7)
 #'@return a list with (several) dataframe(s)
 #'@export
 om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
@@ -60,52 +60,17 @@ om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","
 
     cat(paste0("Done. AssessmentV6 Data has ", nrow(final_list$dat.ass6), " rows\n"))
 
-    if (clean) {
-
-      final_list$dat.ass6 <- final_list$dat.ass6 %>%
-        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
-        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
-        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
-        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked)"), NA_character_, .x)) %>%
-        dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x))  %>%
-        dplyr::select(sort(tidyselect::peek_vars(), decreasing = T)) %>%
-        dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
-               D1, D2, D3, D4, D5, D6, D7, D8,
-               dplyr::everything()) %>%
-        # select(contains("Trait"))
-        dplyr::mutate_at(dplyr::vars(AssessmentVersion,
-                       AssessmentsDone,
-                       D1,
-                       dplyr::contains("Motivation"),
-                       dplyr::contains("GBSS"),
-                       dplyr::contains("CIHS_LIO"),
-                       dplyr::contains("Temp"),
-                       dplyr::contains("C1"),
-                       dplyr::contains("C2"),
-                       dplyr::contains("C3"),
-                       dplyr::contains("C4"),
-                       dplyr::contains("C5"),
-                       dplyr::contains("C6"),
-                       dplyr::contains("HowImportantIssue"),
-                       dplyr::contains("SoughtOutDifferent"),
-                       dplyr::contains("Preparedness"),
-                       dplyr::contains("GrowthMindset"),
-                       dplyr::contains("Trait"),
-                       dplyr::contains("Upset"),
-                       dplyr::contains("HowLeastLikedGroup"),
-                       dplyr::contains("PoliticalTolerance"),
-                       dplyr::contains("IssueQ"),
-                       dplyr::contains("ROV_NE"),
-                       dplyr::contains("TalkToDifferent"),
-                       dplyr::contains("Trait")
-        ), ~as.character(.x) %>% readr::parse_number())
-
-
-
+    if (v6.1) {
+      final_list$dat.ass6 <- get_assessmentv6.1(final_list$dat.ass6) %>%
+        dplyr::filter(AssessmentVersion == "6.1")
     }
 
-    if (v6.1) {
-      final_list$dat.ass6 <- get_assessmentv6.1(final_list$dat.ass6)
+
+    if (clean) {
+
+      final_list$dat.ass6 <- final_list$dat.ass6 %>% clean_assessment6()
+
+
     }
 
 
@@ -396,7 +361,7 @@ om_clean_ppol <- function(app.dat) {
   app.dat %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
-    dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), as.numeric) %>%
+    # dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), as.numeric) %>%
     ## construct raw ppol variable
     dplyr::mutate(ppol_raw = D4) %>%
     ## fix the names of categories
@@ -435,7 +400,7 @@ om_clean_ppol <- function(app.dat) {
       ppol_num == 4 ~ "Moderates",
       T ~ NA_character_
     )) %>%
-    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_cat, c("Progressives",
+    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_catmod, c("Progressives",
                                                               "Moderates",
                                                               "Conservatives")))
   # TODO: For future make more ppol variants
@@ -893,23 +858,25 @@ chr_to_datetime <- function(date) {
 #'
 #'
 #' @export
-get_assessmentv6.1 <- function(clean_assessment) {
+get_assessmentv6.1 <- function(assessment) {
 
-  pre_vars <- c("ProgTemp", "ConTemp",
+  pre_vars <- c("ProgTemp", "ConTemp", "DateStart", "DateFinish",
                 "MotivationProg1", "MotivationProg2",
                 "MotivationCon1", "MotivationCon2",
                 "CIHS_LIO1", "CIHS_LIO2", "CIHS_LIO3", "CIHS_LIO4",
                 "GrowthMindset", "IssueDisplay", "HowImportantIssue",
-                "IHText", "Preparedness3",
+                "IHText", "Preparedness3", "IntellectualHumility1",
+                "IntellectualHumility2", "IntellectualHumility3",
                 "SoughtOutDifferent", "FeedbackAssessment",
                 "GBSS1", "GBSS2", "GBSS3")
 
-  assessment61 <- clean_assessment %>%
+  assessment61 <- assessment %>%
     dplyr::select(
       c("id", "OMID", "AccessCode", "AssessmentVersion", "AssessmentsDone"),
       c("D1", "D2", "D3", "D4", "D6",
         paste0(pre_vars, "Pre"),
-        paste0(pre_vars, "Post")
+        paste0(pre_vars, "Post"),
+        paste0(pre_vars, "FollowUp")
       )
     )
 
@@ -921,13 +888,13 @@ get_assessmentv6.1 <- function(clean_assessment) {
 #'
 #'
 #' @export
-clean_assessment7 <- function(clean_assessment) {
+clean_assessment7 <- function(assessment) {
 
   test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3", "TEST2020")
 
-  assessment7 <- clean_assessment %>%
+  assessment7 <- assessment %>%
     dplyr::filter(AccessCode != "Admin") %>%
-    select(-MisclickPre, -MisclickPost, -MisclickFollowUp) %>%
+    dplyr::select(-MisclickPre, -MisclickPost, -MisclickFollowUp) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
@@ -935,18 +902,23 @@ clean_assessment7 <- function(clean_assessment) {
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Prefer not to say)"), NA_character_, .x)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Blank)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, ""), NA_character_, .x)) %>%
+    dplyr::mutate(D1 = ifelse(D1 == "99", "991", D1)) %>%
+    dplyr::mutate(TargetAge = ifelse(TargetAge == "99", "991", TargetAge)) %>%
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "99"), NA_character_, .x)) %>%
-    dplyr::mutate_at(dplyr::vars(
-      dplyr::contains("Date"),
-      dplyr::contains("Time")
-    ), ~lubridate::as_datetime(.x)) %>%
+    dplyr::mutate(D1 = ifelse(D1 == "991", "99", D1)) %>%
+    dplyr::mutate(TargetAge = ifelse(TargetAge == "991", "99", TargetAge)) %>%
     dplyr::filter(!(AccessCode %in% test_acs)) %>%
-    dplyr::select(sort(tidyselect::peek_vars(), decreasing = F)) %>%
+    # dplyr::select(sort(tidyselect::peek_vars(), decreasing = F)) %>%
     dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
                   D1, D2, D3, D4, D5, D6,
                   dplyr::everything()) %>%
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()  %>%
+    dplyr::mutate_at(dplyr::vars(
+      dplyr::contains("Date"),
+      dplyr::contains("Time")
+    ), ~lubridate::as_datetime(.x)) %>%
     dplyr::mutate_at(dplyr::vars(AssessmentVersion,
                                  AssessmentsDone,
                                  D1,
@@ -1092,6 +1064,129 @@ clean_assessment7 <- function(clean_assessment) {
 
 }
 
+#' Get Assessment V6
+#'
+#'
+#' @export
+clean_assessment6 <- function(assessment) {
+
+  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3", "TEST2020", "NA")
+
+  assessment6 <- assessment %>%
+    dplyr::filter(AccessCode != "Admin") %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Prefer not to say)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Blank)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, ""), NA_character_, .x)) %>%
+    # dplyr::select(sort(tidyselect::peek_vars(), decreasing = T)) %>%
+    dplyr::filter(!(AccessCode %in% test_acs)) %>%
+    dplyr::mutate_all(as.character) %>%
+    om_clean_ppol()   %>%
+    dplyr::mutate_at(dplyr::vars(
+      dplyr::contains("Date")
+    ), ~openmindR::chr_to_datetime(.x)) %>%
+    dplyr::mutate_at(dplyr::vars(
+      dplyr::contains("Time")
+    ), ~lubridate::as_datetime(.x)) %>%
+    dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
+                  D1, D2, D3, D4, dplyr::contains("D5"), D6, dplyr::contains("D7"), dplyr::contains("D8"),
+                  dplyr::everything()) %>%
+    # select(contains("Trait"))
+    dplyr::mutate_at(dplyr::vars(AssessmentVersion,
+                                 AssessmentsDone,
+                                 D1,
+                                 dplyr::contains("Motivation"),
+                                 dplyr::contains("GBSS"),
+                                 dplyr::contains("CIHS_LIO"),
+                                 dplyr::contains("Temp"),
+                                 dplyr::contains("C1"),
+                                 dplyr::contains("C2"),
+                                 dplyr::contains("C3"),
+                                 dplyr::contains("C4"),
+                                 dplyr::contains("C5"),
+                                 dplyr::contains("C6"),
+                                 dplyr::contains("HowImportantIssue"),
+                                 dplyr::contains("IntellectualHumility"),
+                                 dplyr::contains("SoughtOutDifferent"),
+                                 dplyr::contains("Preparedness"),
+                                 dplyr::contains("GrowthMindset"),
+                                 dplyr::contains("Trait"),
+                                 dplyr::contains("Upset"),
+                                 dplyr::contains("HowLeastLikedGroup"),
+                                 dplyr::contains("PoliticalTolerance"),
+                                 dplyr::contains("IssueQ"),
+                                 dplyr::contains("ROV_NE"),
+                                 dplyr::contains("TalkToDifferent"),
+                                 dplyr::contains("Trait")
+    ), ~as.character(.x) %>% readr::parse_number()) %>%
+    polar_measures(ProgTempPre, ConTempPre) %>%
+    polar_measures(ProgTempPost, ConTempPost) %>%
+    polar_measures(ProgTempFollowUp, ConTempFollowUp) %>%
+    dplyr::mutate(CIHS_LIOPre = (CIHS_LIO1Pre+CIHS_LIO2Pre+CIHS_LIO3Pre+CIHS_LIO4Pre)/4) %>%
+    dplyr::mutate(CIHS_LIOPost = (CIHS_LIO1Post+CIHS_LIO2Post+CIHS_LIO3Post+CIHS_LIO4Post)/4) %>%
+    dplyr::mutate(CIHS_LIOFollowUp = (CIHS_LIO1FollowUp+CIHS_LIO2FollowUp+CIHS_LIO3FollowUp+CIHS_LIO4FollowUp)/4) %>%
+    dplyr::mutate(GBSSPre = (GBSS1Pre+GBSS2Pre+GBSS3Pre)/3) %>%
+    dplyr::mutate(GBSSPost = (GBSS1Post+GBSS2Post+GBSS3Post)/3) %>%
+    dplyr::mutate(GBSSFollowUp = (GBSS1FollowUp+GBSS2FollowUp+GBSS3FollowUp)/3) %>%
+    dplyr::mutate(MotivationProgPre = (MotivationProg1Pre + (8 - MotivationProg2Pre)) / 2) %>%
+    dplyr::mutate(MotivationProgPost = (MotivationProg1Post + (8 - MotivationProg2Post)) / 2) %>%
+    dplyr::mutate(MotivationProgFollowUp = (MotivationProg1FollowUp + (8 - MotivationProg2FollowUp)) / 2) %>%
+    dplyr::mutate(MotivationConPre = (MotivationCon1Pre + (8 - MotivationCon2Pre)) / 2) %>%
+    dplyr::mutate(MotivationConPost = (MotivationCon1Post + (8 - MotivationCon2Post)) / 2) %>%
+    dplyr::mutate(MotivationConFollowUp = (MotivationCon1FollowUp + (8 - MotivationCon2FollowUp)) / 2) %>%
+    dplyr::mutate(PreparednessPre = Preparedness3Pre) %>%
+    dplyr::mutate(PreparednessPost = Preparedness3Post) %>%
+    dplyr::mutate(PreparednessFollowUp = Preparedness3FollowUp) %>%
+    # my ingroup
+    dplyr::mutate(IngroupMotivationPre = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgPre,
+      ppol_cat == "Conservatives" ~ MotivationConPre
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationPre = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgPre,
+      ppol_cat == "Progressives" ~ MotivationConPre
+    )) %>%
+    # my ingroup
+    dplyr::mutate(IngroupMotivationPost = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgPost,
+      ppol_cat == "Conservatives" ~ MotivationConPost
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationPost = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgPost,
+      ppol_cat == "Progressives" ~ MotivationConPost
+    )) %>%
+    # my ingroup
+    dplyr::mutate(IngroupMotivationFollowUp = dplyr::case_when(
+      ppol_cat == "Progressives" ~ MotivationProgFollowUp,
+      ppol_cat == "Conservatives" ~ MotivationConFollowUp
+    )) %>%
+    # my outgroup
+    dplyr::mutate(OutgroupMotivationFollowUp = dplyr::case_when(
+      ppol_cat == "Conservatives" ~ MotivationProgFollowUp,
+      ppol_cat == "Progressives" ~ MotivationConFollowUp
+    )) %>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAPre = abs(IngroupMotivationPre - OutgroupMotivationPre))%>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAPost = abs(IngroupMotivationPost - OutgroupMotivationPost)) %>%
+    # compute ingroup v outgroup motivation attribution
+    dplyr::mutate(MAAFollowUp = abs(IngroupMotivationFollowUp - OutgroupMotivationFollowUp)) %>%
+    dplyr::mutate(IntellectualHumilityPre = (IntellectualHumility1Pre+IntellectualHumility2Pre+IntellectualHumility3Pre+CIHS_LIO3Pre)/4) %>%
+    dplyr::mutate(IntellectualHumilityPost = (IntellectualHumility1Post+IntellectualHumility2Post+IntellectualHumility3Post+CIHS_LIO3Post)/4) %>%
+    dplyr::mutate(IntellectualHumilityFollowUp = (IntellectualHumility1FollowUp+IntellectualHumility2FollowUp+IntellectualHumility3FollowUp+CIHS_LIO3FollowUp)/4)
+
+
+  return(assessment6)
+
+}
+
+
 
 #' Merge Assessments
 #'
@@ -1142,3 +1237,4 @@ merge_assessments <- function(v4, v5, v6) {
   return(master_data)
 
 }
+
