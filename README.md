@@ -166,11 +166,9 @@ want to perform analysis on. The next lines of code show that process.
 ## get results for all variables
 assessmentv7  %>%
   ## select only relevant variables and composite scores
-  select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
+  select(OMID, AffPol1Pre:IHCultureSub3FollowUp) %>% 
   ## turn data into long format
   om_gather(which_strings = v7_var_strings)  %>%
-  ## drop NA responses
-  drop_na() %>%
   ## perform t-test on each variable (for Pre and Post)
   om_ttest("PrePost") %>% 
   ## arrange by cohens D
