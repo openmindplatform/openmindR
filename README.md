@@ -165,7 +165,7 @@ want to perform analysis on. The next lines of code show that process.
 ``` r
 ## get results for all variables
 assessmentv7  %>%
-  ## select onyly relevant variables and composite scores
+  ## select only relevant variables and composite scores
   select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
   ## turn data into long format
   om_gather(which_strings = v7_var_strings)  %>%
