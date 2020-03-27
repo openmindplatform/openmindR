@@ -888,15 +888,15 @@ om_mix_complete <- function(experiment, title) {
 #'
 #' This function performs t-tests on v6 and v7 data
 #' @param gathered_dat Long format data
-#' @param comparison "PrePost, PreFollowUpT1T2 o rPreFollowUpT1T3
+#' @param comparison Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
 #' @export
 om_ttest <- function(gathered_dat, comparison) {
 
   if (comparison == "PrePost"){
     gathered_dat <- gathered_dat %>%
-      filter(Type %in% c("Pre", "Post")) %>%
-      mutate(Type = fct_relevel(Type, c("Pre", "Post"))) %>%
-      filter(variable_code %nin% c("C1", "C5", "C6"))
+      dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+      dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
     if(nrow(gathered_dat)==0){
       return(NULL)
@@ -911,9 +911,9 @@ om_ttest <- function(gathered_dat, comparison) {
       tidyr::drop_na(Response) %>%
       dplyr::add_count(OMID) %>%
       dplyr::filter(n == 3) %>%
-      filter(Type %in% c("Pre", "Post")) %>%
-      mutate(Type = fct_relevel(Type, c("Pre", "Post"))) %>%
-      filter(variable_code %nin% c("C1", "C5", "C6"))
+      dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+      dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
     if(nrow(gathered_dat)==0){
       return(NULL)
@@ -923,8 +923,8 @@ om_ttest <- function(gathered_dat, comparison) {
   }
   if (comparison == "PreFollowUpT1T3"){
     var <- gathered_dat %>%
-      slice(1) %>%
-      pull(variable_code)
+      dplyr::slice(1) %>%
+      dplyr::pull(variable_code)
 
     OMID_n <- 3
     if(var %in% c("C1", "C5", "C6")){
@@ -937,8 +937,8 @@ om_ttest <- function(gathered_dat, comparison) {
       tidyr::drop_na(Response) %>%
       dplyr::add_count(OMID) %>%
       dplyr::filter(n == OMID_n) %>%
-      filter(Type %in% c("Pre", "FollowUp")) %>%
-      mutate(Type = fct_relevel(Type, c("Pre", "FollowUp")))
+      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))
 
     T2 <- "FollowUp"
   }
@@ -950,18 +950,20 @@ om_ttest <- function(gathered_dat, comparison) {
     dplyr::add_count(OMID) %>%
     dplyr::filter(n == 2)  %>%
     dplyr::mutate(var_code = variable_code) %>%
-    group_by(variable_code) %>%
+    dplyr::group_by(variable_code) %>%
     dplyr::summarize(
       cohend = abs(
         effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate
       )
       ,
-      cohendCIlow = abs(
+      cohendCIlow = #abs(
         effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]
-      ),
-      cohendCIhi = abs(
+      #)
+      ,
+      cohendCIhi = #abs(
         effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]
-      ),
+      #)
+      ,
       tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
       pvalue = t.test(Response~Type, paired=TRUE)$p.value,
       df = t.test(Response~Type, paired=TRUE)$parameter,
@@ -973,13 +975,14 @@ om_ttest <- function(gathered_dat, comparison) {
 
     )
 
-  vars <- gathered_dat %>% select(variable_code) %>% distinct() %>% pull()
+  vars <- gathered_dat %>% select(variable_code) %>% dplyr::distinct() %>% dplyr::pull()
 
   within_stats <- vars %>% map_dfr(~openmindR:::withinSE(gathered_dat, variable = .x, WaveType = NULL))
 
 
   final <- ttest_dat %>%
-    left_join(within_stats)
+    dplyr::left_join(within_stats, by = "variable_code") %>%
+    mutate(N = df+1)
 
   return(final)
 

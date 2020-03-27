@@ -28,10 +28,12 @@ library(dplyr)
   - [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
   - [merge\_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
   - [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
+  - [AssessmentV7](https://github.com/openmindplatform/openmindR#AssessmentV7)
 
 ## `om_parse_lifehacks`
 
-This function parses and cleans the list variables that contain the lifehack data. The input dataset needs to have the four following
+This function parses and cleans the list variables that contain the
+lifehack data. The input dataset needs to have the four following
 columns: `LifeHacksChosen`, `LifeHacksComplete`, `LifeHacksUseful` and
 `LifeHacksReason`. You can find them in the ParticipantProgress table in
 Airtable. The function will parse these four columns into 4 x 5 Steps
@@ -111,13 +113,48 @@ it into a folder called “Data” under Research and filter down to only
 include V6.1 data.
 
 ``` r
-key <- readr::read_lines("../../Keys/airtabler.txt")
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
 assessmentv6 <- om_download_at(key, 
                             tables = "AssessmentV6", 
                             clean = TRUE, 
                             file = "../../../Data/assessmentv6.1.csv",
                             v6.1 = TRUE)
+
+# library(tidyverse)
+```
+
+## AssessmentV7
+
+``` r
+## Get Key (may differ in your code)
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+## get v7 data
+assessmentv7 <- om_download_at(key,
+                            tables = "AssessmentV7",
+                            clean = TRUE)
+
+## Perform t-test on a single variable
+assessmentv7 %>% 
+  om_gather("AffPol1") %>% 
+  om_ttest("PrePost")
+
+
+## get results for all variables
+assessmentv7  %>%
+  ## select onyly relevant variables and composite scores
+  select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
+  ## turn data into long format
+  om_gather(which_strings = v7_var_strings)  %>%
+  ## drop NA responses
+  drop_na() %>%
+  ## split by variable code
+  group_split(variable_code) %>% 
+  ## perform t-test on each variable (for Pre and Post)
+  map_dfr(~{om_ttest(.x, "PrePost")}) %>%
+  ## arrange by cohens D
+  arrange(desc(cohend)) 
 ```
 
 # openmindR Cleaning Functions
@@ -206,45 +243,6 @@ dat.ass %>%
   )
 ```
 
-    ## # A tibble: 654 x 111
-    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
-    ##  1 2.53e12 college  PradoWilk…                4               2  0.5   0.5 
-    ##  2 9.56e12 college  TalpashWi…                4               3  0.54  0.53
-    ##  3 3.88e12 college  PradoWilk…                4               2  0.8   0.2 
-    ##  4 9.94e12 college  TalpashWi…                4               2  0.5   0.5 
-    ##  5 4.59e12 college  TalpashWi…                4               1  0.7   0.33
-    ##  6 2.35e12 college  PradoWilk…                4               2 NA    NA   
-    ##  7 1.38e12 college  TalpashWi…                4               2  0.5   0.5 
-    ##  8 6.60e12 college  KarimiWil…                4               2  0.86  0.15
-    ##  9 2.98e12 college  HudsonWil…                4               3  0.5   0.5 
-    ## 10 1.10e12 college  HudsonWil…                4               2  0.5   0.5 
-    ## # … with 644 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
-    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
-    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
-    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
-    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
-    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
-    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
-    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
-    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
-    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
-    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
-    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
-    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
-    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
-    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
-    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
-    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
-    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
-    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
-
 This dataset was filtered down to only AccessCodes that include
 “Wilkes”. The `accesscode` argument is not case-sensitive and can
 both be used with vectors:
@@ -260,45 +258,6 @@ dat.ass %>%
   )
 ```
 
-    ## # A tibble: 31 x 111
-    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
-    ##  1 6.60e12 college  KarimiWil…                4               2  0.86  0.15
-    ##  2 2.52e12 college  KarimiWil…                4               2 NA    NA   
-    ##  3 6.77e12 college  KarimiWil…                4               3  0.9   0.2 
-    ##  4 9.14e12 college  KarimiWil…                4               2  0.5   0.5 
-    ##  5 7.56e12 college  KarimiWil…                4               2 NA    NA   
-    ##  6 3.79e11 college  KarimiWil…                4               2  1     0.3 
-    ##  7 6.09e12 college  KarimiWil…                4               2  0.5   0.5 
-    ##  8 8.15e12 college  KarimiWil…                4               2  0.54  0.55
-    ##  9 1.92e11 college  KarimiWil…                4               2  0.35  0.05
-    ## 10 4.26e12 college  KarimiWil…                4               3  1     0.3 
-    ## # … with 21 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
-    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
-    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
-    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
-    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
-    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
-    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
-    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
-    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
-    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
-    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
-    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
-    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
-    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
-    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
-    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
-    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
-    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
-    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
-
 And individual strings:
 
 ``` r
@@ -311,45 +270,6 @@ dat.ass %>%
              accesscode = c("suszko|karimi")
   )
 ```
-
-    ## # A tibble: 31 x 111
-    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
-    ##  1 6.60e12 college  KarimiWil…                4               2  0.86  0.15
-    ##  2 2.52e12 college  KarimiWil…                4               2 NA    NA   
-    ##  3 6.77e12 college  KarimiWil…                4               3  0.9   0.2 
-    ##  4 9.14e12 college  KarimiWil…                4               2  0.5   0.5 
-    ##  5 7.56e12 college  KarimiWil…                4               2 NA    NA   
-    ##  6 3.79e11 college  KarimiWil…                4               2  1     0.3 
-    ##  7 6.09e12 college  KarimiWil…                4               2  0.5   0.5 
-    ##  8 8.15e12 college  KarimiWil…                4               2  0.54  0.55
-    ##  9 1.92e11 college  KarimiWil…                4               2  0.35  0.05
-    ## 10 4.26e12 college  KarimiWil…                4               3  1     0.3 
-    ## # … with 21 more rows, and 104 more variables: Q3Pre <dbl>, Q4Pre <dbl>,
-    ## #   Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>, Q9Pre <dbl>,
-    ## #   Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>, C2Pre <dbl>,
-    ## #   C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>, D5 <chr>,
-    ## #   B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>, Q3Post <dbl>,
-    ## #   Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>, Q8Post <dbl>,
-    ## #   Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>, Q12Post <dbl>,
-    ## #   B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>, Q2FollowUp <dbl>,
-    ## #   Q3FollowUp <dbl>, Q4FollowUp <dbl>, Q5FollowUp <dbl>,
-    ## #   Q6FollowUp <dbl>, Q7FollowUp <dbl>, Q8FollowUp <dbl>,
-    ## #   Q9FollowUp <dbl>, Q10FollowUp <dbl>, Q11FollowUp <dbl>,
-    ## #   Q12FollowUp <dbl>, C1FollowUp <dbl>, C2FollowUp <dbl>,
-    ## #   C3FollowUp <dbl>, B1FollowUp <chr>, DateFollowUp <chr>,
-    ## #   W1FollowUp <chr>, createdTime <dbl>, ppol_raw <chr>, ppol <chr>,
-    ## #   ppol_num <dbl>, ppol_cat <chr>, Q14Pre <dbl>, Q15Pre <dbl>,
-    ## #   Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>, Q18Pre <dbl>, Q19Pre <dbl>,
-    ## #   Q14Post <dbl>, Q15Post <dbl>, Q16Post <dbl>, Q17Post <dbl>,
-    ## #   Q20Post <dbl>, Q18Post <dbl>, Q19Post <dbl>, Q14FollowUp <dbl>,
-    ## #   Q15FollowUp <dbl>, Q16FollowUp <dbl>, Q17FollowUp <dbl>,
-    ## #   Q20FollowUp <dbl>, Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>,
-    ## #   ethnic <chr>, ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>,
-    ## #   B2Pre <chr>, B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>,
-    ## #   C3Post <lgl>, BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
-    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
-    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 ## `om_clean_par`
 
@@ -378,34 +298,6 @@ Takes the following arguments:
 dat.par %>% 
   om_clean_par(parse_feedback = T) 
 ```
-
-    ## # A tibble: 23,723 x 52
-    ##    OMID  StepTimes StepsComplete StepCorrect1 StepCorrect2 StepCorrect3
-    ##    <chr> <chr>     <chr>                <dbl>        <dbl>        <dbl>
-    ##  1 7806… <NA>      1, 1, 1, 1, 1        0.667        0.625        0.667
-    ##  2 1000… <NA>      1, 1, 1, 1, 1        0.75         1            0.833
-    ##  3 1945… <NA>      1, 1, 1, 1, 1        0.667        1            0.667
-    ##  4 5803… 27.7 min… 1, 1, 1, 1, 1        0.833        1            0.667
-    ##  5 3646… 10.07 mi… 1, 1, 1, 0, 0        0.667        1            0.833
-    ##  6 7858… <NA>      1, 0, 0, 0, 0        0.833       NA           NA    
-    ##  7 9277… <NA>      1, 1, 1, 1, 1        1            1            1    
-    ##  8 4988… 47.5 min… 1, 1, 1, 1, 1        1            1            1    
-    ##  9 6750… <NA>      1, 1, 1, 1, 1        1            1            1    
-    ## 10 4023… <NA>      1, 1, 1, 1, 1        0.833        1            0.667
-    ## # … with 23,713 more rows, and 46 more variables: StepCorrect4 <dbl>,
-    ## #   StepCorrect5 <dbl>, StepTimes1 <dbl>, StepTimes2 <dbl>,
-    ## #   StepTimes3 <dbl>, StepTimes4 <dbl>, StepTimes5 <dbl>, Step1 <chr>,
-    ## #   Step1_Q1 <chr>, Step1_Q2 <chr>, Step1_Q3 <chr>, Step1_Q4 <chr>,
-    ## #   Step1_Q5 <chr>, Step2 <chr>, Step2_Q1 <chr>, Step2_Q2 <chr>,
-    ## #   Step2_Q3 <chr>, Step2_Q4 <chr>, Step2_Q5 <chr>, Step3 <chr>,
-    ## #   Step3_Q1 <chr>, Step3_Q2 <chr>, Step3_Q3 <chr>, Step3_Q4 <chr>,
-    ## #   Step3_Q5 <chr>, Step4 <chr>, Step4_Q1 <chr>, Step4_Q2 <chr>,
-    ## #   Step4_Q3 <chr>, Step4_Q4 <chr>, Step4_Q5 <chr>, Step5 <chr>,
-    ## #   Step5_Q1 <chr>, Step5_Q2 <chr>, Step5_Q3 <chr>, Step5_Q4 <chr>,
-    ## #   Step5_Q5 <chr>, FeedbackAnswers <chr>,
-    ## #   FeedbackAnswersVariableNames <chr>, AppRating <dbl>,
-    ## #   AppRecommend <chr>, LifeHacksChosen <chr>, LifeHacksComplete <chr>,
-    ## #   LifeHacksUseful <chr>, LifeHacksReason <chr>, at_date <chr>
 
 ## `om_rescale`
 
@@ -486,50 +378,6 @@ occasionally occur within AirTable.
 dat.ass %>% 
   remove_dups()
 ```
-
-    ## Joining, by = c("OMID", "createdTime", "AssessmentVersion", "AssessmentsDone", "UserType", "AccessCode", "Q1Pre", "Q2Pre", "Q3Pre", "Q4Pre", "Q5Pre", "Q6Pre", "Q7Pre", "Q8Pre", "Q9Pre", "Q10Pre", "Q11Pre", "Q12Pre", "C1Pre", "C2Pre", "C3Pre", "D1", "D2", "D3", "D4", "D5", "B1Pre", "DatePre", "Q1Post", "Q2Post", "Q3Post", "Q4Post", "Q5Post", "Q6Post", "Q7Post", "Q8Post", "Q9Post", "Q10Post", "Q11Post", "Q12Post", "B1Post", "DatePost", "Q1FollowUp", "Q2FollowUp", "Q3FollowUp", "Q4FollowUp", "Q5FollowUp", "Q6FollowUp", "Q7FollowUp", "Q8FollowUp", "Q9FollowUp", "Q10FollowUp", "Q11FollowUp", "Q12FollowUp", "C1FollowUp", "C2FollowUp", "C3FollowUp", "B1FollowUp", "DateFollowUp", "W1FollowUp", "ppol_raw", "ppol", "ppol_num", "ppol_cat", "Q14Pre", "Q15Pre", "Q16Pre", "Q17Pre", "Q20Pre", "Q18Pre", "Q19Pre", "Q14Post", "Q15Post", "Q16Post", "Q17Post", "Q20Post", "Q18Post", "Q19Post", "Q14FollowUp", "Q15FollowUp", "Q16FollowUp", "Q17FollowUp", "Q20FollowUp", "Q18FollowUp", "Q19FollowUp", "gender", "ethnic", "ethnic_num", "id", "S1Pre", "BTaskPre", "B2Pre", "B3Pre", "S1Post", "C1Post", "C2Post", "C3Post", "BTaskPost", "B2Post", "B3Post", "D6", "S1FollowUp", "BTaskFollowUp", "B2FollowUp", "B3FollowUp", "DistanceInPre", "DistanceOutPre", "DistanceInPost", "DistanceOutPost", "DistanceInFollowUp", "DistanceOutFollowUp")
-
-    ## Removing 0 duplicates...
-
-    ## # A tibble: 21,058 x 112
-    ##       OMID UserType AccessCode AssessmentVersi… AssessmentsDone Q1Pre Q2Pre
-    ##      <dbl> <chr>    <chr>                 <dbl>           <dbl> <dbl> <dbl>
-    ##  1 6.20e12 orgadult Individua…                4               1 0.83  0.9  
-    ##  2 9.05e12 college  LangeAriz…                4               2 0.75  0.75 
-    ##  3 2.47e12 orgstud… Rhodos2018                4               2 0.8   0.3  
-    ##  4 5.44e12 college  Individua…                4               1 0.580 0.580
-    ##  5 8.82e12 college  Individua…                4               1 0.5   0.52 
-    ##  6 6.18e12 college  Individua…                4               1 0.4   0.7  
-    ##  7 9.17e12 orgadult Individua…                4               1 0.8   0.4  
-    ##  8 6.16e12 orgadult Individua…                4               3 0.83  0.3  
-    ##  9 6.84e12 orgadult Individua…                4               1 0.81  0.9  
-    ## 10 5.52e11 orgadult Individua…                4               1 0.8   0.290
-    ## # … with 21,048 more rows, and 105 more variables: Q3Pre <dbl>,
-    ## #   Q4Pre <dbl>, Q5Pre <dbl>, Q6Pre <dbl>, Q7Pre <dbl>, Q8Pre <dbl>,
-    ## #   Q9Pre <dbl>, Q10Pre <dbl>, Q11Pre <dbl>, Q12Pre <dbl>, C1Pre <dbl>,
-    ## #   C2Pre <dbl>, C3Pre <dbl>, D1 <dbl>, D2 <chr>, D3 <chr>, D4 <chr>,
-    ## #   D5 <chr>, B1Pre <chr>, DatePre <chr>, Q1Post <dbl>, Q2Post <dbl>,
-    ## #   Q3Post <dbl>, Q4Post <dbl>, Q5Post <dbl>, Q6Post <dbl>, Q7Post <dbl>,
-    ## #   Q8Post <dbl>, Q9Post <dbl>, Q10Post <dbl>, Q11Post <dbl>,
-    ## #   Q12Post <dbl>, B1Post <chr>, DatePost <chr>, Q1FollowUp <dbl>,
-    ## #   Q2FollowUp <dbl>, Q3FollowUp <dbl>, Q4FollowUp <dbl>,
-    ## #   Q5FollowUp <dbl>, Q6FollowUp <dbl>, Q7FollowUp <dbl>,
-    ## #   Q8FollowUp <dbl>, Q9FollowUp <dbl>, Q10FollowUp <dbl>,
-    ## #   Q11FollowUp <dbl>, Q12FollowUp <dbl>, C1FollowUp <dbl>,
-    ## #   C2FollowUp <dbl>, C3FollowUp <dbl>, B1FollowUp <chr>,
-    ## #   DateFollowUp <chr>, W1FollowUp <chr>, createdTime <dttm>,
-    ## #   ppol_raw <chr>, ppol <chr>, ppol_num <dbl>, ppol_cat <chr>,
-    ## #   Q14Pre <dbl>, Q15Pre <dbl>, Q16Pre <dbl>, Q17Pre <dbl>, Q20Pre <dbl>,
-    ## #   Q18Pre <dbl>, Q19Pre <dbl>, Q14Post <dbl>, Q15Post <dbl>,
-    ## #   Q16Post <dbl>, Q17Post <dbl>, Q20Post <dbl>, Q18Post <dbl>,
-    ## #   Q19Post <dbl>, Q14FollowUp <dbl>, Q15FollowUp <dbl>,
-    ## #   Q16FollowUp <dbl>, Q17FollowUp <dbl>, Q20FollowUp <dbl>,
-    ## #   Q18FollowUp <dbl>, Q19FollowUp <dbl>, gender <dbl>, ethnic <chr>,
-    ## #   ethnic_num <dbl>, id <chr>, S1Pre <chr>, BTaskPre <chr>, B2Pre <chr>,
-    ## #   B3Pre <chr>, S1Post <chr>, C1Post <lgl>, C2Post <lgl>, C3Post <lgl>,
-    ## #   BTaskPost <chr>, B2Post <chr>, B3Post <chr>, D6 <chr>,
-    ## #   S1FollowUp <chr>, BTaskFollowUp <chr>, B2FollowUp <chr>,
-    ## #   B3FollowUp <chr>, DistanceInPre <dbl>, DistanceOutPre <dbl>, …
 
 ## `om_gather`
 
@@ -783,8 +631,6 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
-
 **Adapt `theme_om`**
 
   - `legend_position`
@@ -809,8 +655,6 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
-
 Or all text sizes at once
 
   - `overall_text_size`
@@ -827,8 +671,6 @@ titanic_dat %>%
   facet_wrap(~Survived) +
   labs(title = "Titanic Survival by Class") 
 ```
-
-![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

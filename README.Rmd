@@ -17,7 +17,8 @@ devtools::install_github("openmindplatform/openmindR")
 
 ```{r, echo=F}
 knitr::opts_chunk$set(message = F, 
-                      warning = F)
+                      warning = F, 
+                      eval = F)
 
 # AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
 # 
@@ -38,6 +39,7 @@ library(dplyr)
 + [om_parse_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
 + [merge_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
 + [om_download_at](https://github.com/openmindplatform/openmindR#om_download_at)
++ [AssessmentV7](https://github.com/openmindplatform/openmindR#AssessmentV7)
 
 
 ## `om_parse_lifehacks`
@@ -109,7 +111,7 @@ Here is a code example that will download Assessment V6, clean it, save it into 
 
 
 ```{r, eval=F}
-key <- readr::read_lines("../../Keys/airtabler.txt")
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
 assessmentv6 <- om_download_at(key, 
                             tables = "AssessmentV6", 
@@ -117,43 +119,45 @@ assessmentv6 <- om_download_at(key,
                             file = "../../../Data/assessmentv6.1.csv",
                             v6.1 = TRUE)
 
-# assessmentv7 <- om_download_at(key, 
-#                             tables = "AssessmentV7", 
-#                             clean = TRUE)
-# 
-# 
-# 
-# 
-# wide_dat <- assessmentv7 %>% 
-#   select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
-#   janitor::remove_empty()
-# 
-# v7_strings <- wide_dat %>% 
-#   colnames() %>% 
-#   keep(~str_detect(.x, "Pre|Post")) %>% 
-#   str_remove("Pre|Post") %>% 
-#   unique() %>% 
-#   paste0(collapse = "|")
-# 
-# # debugonce(om_ttest)
-# 
-# wide_dat %>% 
-#   om_gather(which_strings = v7_strings)  %>%
-#   drop_na() %>% 
-#   # filter(is.na(variable_code))
-#   # dplyr::count(variable_code, sort = T) %>% 
-#   split(.$variable_code) %>% 
-#       # .[[21]] #%>%
-#       # om_ttest("PrePost")
-#   map_dfr(~{om_ttest(.x, "PrePost")}) %>% 
-#   mutate(Variant = "7") %>% 
-#   mutate(Comparison = "PrePost") %>% 
-#   select(variable_code, cohend, pvalue, N, Pre, Post, percentimproved) %>% 
-#   arrange(desc(cohend)) %>% 
-#   View()
+# library(tidyverse)
 
 ```
 
+
+## AssessmentV7
+
+```{r, eval = F}
+
+## Get Key (may differ in your code)
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+## get v7 data
+assessmentv7 <- om_download_at(key,
+                            tables = "AssessmentV7",
+                            clean = TRUE)
+
+## Perform t-test on a single variable
+assessmentv7 %>% 
+  om_gather("AffPol1") %>% 
+  om_ttest("PrePost")
+
+
+## get results for all variables
+assessmentv7  %>%
+  ## select onyly relevant variables and composite scores
+  select(OMID:AssessmentsDone, AffPol1Pre:IHCultureSub3FollowUp) %>% 
+  ## turn data into long format
+  om_gather(which_strings = v7_var_strings)  %>%
+  ## drop NA responses
+  drop_na() %>%
+  ## split by variable code
+  group_split(variable_code) %>% 
+  ## perform t-test on each variable (for Pre and Post)
+  map_dfr(~{om_ttest(.x, "PrePost")}) %>%
+  ## arrange by cohens D
+  arrange(desc(cohend)) 
+
+```
 
 # openmindR Cleaning Functions
 

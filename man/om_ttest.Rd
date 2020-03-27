@@ -9,7 +9,7 @@ om_ttest(gathered_dat, comparison)
 \arguments{
 \item{gathered_dat}{Long format data}
 
-\item{comparison}{"PrePost, PreFollowUpT1T2 o rPreFollowUpT1T3}
+\item{comparison}{Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"}
 }
 \description{
 This function performs t-tests on v6 and v7 data
