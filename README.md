@@ -155,7 +155,7 @@ variable and specifying the comparison (here: `"PrePost"`).
 ## Perform t-test on a single variable
 assessmentv7 %>% 
   om_gather("AffPol1") %>% 
-  om_ttest("PrePost")
+  om_ttest(comparison = "PrePost")
 ```
 
 However, this is not how `om_ttest` is intended to work. Rather it
@@ -171,10 +171,8 @@ assessmentv7  %>%
   om_gather(which_strings = v7_var_strings)  %>%
   ## drop NA responses
   drop_na() %>%
-  ## split by variable code
-  group_split(variable_code) %>% 
   ## perform t-test on each variable (for Pre and Post)
-  map_dfr(~{om_ttest(.x, "PrePost")}) %>%
+  om_ttest("PrePost") %>% 
   ## arrange by cohens D
   arrange(desc(cohend)) 
 ```

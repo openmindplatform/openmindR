@@ -892,97 +892,108 @@ om_mix_complete <- function(experiment, title) {
 #' @export
 om_ttest <- function(gathered_dat, comparison) {
 
-  if (comparison == "PrePost"){
-    gathered_dat <- gathered_dat %>%
-      dplyr::filter(Type %in% c("Pre", "Post")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
-      dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
+  gathered_dat <- gathered_dat %>%
+    group_split(variable_code)
 
-    if(nrow(gathered_dat)==0){
-      return(NULL)
-    }
+  final <- gathered_dat %>%
+    map_dfr(~{
 
-    T2 <- "Post"
-  }
-  if (comparison == "PreFollowUpT1T2"){
-    gathered_dat <- gathered_dat %>%
-      dplyr::mutate(Type = as.factor(Type)) %>%
-      dplyr::mutate(OMID = as.factor(OMID)) %>%
-      tidyr::drop_na(Response) %>%
-      dplyr::add_count(OMID) %>%
-      dplyr::filter(n == 3) %>%
-      dplyr::filter(Type %in% c("Pre", "Post")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
-      dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
+      if (comparison == "PrePost"){
+        internal <- .x %>%
+          dplyr::filter(Type %in% c("Pre", "Post")) %>%
+          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+          dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
-    if(nrow(gathered_dat)==0){
-      return(NULL)
-    }
+        if(nrow(internal)==0){
+          return(NULL)
+        }
 
-    T2 <- "Post"
-  }
-  if (comparison == "PreFollowUpT1T3"){
-    var <- gathered_dat %>%
-      dplyr::slice(1) %>%
-      dplyr::pull(variable_code)
+        T2 <- "Post"
+      }
+      if (comparison == "PreFollowUpT1T2"){
+        internal <- .x %>%
+          dplyr::mutate(Type = as.factor(Type)) %>%
+          dplyr::mutate(OMID = as.factor(OMID)) %>%
+          tidyr::drop_na(Response) %>%
+          dplyr::add_count(OMID) %>%
+          dplyr::filter(n == 3) %>%
+          dplyr::filter(Type %in% c("Pre", "Post")) %>%
+          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+          dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
-    OMID_n <- 3
-    if(var %in% c("C1", "C5", "C6")){
-      OMID_n <- 2
-    }
+        if(nrow(gathered_dat)==0){
+          return(NULL)
+        }
 
-    gathered_dat <- gathered_dat %>%
-      dplyr::mutate(Type = as.factor(Type)) %>%
-      dplyr::mutate(OMID = as.factor(OMID)) %>%
-      tidyr::drop_na(Response) %>%
-      dplyr::add_count(OMID) %>%
-      dplyr::filter(n == OMID_n) %>%
-      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))
+        T2 <- "Post"
+      }
+      if (comparison == "PreFollowUpT1T3"){
+        var <- .x %>%
+          dplyr::slice(1) %>%
+          dplyr::pull(variable_code)
 
-    T2 <- "FollowUp"
-  }
+        OMID_n <- 3
+        if(var %in% c("C1", "C5", "C6")){
+          OMID_n <- 2
+        }
 
-  ttest_dat <-  gathered_dat %>%
-    dplyr::mutate(Type = as.factor(Type)) %>%
-    dplyr::mutate(OMID = as.factor(OMID)) %>%
-    tidyr::drop_na(Response) %>%
-    dplyr::add_count(OMID) %>%
-    dplyr::filter(n == 2)  %>%
-    dplyr::mutate(var_code = variable_code) %>%
-    dplyr::group_by(variable_code) %>%
-    dplyr::summarize(
-      cohend = abs(
-        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate
-      )
-      ,
-      cohendCIlow = #abs(
-        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]
-      #)
-      ,
-      cohendCIhi = #abs(
-        effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]
-      #)
-      ,
-      tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
-      pvalue = t.test(Response~Type, paired=TRUE)$p.value,
-      df = t.test(Response~Type, paired=TRUE)$parameter,
-      percentimproved = perc_improved(Response[Type == "Pre"],
-                                      Response[Type == T2],
-                                      (df+1),
-                                      .data$var_code[1])
+        internal <- .x %>%
+          dplyr::mutate(Type = as.factor(Type)) %>%
+          dplyr::mutate(OMID = as.factor(OMID)) %>%
+          tidyr::drop_na(Response) %>%
+          dplyr::add_count(OMID) %>%
+          dplyr::filter(n == OMID_n) %>%
+          dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))
+
+        T2 <- "FollowUp"
+      }
+
+      ttest_dat <-  internal %>%
+        dplyr::mutate(Type = as.factor(Type)) %>%
+        dplyr::mutate(OMID = as.factor(OMID)) %>%
+        tidyr::drop_na(Response) %>%
+        dplyr::add_count(OMID) %>%
+        dplyr::filter(n == 2)  %>%
+        dplyr::mutate(var_code = variable_code) %>%
+        dplyr::group_by(variable_code) %>%
+        dplyr::summarize(
+          cohend = abs(
+            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate
+          )
+          ,
+          cohendCIlow = #abs(
+            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]
+          #)
+          ,
+          cohendCIhi = #abs(
+            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]
+          #)
+          ,
+          tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
+          pvalue = t.test(Response~Type, paired=TRUE)$p.value,
+          df = t.test(Response~Type, paired=TRUE)$parameter,
+          percentimproved = perc_improved(Response[Type == "Pre"],
+                                          Response[Type == T2],
+                                          (df+1),
+                                          .data$var_code[1])
 
 
-    )
+        )
 
-  vars <- gathered_dat %>% select(variable_code) %>% dplyr::distinct() %>% dplyr::pull()
+      vars <- internal %>% select(variable_code) %>% dplyr::distinct() %>% dplyr::pull()
 
-  within_stats <- vars %>% map_dfr(~openmindR:::withinSE(gathered_dat, variable = .x, WaveType = NULL))
+      within_stats <- vars %>% map_dfr(~openmindR:::withinSE(internal, variable = .x, WaveType = NULL))
 
 
-  final <- ttest_dat %>%
-    dplyr::left_join(within_stats, by = "variable_code") %>%
-    mutate(N = df+1)
+      final <- ttest_dat %>%
+        dplyr::left_join(within_stats, by = "variable_code") %>%
+        mutate(N = df+1)
+
+      return(final)
+
+
+    })
 
   return(final)
 

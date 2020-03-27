@@ -11,27 +11,20 @@ output: github_document
 
 Install package like this:
 
-```{r setup, eval=FALSE}
+
+```r
 devtools::install_github("openmindplatform/openmindR")
 ```
 
-```{r, echo=F}
-knitr::opts_chunk$set(message = F, 
-                      warning = F, 
-                      eval = F)
 
-# AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
-# 
-# usethis::use_data(AssessmentV6Codebook)
-```
 
 
 Load package(s):
 
-```{r}
+
+```r
 library(openmindR)
 library(dplyr)
-
 ```
 
 # New Functions
@@ -51,7 +44,8 @@ This function parses and cleans the list variables that contain the lifehack dat
 + `LifeHacksUseful1` - `LifeHacksUseful5`: Did the user find completing the lifehack useful
 + `LifeHacksReason1` - `LifeHacksReason5`: Why didn't the user complete the lifehack
 
-```{r, eval = F}
+
+```r
 ## get key
 key <- read_lines("../../Keys/airtabler.txt")
 
@@ -82,7 +76,8 @@ parsed_lh %>%
 
 This function merges assessment v4, v5 and v6 data and only keeps common variables. 
 
-```{r, eval= F}
+
+```r
 ## get previous assessment dat
 v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv") 
 v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv") 
@@ -96,7 +91,6 @@ v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
 
 ## merge all three datasets and only keep common variables
 merge_assessments(v4, v5, v6)
-
 ```
 
 ## `om_download_at`
@@ -110,7 +104,8 @@ merge_assessments(v4, v5, v6)
 Here is a code example that will download Assessment V6, clean it, save it into a folder called "Data" under Research and filter down to only include V6.1 data.
 
 
-```{r, eval=F}
+
+```r
 key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
 assessmentv6 <- om_download_at(key, 
@@ -120,7 +115,6 @@ assessmentv6 <- om_download_at(key,
                             v6.1 = TRUE)
 
 # library(tidyverse)
-
 ```
 
 
@@ -135,8 +129,8 @@ This function performs t-tests on long format data and returns stats on the mode
     
 First we download v7 data:
 
-```{r, eval = F}
 
+```r
 ## Get Key (may differ in your code)
 key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
@@ -144,12 +138,12 @@ key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 assessmentv7 <- om_download_at(key,
                             tables = "AssessmentV7",
                             clean = TRUE)
-
 ```
 
 You can perform t-tests on a single variable by *only* gathering one variable and specifying the comparison (here: `"PrePost"`).  
 
-```{r}
+
+```r
 ## Perform t-test on a single variable
 assessmentv7 %>% 
   om_gather("AffPol1") %>% 
@@ -158,7 +152,8 @@ assessmentv7 %>%
 
 However, this is not how `om_ttest` is intended to work. Rather it should be used on a dataset in long format with all variables that you want to perform analysis on. The next lines of code show that process. 
 
-```{r}
+
+```r
 ## get results for all variables
 assessmentv7  %>%
   ## select only relevant variables and composite scores
@@ -171,8 +166,6 @@ assessmentv7  %>%
   om_ttest("PrePost") %>% 
   ## arrange by cohens D
   arrange(desc(cohend)) 
-
-
 ```
 
 
@@ -191,7 +184,8 @@ The following functions are meant to turn AirTable (and GuidedTrack) data into a
 
 ![](images/openmindR workflow.png)
 
-```{r, eval=F}
+
+```r
 cleaned_dat <-
   ## Participant Progress Data
   dat.par %>% 
@@ -239,73 +233,18 @@ cleaned_dat <-
 
 ## Turn data into long format
 gathered_dat <- om_gather(cleaned_dat, q_c_strings)
-
 ```
 
 
-```{r, echo = F}
 
-db_get_data <- function(tbl_dat) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), "../../Research/Projects/Current Projects/om_metrics_report/sql_data/omdata.db")
-
-  out <- con %>%
-    dplyr::tbl(tbl_dat) %>%
-    dplyr::collect()
-
-  DBI::dbDisconnect(con)
-
-  return(out)
-}
-
-
-# Matching string for all Q variables
-# q_strings <- paste0(
-#   paste0("Q", 1:18, "P", collapse = "|"), "|", paste0("Q", 1:18, "F", collapse = "|")
-#   )
-# ## Matching string for all (relevant) D variables
-# d_strings <- paste0("D", 1, collapse = "|")
-# ## Matching string for all C variables
-# c_strings <- paste0("C", 1:3, collapse = "|")
-# 
-# ## Matching string for all (relevant) D, Q and C variables
-# var_strings <- paste0(q_strings, "|", d_strings, "|", c_strings, collapse = "|")
-# ## Matching string for all Q and C variables
-# q_c_strings <- paste0(q_strings, "|", c_strings, collapse = "|")
-# ## Matching string for ranging vars from 0 to 1
-# range01_strings <- stringr::str_c(stringr::str_c("Q", 3:12, "P", collapse = "|"), "|",
-#                          stringr::str_c("Q", 3:12, "F", collapse = "|"),
-#                          stringr::str_c("|", c_strings, collapse = "|")
-# )
-
-
-# Read in data
-dat.acc <- db_get_data("dat.acc")
-dat.par <- db_get_data("dat.par")
-# dat.ass4 <- db_get_data("dat.ass4")
-# dat.ass5 <- db_get_data("dat.ass5")
-# dat.ass <- db_get_data("cleaned_dat")
-
-dat.ass <- readr::read_csv("../../Research/Data/2019-10-29_assessmentv4.csv") %>% 
-  dplyr::bind_rows(readr::read_csv("../../Research/Data/2019-10-29_assessmentv5.csv"))
-
-
-# dat.ass <- dat.ass4 %>% 
-#   dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
-#   mutate(OMID = as.character(OMID)) %>% 
-#   dplyr::bind_rows(dat.ass5 %>% 
-#                      mutate(AssessmentVersion = as.numeric(AssessmentVersion)) %>% 
-#                      mutate(AssessmentsDone = as.numeric(AssessmentsDone)))
-
-
-```
 
 
 ## `om_filter_data`
 
 Filter down Assessment data from AirTable by `AssessmentsDone`, `AssessmentVersion` and `AccessCodes`.
 
-```{r}
 
+```r
 dat.ass %>% 
   # specify which number of assessment you want to have
   om_filter_data(n_assessments = 1:3,
@@ -319,7 +258,8 @@ dat.ass %>%
 
 This dataset was filtered down to only AccessCodes that include "Wilkes". The `accesscode` argument is not case-sensitive and can both be used with vectors:
 
-```{r}
+
+```r
 dat.ass %>% 
   # specify which number of assessment you want to have
   om_filter_data(n_assessments = 1:3,
@@ -332,7 +272,8 @@ dat.ass %>%
 
 And individual strings:
 
-```{r}
+
+```r
 dat.ass %>% 
   # specify which number of assessment you want to have
   om_filter_data(n_assessments = 1:3,
@@ -362,7 +303,8 @@ Takes the following arguments:
 
 + **...**	Arguments for select to get additional variables from ParticipantProgress
 
-```{r}
+
+```r
 dat.par %>% 
   om_clean_par(parse_feedback = T) 
 ```
@@ -376,7 +318,8 @@ Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divided by 6.
 **Should be run before any measures are constructed so that they are all on the same scale.**
 
 
-```{r, eval = F}
+
+```r
 dat.ass %>% 
   om_rescale()
 ```
@@ -398,7 +341,8 @@ Creates the following variables:
 Function automatically accounts for Assessment Version 4 and 5/5.1.
 
 
-```{r, eval = F}
+
+```r
 dat.ass %>% 
   om_construct_measures()
 ```
@@ -417,17 +361,16 @@ Creates the following measures of Political Orientation
 + **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
 + **ppol_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 
-```{r, eval = F}
 
+```r
 dat.ass <- dat.ass %>% 
   om_clean_ppol()
-
-
 ```
 
 Now `om_construct_measures` will work!
 
-```{r, eval = F}
+
+```r
 dat.ass %>% 
   om_construct_measures()
 ```
@@ -436,7 +379,8 @@ dat.ass %>%
 
 This function is really important to clean up duplicated OMIDs that occasionally occur within AirTable. 
 
-```{r, message = T}
+
+```r
 dat.ass %>% 
   remove_dups()
 ```
@@ -459,7 +403,8 @@ Takes the following arguments:
 + **which_strings** a string indicating which variables should be parsed out (`q_c_strings` indicates all Q and C questions). The format looks as follows: "Q1|Q2|Q3" (so each variable without the "Pre", "Post" or "FollowUp" suffix)
 
 
-```{r, eval = F}
+
+```r
 dat.ass %>% 
   om_gather(q_c_strings) %>% 
   ## select just the relevant vars as showcase
@@ -484,7 +429,8 @@ The `aversion` argument specifies which Assessment version you want to perform m
 
 With the `compare` argument you can specify either `"PrePost"`, `"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the latter is the default).
 
-```{r, eval = F}
+
+```r
 ## Prepare gathered_dat
 gathered_dat <- dat.ass %>% 
   om_rescale() %>% 
@@ -504,7 +450,8 @@ Prepare paired data for plot with within subject error term.
 
 The `aversion` argument specifies which Assessment version you want to perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
 
-```{r, eval = F}
+
+```r
 om_label_stats(gathered_dat, aversion = "V4")
 ```
 
@@ -513,7 +460,8 @@ om_label_stats(gathered_dat, aversion = "V4")
 
 Example workflow for Ann Miller experimental data
 
-```{r, eval = F}
+
+```r
 load("../om_parser/data/ann_miller_merged.Rdata")
 
 cleaned_data <- ann_miller_merged %>% 
@@ -557,7 +505,8 @@ Takes the following arguments:
 
 Lets perform a model on `Q11` with all arguments turned on.
 
-```{r, eval = F}
+
+```r
 Q11_dat <- om_mix_models(gathered_dat, 
               question = "Q11", 
               plot_model = T, 
@@ -569,13 +518,15 @@ Q11_dat <- om_mix_models(gathered_dat,
 
 For instance, the argument `plot_model = T` will give us a coefficient plot of the model:
 
-```{r, fig.width = 8, fig.height = 5, eval = F}
+
+```r
 Q11_dat$ggmod
 ```
 
 The argument `get_effects = T` will give us marginal effects of the model:
 
-```{r, eval = F}
+
+```r
 Q11_dat$effects_dat %>% 
   knitr::kable()
 ```
@@ -583,14 +534,16 @@ Q11_dat$effects_dat %>%
 
 The argument `get_tidy = T` will give us coefficients and pseudo cohen's d values of the model as a tidy dataframe:
 
-```{r, eval = F}
+
+```r
 Q11_dat$tidy_dat %>% 
   knitr::kable()
 ```
 
 Finally, by default `om_mixed_models` produces the raw `lme4` object containing the model:
 
-```{r, eval = F}
+
+```r
 Q11_dat$lme_dat
 ```
 
@@ -606,7 +559,8 @@ Takes the following arguments:
 + **var_label** supply a character that is plotted as title and y-axis
 + **show_stats** Show statistics on the bottom right. Only possible if you supply `tidy_dat`
 
-```{r, fig.width = 12, fig.height = 8.58, eval = F}
+
+```r
 om_mix_plot(effects_dat = Q11_dat$effects_dat, 
             tidy_dat = Q11_dat$tidy_dat, 
             var_label = "Growth Mindset",
@@ -626,7 +580,8 @@ Just specify data and title where the latter needs to be one of the following (a
 + `"Social Closeness"`
 + `"Perspective-Taking"`
 
-```{r, fig.width = 12, fig.height = 8.58, eval = F}
+
+```r
 om_mix_complete(gathered_dat, "Growth Mindset")
 ```
 
@@ -641,14 +596,15 @@ There are three functions for the ggplot2 theme:
 
 Make sure you have the Poppins font installed!
 
-```{r, eval = F}
+
+```r
 extrafont::font_import()
 ```
 
 
-```{r}
-windowsFonts(`Poppins` = windowsFont("Poppins"))
 
+```r
+windowsFonts(`Poppins` = windowsFont("Poppins"))
 ```
 
 
@@ -656,7 +612,8 @@ windowsFonts(`Poppins` = windowsFont("Poppins"))
 
 **Example**
 
-```{r fig.width=8, fig.height=5, message=F, warning=F}
+
+```r
 ## Load tidyverse
 library(tidyverse)
 
@@ -669,7 +626,6 @@ titanic_dat %>%
   scale_fill_om("Class") +
   facet_wrap(~Survived) +
   labs(title = "Titanic Survival by Age and Class") 
-  
 ```
 
 **Adapt `theme_om`**
@@ -680,7 +636,8 @@ titanic_dat %>%
 + `legend_text_size`
 + `title_size`
 
-```{r fig.width=8, fig.height=5, message=F}
+
+```r
 titanic_dat %>% 
   ggplot(aes(Class, n, fill = Class)) +
   geom_col() +
@@ -698,7 +655,8 @@ Or all text sizes at once
 
 + `overall_text_size`
 
-```{r fig.width=8, fig.height=5, message=F}
+
+```r
 titanic_dat %>% 
   ggplot(aes(Class, n, fill = Class)) +
   geom_col() +
