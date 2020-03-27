@@ -1254,8 +1254,8 @@ om_reverse_code <- function(assessment) {
                "IHCulture1", "IHCulture2", "IHCulture5", "IHCulture6",
                "IntAnx1", "IntAnx2",
                "Avoidance1", "Avoidance2",
-               "Attribution1", "Attribution2", "Attribution3",
-               "SocialDistance1", "SocialDistance2"#,
+               "Attribution1", "Attribution2", "Attribution3"#,
+               # "SocialDistance1", "SocialDistance2"#,
                # "Anxiety1",  "Anxiety2", "Anxiety3", "Anxiety4",
                # "GBSS1", "GBSS2", "GBSS3",
                # "MotivationProg1", "MotivationProg2", "MotivationCon1", "MotivationCon2"
@@ -1289,7 +1289,7 @@ om_reverse_code <- function(assessment) {
     dplyr::mutate_at(dplyr::vars(reverse),  .funs = list(Rev = ~ 6 - .))
 
 
-  reverse <- c("MotivationProg1", "MotivationProg2", "MotivationCon1", "MotivationCon2")
+  reverse <- c("MotivationProg1", "MotivationCon1")
   reversePre <- reverse %>%
     paste0(., "Pre")
   reversePost <- reverse %>%
