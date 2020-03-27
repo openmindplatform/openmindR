@@ -28,7 +28,7 @@ library(dplyr)
   - [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
   - [merge\_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
   - [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
-  - [AssessmentV7](https://github.com/openmindplatform/openmindR#AssessmentV7)
+  - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
 
 ## `om_parse_lifehacks`
 
@@ -124,7 +124,19 @@ assessmentv6 <- om_download_at(key,
 # library(tidyverse)
 ```
 
-## AssessmentV7
+## `om_ttest`
+
+This function performs t-tests on long format data and returns stats on
+the model (including p-values, t-statistics and Cohen’s D effect size).
+
+`om_ttest` takes two arguments:
+
+  - `gathered_dat` OpenMind data in long format (best created with
+    [om\_gather](https://github.com/openmindplatform/openmindR#om_gather))
+  - `comparison` Three possible comparisons “PrePost”, “PreFollowUpT1T2”
+    or “PreFollowUpT1T3”
+
+First we download v7 data:
 
 ``` r
 ## Get Key (may differ in your code)
@@ -134,13 +146,23 @@ key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 assessmentv7 <- om_download_at(key,
                             tables = "AssessmentV7",
                             clean = TRUE)
+```
 
+You can perform t-tests on a single variable by *only* gathering one
+variable and specifying the comparison (here: `"PrePost"`).
+
+``` r
 ## Perform t-test on a single variable
 assessmentv7 %>% 
   om_gather("AffPol1") %>% 
   om_ttest("PrePost")
+```
 
+However, this is not how `om_ttest` is intended to work. Rather it
+should be used on a dataset in long format with all variables that you
+want to perform analysis on. The next lines of code show that process.
 
+``` r
 ## get results for all variables
 assessmentv7  %>%
   ## select onyly relevant variables and composite scores
@@ -394,7 +416,9 @@ Takes the following arguments:
 
   - **.data** Assessment data
   - **which\_strings** a string indicating which variables should be
-    parsed out (`q_c_strings` indicates all Q and C questions)
+    parsed out (`q_c_strings` indicates all Q and C questions). The
+    format looks as follows: “Q1|Q2|Q3” (so each variable without the
+    “Pre”, “Post” or “FollowUp” suffix)
 
 <!-- end list -->
 
