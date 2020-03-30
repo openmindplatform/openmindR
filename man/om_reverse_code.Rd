@@ -12,3 +12,7 @@ om_reverse_code(assessment)
 \description{
 Reverse codes items and adds them at the end of the dataset with a "_Rev" at the end.
 }
+\examples{
+assessmentv7 \%>\%
+  om_reverse_code()
+}

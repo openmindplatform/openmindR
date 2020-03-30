@@ -4,10 +4,10 @@
 \alias{om_clean_ppol}
 \title{Creates several measures of Political Orientation}
 \usage{
-om_clean_ppol(app.dat)
+om_clean_ppol(assessment)
 }
 \arguments{
-\item{app.dat}{Assessment data from AirTable}
+\item{assessment}{Assessment data from AirTable}
 }
 \description{
 Creates the following measures of Political Orientation
@@ -19,8 +19,7 @@ Creates the following measures of Political Orientation
   \item ppol_catmod: a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 }
 }
-\section{Workflow}{
-
-\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+\examples{
+assessmentv7 \%>\%
+  om_clean_ppol()
 }
-

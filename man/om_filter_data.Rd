@@ -4,8 +4,13 @@
 \alias{om_filter_data}
 \title{This function filters down Assessment (or ParticipantProgress) data}
 \usage{
-om_filter_data(app.dat, n_assessments = NULL, version = NULL,
-  accesscode = NULL, exact_search = F)
+om_filter_data(
+  app.dat,
+  n_assessments = NULL,
+  version = NULL,
+  accesscode = NULL,
+  exact_search = F
+)
 }
 \arguments{
 \item{app.dat}{Assessment data from AirTable}
@@ -30,8 +35,14 @@ Finally, if you want just one specific Access Code then you'd use \code{"EddySal
 
 Usually you would run this function first to filter down your data.
 }
-\section{Workflow}{
-
-\code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
+\examples{
+assessmentv7 \%>\%
+   # specify which number of assessment you want to have
+   om_filter_data(n_assessments = 1:2,
+              # assessment version?
+              version = 7,
+              # select Accesscode(s)
+              accesscode = "TuttlePen"
+              # "TuttlePen" #try this out :)
+   )
 }
-

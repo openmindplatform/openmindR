@@ -20,15 +20,160 @@ Load package(s):
 
 ``` r
 library(openmindR)
-library(dplyr)
+library(tidyverse)
 ```
 
-# New Functions
+# openmindR Cleaning Functions
+
+The following functions are meant to turn AirTable data into a single
+clean file that can be analyzed.
+
+  - [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
+
+  - [om\_filter\_data](https://github.com/openmindplatform/openmindR#om_filter_data)
+
+  - [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
+
+  - [om\_gather](https://github.com/openmindplatform/openmindR#om_gather)
 
   - [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
+
   - [merge\_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
-  - [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
-  - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
+
+## `om_download_at`
+
+`openmindR` can download and clean data directly from Airtable.
+
+  - `clean`: Whether to return “clean” data (i.e. numeric data is
+    numeric and minors or opt-outs are `NA`. Also constructs measures.
+    (`TRUE`/`FALSE`)
+  - `file`: give a file path to where the downloaded data should be
+    stored
+  - `v6.1`: filter down the dataset to only include Assessment V6.1
+    (`TRUE/FALSE`)
+
+Here is a code example that will download Assessment V6, clean it, save
+it into a folder called “Data” under Research and filter down to only
+include V6.1 data.
+
+``` r
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+assessmentv6 <- om_download_at(key, 
+                            tables = "AssessmentV6", 
+                            clean = TRUE, 
+                            file = "../../../Data/assessmentv6.1.csv",
+                            v6.1 = TRUE)
+```
+
+Here is another example code for downloading a clean version of
+Assessment v7:
+
+``` r
+assessmentv7 <- om_download_at(key, 
+                            tables = "AssessmentV7", 
+                            clean = TRUE)
+```
+
+    ## Seting up key
+    ## Download AssessmentV7 Data
+    ## Done. AssessmentV7 Data has 208 rows
+
+## `om_filter_data`
+
+Filter down Assessment data from AirTable by `AssessmentsDone`,
+`AssessmentVersion` and `AccessCodes`.
+
+``` r
+assessmentv7 %>% 
+  # specify which number of assessment you want to have
+  om_filter_data(n_assessments = 1:2,
+             # assessment version?
+             version = 7,
+             # select Accesscode(s) 
+             accesscode = "TuttlePen"
+             # "TuttlePen" #try this out :)
+  )
+```
+
+This dataset was filtered down to only AccessCodes that include
+“Wilkes”. The `accesscode` argument is not case-sensitive and can
+both be used with vectors:
+
+``` r
+assessmentv7 %>% 
+  # specify which number of assessment you want to have
+  om_filter_data(n_assessments = 1:2,
+             # assessment version?
+             version = 7,
+             # select Accesscode(s) 
+             accesscode = c("TuttlePennStateS20", "SpriggsBTHS201S20")
+  )
+```
+
+And individual strings:
+
+``` r
+assessmentv7 %>% 
+  # specify which number of assessment you want to have
+  om_filter_data(n_assessments = 1:2,
+             # assessment version?
+             version = 7,
+             # select Accesscode(s) to produce report for
+             accesscode = c("tuttle|spriggs")
+  )
+```
+
+## `om_clean_ppol`
+
+Creates the following measures of Political Orientation
+
+  - **ppol\_raw:** a variable that merges Assessment V4 and V5.1
+    spelling of Political Orientation (D4)
+  - **ppol:** a factor variable ordered from “Very Progressive/left” to
+    “Very Conservative/right”. Excludes all other categories as NA
+    (classical liberal etc.)
+  - **ppol\_num:** numeric variable ranging from 1 “Very
+    Progressive/left” to 7 “Very Conservative/right”
+  - **ppol\_cat:** a factor variable which has two categories
+    “Progressive” and “Conservative”. The rest is NA.
+  - **ppol\_catmod:** a factor variable which has three categories
+    “Progressive”, “Conservative” and “Moderates”. The rest is NA.
+
+<!-- end list -->
+
+``` r
+assessmentv7 %>% 
+  om_clean_ppol()
+```
+
+## `om_gather`
+
+This function will turn Assessment data into long format.
+
+Creates the following variables:
+
+  - **Question:** Q1Pre, Q2Pre, Q3Pre etc.
+  - **Type:** Pre, Post, or FollowUp
+  - **Response:** Values of the Question
+  - **variable\_code:** Q1, Q2, Q3 etc.
+
+Takes the following arguments:
+
+  - **.data** Assessment data
+  - **which\_strings** a string indicating which variables should be
+    parsed out (`v7_var_strings` has all variables for v7). The format
+    looks as follows: “AffPol1|AffPol2|GM1” (so each variable without
+    the “Pre”, “Post” or “FollowUp” suffix)
+
+<!-- end list -->
+
+``` r
+assessmentv7 %>% 
+  om_gather(v7_var_strings) %>% 
+  ## select just the relevant vars as showcase
+  select(Question, Response, Type, variable_code)
+```
 
 ## `om_parse_lifehacks`
 
@@ -96,33 +241,11 @@ v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
 merge_assessments(v4, v5, v6)
 ```
 
-## `om_download_at`
+# openmindR Analysis Functions
 
-`openmindR` can download and clean data directly from Airtable. There
-are three new arguments for Assessment v6:
+This section introduces the openmindR analysis functions.
 
-  - `clean`: Whether to return “clean” data (i.e. numeric data is
-    numeric and minors or opt-outs are `NA` (`TRUE`/`FALSE`)
-  - `file`: give a file path to where the downloaded data should be
-    stored
-  - `v6.1`: filter down the dataset to only include Assessment V6.1
-    (`TRUE/FALSE`)
-
-Here is a code example that will download Assessment V6, clean it, save
-it into a folder called “Data” under Research and filter down to only
-include V6.1 data.
-
-``` r
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
-
-assessmentv6 <- om_download_at(key, 
-                            tables = "AssessmentV6", 
-                            clean = TRUE, 
-                            file = "../../../Data/assessmentv6.1.csv",
-                            v6.1 = TRUE)
-
-# library(tidyverse)
-```
+  - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
 
 ## `om_ttest`
 
@@ -131,7 +254,7 @@ the model (including p-values, t-statistics and Cohen’s D effect size).
 
 `om_ttest` takes two arguments:
 
-  - `gathered_dat` OpenMind data in long format (best created with
+  - `gathered_dat` OpenMind data in long format (must be created with
     [om\_gather](https://github.com/openmindplatform/openmindR#om_gather))
   - `comparison` Three possible comparisons “PrePost”, “PreFollowUpT1T2”
     or “PreFollowUpT1T3”
@@ -175,442 +298,42 @@ assessmentv7  %>%
   arrange(desc(cohend)) 
 ```
 
-# openmindR Cleaning Functions
+### `perc_improved`
 
-The following functions are meant to turn AirTable (and GuidedTrack)
-data into a single clean file that can be analyzed. Along the way it
-parses the data, constructs measures, removes duplicates and optionally
-turns it into long format. The solid line is the suggested workflow for
-a complete dataset. The dashed lines are optional (if you don’t want to
-add GuidedTrack data).
+`om_ttest` uses a helper function to determine the percentage of people
+who improved: `perc_improved` from T1 to T2 (or T3). For this, we need
+to decide which variables are coded so that “improvement” means higher
+values and which ones coded so that improving means lower values on the
+respective scales.
 
-  - [om\_filter\_data](https://github.com/openmindplatform/openmindR#om_filter_data)
-  - [om\_clean\_par](https://github.com/openmindplatform/openmindR#om_clean_par)
-  - [om\_rescale](https://github.com/openmindplatform/openmindR#om_rescale)
-  - [om\_construct\_measures](https://github.com/openmindplatform/openmindR#om_construct_measures)
-  - [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
-  - [remove\_dups](https://github.com/openmindplatform/openmindR#remove_dups)
-  - [om\_gather](https://github.com/openmindplatform/openmindR#om_gather)
+Here is the list of variables that should have **higher values** to show
+improvement:
 
-![](images/openmindR%20workflow.png)
+    ##  [1] "GrowthMindset"        "CIHS_LIO"             "OutgroupLiking"      
+    ##  [4] "OutgroupMotivation"   "Preparedness"         "C1"                  
+    ##  [7] "C6"                   "IntellectualHumility" "GM"                  
+    ## [10] "IHSub1"               "IHSub2"               "IHSub3"              
+    ## [13] "IHCultureSub1"        "IHCultureSub2"        "IHCultureSub3"       
+    ## [16] "SE"                   "Belong"               "Dissent"             
+    ## [19] "Tolerance"            "IngroupLiking"        "IngroupMotivation"   
+    ## [22] "OutgroupLiking"       "OutgroupMotivation"   "MotivationCon"       
+    ## [25] "MotivationProg"
 
-``` r
-cleaned_dat <-
-  ## Participant Progress Data
-  dat.par %>% 
-  ## calculating step scores and more
-  om_clean_par(parse_feedback = T) %>% 
-  ## Assessment Data
-  left_join(app.dat) %>%
-  ## adding actual time
-  mutate(createdTime = ifelse(is.na(createdTime), at_date, createdTime)) %>% 
-  ## Make variables Q1 and Q2 as well as Q3 to C3 range 0 to 1
-  om_rescale() %>% 
-  ## construct ppol measures
-  om_clean_ppol()  %>% 
-  ## construct measures such as intellectual humility
-  om_construct_measures() %>% 
-  ## AccessCode Data  (only keep variables specified in acc_filters)
-  left_join(dat.acc %>% select(acc_filters)) %>% 
-  ## remove duplicates
-  remove_dups() %>% 
-  ## make vars numeric
-  mutate_at(vars(matches(var_strings)), as.numeric) %>% 
-  mutate_at(vars(Step1:Step5_Q5), as.character) %>%  
-  mutate(AssessmentsDone = as.character(AssessmentsDone)) %>% 
-  ##  GuidedTrack Data
-  mutate(Source = "AirTable") %>% 
-  ## TODO: Should happen automatically in om_clean_par but not, whats going on
-  mutate(AppRating = as.character(AppRating)) %>% 
-  coalesce_join(gt_parsed_feedback %>%
-                  mutate(Source = "GT") %>%
-                  mutate(AppRating = as.character(AppRating)) %>%
-                  mutate_at(vars(Step1:Step5_Q5), as.character) %>%
-                  mutate(AssessmentsDone = as.character(AssessmentsDone)) %>%
-                  mutate(createdTime = date), by = "OMID") %>%
-  ## weird case where UserType is empty string
-  mutate(UserType = ifelse(nchar(UserType) == 0, NA, UserType)) %>%
-  drop_na(UserType) %>% 
-  mutate(createdTime = as_datetime(createdTime)) %>% 
-  ## Count how many steps complete
-  mutate(steps_complete = str_count(StepsComplete, "1") %>% as.character) %>% 
-  ## we only want AssessmentsDone 1 thru 3
-  ## Problem: There are AssessmentsDone 0 in the data.. they have completed steps but no Assessment.. how is that possible?
-  filter(AssessmentsDone %in% 1:3) %>% 
-  ## TODO: maybe this is not needed
-  mutate(AppRating = as.numeric(AppRating)) 
+Here is the list of variables that should have **lower values** to show
+improvement:
 
-## Turn data into long format
-gathered_dat <- om_gather(cleaned_dat, q_c_strings)
-```
+    ##  [1] "AffPol1"        "AffPol2"        "GBSS"           "MAA"           
+    ##  [5] "C5"             "Anxiety"        "Attribution"    "IntAnx"        
+    ##  [9] "SocialDistance" "Avoidance"
 
-## `om_filter_data`
+## `om_reverse_code`
 
-Filter down Assessment data from AirTable by `AssessmentsDone`,
-`AssessmentVersion` and `AccessCodes`.
+Reverse codes items and adds them at the end of the dataset with a
+“`*_Rev`” at the end.
 
 ``` r
-dat.ass %>% 
-  # specify which number of assessment you want to have
-  om_filter_data(n_assessments = 1:3,
-             # assessment version?
-             version = 4,
-             # select Accesscode(s) to produce report for
-             accesscode = "Wilkes"
-             # "Wilkes" #try this out :)
-  )
-```
-
-This dataset was filtered down to only AccessCodes that include
-“Wilkes”. The `accesscode` argument is not case-sensitive and can
-both be used with vectors:
-
-``` r
-dat.ass %>% 
-  # specify which number of assessment you want to have
-  om_filter_data(n_assessments = 1:3,
-             # assessment version?
-             version = 4,
-             # select Accesscode(s) to produce report for
-             accesscode = c("SuszkoWilkesUF18", "KarimiWilkesUF18")
-  )
-```
-
-And individual strings:
-
-``` r
-dat.ass %>% 
-  # specify which number of assessment you want to have
-  om_filter_data(n_assessments = 1:3,
-             # assessment version?
-             version = 4,
-             # select Accesscode(s) to produce report for
-             accesscode = c("suszko|karimi")
-  )
-```
-
-## `om_clean_par`
-
-Cleans up ParticipantProgress data and creates several measures:
-
-  - **StepTimes1 to StepTimes5:** Duration in minutes to complete a step
-
-  - **StepCorrect1 to StepCorrect5:** Percentage of correct answers for
-    each step
-
-  - **FeedbackAnswers:** Q1 to Q5 for each individual step
-
-Takes the following arguments:
-
-  - **dat.par:** ParticipantProgress data from AirTable
-
-  - **parse\_feedback:** Parse Feedback answers (Q1 to Q5 for Step 1 to
-    5). Default is `FALSE`.
-
-  - **…** Arguments for select to get additional variables from
-    ParticipantProgress
-
-<!-- end list -->
-
-``` r
-dat.par %>% 
-  om_clean_par(parse_feedback = T) 
-```
-
-## `om_rescale`
-
-This function rescales variables from 0 to 1.
-
-Q1 and Q2 is divided by 100 and Q3 - Q12 and C1 - C3 is divided by 6.
-
-**Should be run before any measures are constructed so that they are all
-on the same scale.**
-
-``` r
-dat.ass %>% 
-  om_rescale()
-```
-
-## `om_construct_measures`
-
-This is a higher-level function that uses both `polar_measures` and
-`calc_ih` to constuct various measures.
-
-Creates the following variables:
-
-  - **Q14:** Affective Polarization
-  - **Q15:** Ingroup
-  - **Q16:** Outgroup
-  - **Q17:** Ingroup vs. Outgroup Affective Polarization
-  - **Q18:** Intellectual Humility
-
-Function automatically accounts for Assessment Version 4 and 5/5.1.
-
-``` r
-dat.ass %>% 
-  om_construct_measures()
-```
-
-> Error in polar\_measures(., Q1Pre, Q2Pre) : Input data is missing
-> column `ppol_cat`. Please make sure to run om\_clean\_ppol before you
-> run om\_construct\_measures.
-
-Uh oh\! That didn’t work\! `om_construct_measures` needs the column
-`ppol_cat` to run which can be created with the function
-`om_clean_ppol`.
-
-## `om_clean_ppol`
-
-Creates the following measures of Political Orientation
-
-  - **ppol\_raw:** a variable that merges Assessment V4 and V5.1
-    spelling of Political Orientation (D4)
-  - **ppol:** a factor variable ordered from “Very Progressive/left” to
-    “Very Conservative/right”. Excludes all other categories as NA
-    (classical liberal etc.)
-  - **ppol\_num:** numeric variable ranging from 1 “Very
-    Progressive/left” to 7 “Very Conservative/right”
-  - **ppol\_cat:** a factor variable which has two categories
-    “Progressive” and “Conservative”. The rest is NA.
-
-<!-- end list -->
-
-``` r
-dat.ass <- dat.ass %>% 
-  om_clean_ppol()
-```
-
-Now `om_construct_measures` will work\!
-
-``` r
-dat.ass %>% 
-  om_construct_measures()
-```
-
-## `remove_dups`
-
-This function is really important to clean up duplicated OMIDs that
-occasionally occur within AirTable.
-
-``` r
-dat.ass %>% 
-  remove_dups()
-```
-
-## `om_gather`
-
-This function will turn Assessment data into long format.
-
-Creates the following variables:
-
-  - **Question:** Q1Pre, Q2Pre, Q3Pre etc.
-  - **Type:** Pre, Post, or FollowUp
-  - **Response:** Values of the Question
-  - **variable\_code:** Q1, Q2, Q3 etc.
-
-Takes the following arguments:
-
-  - **.data** Assessment data
-  - **which\_strings** a string indicating which variables should be
-    parsed out (`q_c_strings` indicates all Q and C questions). The
-    format looks as follows: “Q1|Q2|Q3” (so each variable without the
-    “Pre”, “Post” or “FollowUp” suffix)
-
-<!-- end list -->
-
-``` r
-dat.ass %>% 
-  om_gather(q_c_strings) %>% 
-  ## select just the relevant vars as showcase
-  select(Question, Response, Type, variable_code)
-```
-
-# openmindR Analysis Functions
-
-This section introduces the openmindR analysis functions.
-
-  - [om\_summarize\_comparisons](https://github.com/openmindplatform/openmindR#om_summarize_comparisons)
-  - [om\_label\_stats](https://github.com/openmindplatform/openmindR#om_label_stats)
-  - [om\_mix\_models](https://github.com/openmindplatform/openmindR#om_mix_models)
-  - [om\_mix\_plot](https://github.com/openmindplatform/openmindR#om_mix_plot)
-  - [om\_mix\_complete](https://github.com/openmindplatform/openmindR#om_mix_complete)
-
-## `om_summarize_comparisons`
-
-This is a higher-level function that uses “om\_compare”,
-“bind\_questions” and “summarize\_comparison” to calculate t-tests and
-Cohen’s d using long-format Assessment data.
-
-The `aversion` argument specifies which Assessment version you want to
-perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
-
-With the `compare` argument you can specify either `"PrePost"`,
-`"PreFollow"` or both `c("PrePost", "PreFollow")` comparisons (the
-latter is the default).
-
-``` r
-## Prepare gathered_dat
-gathered_dat <- dat.ass %>% 
-  om_rescale() %>% 
-  om_construct_measures() %>%
-  remove_dups() %>%  
-  om_gather(q_c_strings)
-
-gathered_dat %>% 
-  om_summarize_comparisons(aversion = "V4",
-                           compare = c("PrePost", "PreFollow")) %>% 
-  arrange(desc(percentimproved))
-```
-
-## `om_label_stats`
-
-Prepare paired data for plot with within subject error term.
-
-The `aversion` argument specifies which Assessment version you want to
-perform models for. Should be one of `"V4"`, `"V5/V5.1"` or `"All"`
-
-``` r
-om_label_stats(gathered_dat, aversion = "V4")
-```
-
-# Analyzing mixed effects
-
-Example workflow for Ann Miller experimental data
-
-``` r
-load("../om_parser/data/ann_miller_merged.Rdata")
-
-cleaned_data <- ann_miller_merged %>% 
-  ## make unique OMID
-  mutate(OMID = ifelse(is.na(OMID), ResearchID, OMID)) %>% 
-  ## rescale vars
-  om_rescale() %>% 
-  ## make D4 to standard PoliticalAffil
-  mutate(D4 = ifelse(is.na(D4), PoliticalAffil, D4)) %>% 
-  ## create ppols
-  om_clean_ppol() %>%
-  ## om_construct measures needs a complete AV4
-  mutate(AssessmentVersion = 4) %>% 
-  ## construct measures
-  om_construct_measures() %>%
-  ## remove duplicates
-  remove_dups()  
-  
-
-gathered_dat <- cleaned_data %>% 
-  om_gather(q_c_strings)
-```
-
-Now that we have the Ann Miller data in long format we can use our
-analysis functions to perform mixed models. All mixed models functions
-follow the same pattern `om_mix_*`
-
-## `om_mix_models`
-
-This function performs mixed models (Currently only works on Ann Miller
-experimental data).
-
-Takes the following arguments:
-
-  - **gathered\_dat** Assessment data as long format
-
-  - **question** Specify question that you want to perform analysis for
-    (ex: `"Q18"`)
-
-  - **plot\_model** logical. Show a coefficient plot of the model.
-    Default is `FALSE`
-
-  - **get\_effects** logical. Get marginal effects. Default is `FALSE`
-
-  - **get\_tidy** logical. Get a tidy dataframe with estimates. Also
-    calculates pseudo cohen’s d effect sizes. Default is `FALSE`
-
-Lets perform a model on `Q11` with all arguments turned on.
-
-``` r
-Q11_dat <- om_mix_models(gathered_dat, 
-              question = "Q11", 
-              plot_model = T, 
-              get_effects = T, 
-              get_tidy = T)
-```
-
-`om_mixed_models` outputs the results of mixed effects in several ways.
-
-For instance, the argument `plot_model = T` will give us a coefficient
-plot of the model:
-
-``` r
-Q11_dat$ggmod
-```
-
-The argument `get_effects = T` will give us marginal effects of the
-model:
-
-``` r
-Q11_dat$effects_dat %>% 
-  knitr::kable()
-```
-
-The argument `get_tidy = T` will give us coefficients and pseudo cohen’s
-d values of the model as a tidy dataframe:
-
-``` r
-Q11_dat$tidy_dat %>% 
-  knitr::kable()
-```
-
-Finally, by default `om_mixed_models` produces the raw `lme4` object
-containing the model:
-
-``` r
-Q11_dat$lme_dat
-```
-
-## `om_mix_plot`
-
-This function plots the results of mixed models (currently only works on
-Ann Miller experimental data).
-
-Takes the following arguments:
-
-  - **effects\_dat** is a dataset produced by `om_mix_models` and
-    supplies the marginal effects of the model
-  - **tidy\_dat** is a dataset produced by `om_mix_models` and supplies
-    the pseudo cohen’s d for plotting
-  - **var\_label** supply a character that is plotted as title and
-    y-axis
-  - **show\_stats** Show statistics on the bottom right. Only possible
-    if you supply `tidy_dat`
-
-<!-- end list -->
-
-``` r
-om_mix_plot(effects_dat = Q11_dat$effects_dat, 
-            tidy_dat = Q11_dat$tidy_dat, 
-            var_label = "Growth Mindset",
-            show_stats = T)
-```
-
-## `om_mix_complete`
-
-This function allows to run **and** plot a mixed model. It makes use of
-both `om_mix_models` and `om_plot_mix` (currently only works on Ann
-Miller experimental data).
-
-Just specify data and title where the latter needs to be one of the
-following (at the moment):
-
-  - `"Growth Mindset"`
-  - `"Intellectual Humility"`
-  - `"Affective Polarization"`
-  - `"Social Closeness"`
-  - `"Perspective-Taking"`
-
-<!-- end list -->
-
-``` r
-om_mix_complete(gathered_dat, "Growth Mindset")
+assessmentv7 %>% 
+  om_reverse_code()
 ```
 
 # openmindR ggplot2 theme
@@ -651,6 +374,8 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
 **Adapt `theme_om`**
 
   - `legend_position`
@@ -675,6 +400,8 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
 Or all text sizes at once
 
   - `overall_text_size`
@@ -691,6 +418,8 @@ titanic_dat %>%
   facet_wrap(~Survived) +
   labs(title = "Titanic Survival by Class") 
 ```
+
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

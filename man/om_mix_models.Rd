@@ -4,8 +4,13 @@
 \alias{om_mix_models}
 \title{Run mixed effects model}
 \usage{
-om_mix_models(gathered_dat, question, plot_model = F, get_effects = F,
-  get_tidy = F)
+om_mix_models(
+  gathered_dat,
+  question,
+  plot_model = F,
+  get_effects = F,
+  get_tidy = F
+)
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}

@@ -12,3 +12,28 @@ om_parse_lifehacks(cleaned_dat)
 \description{
 Parse LifeHacks and make sure that they all make sense by checking them.
 }
+\examples{
+## get key
+key <- read_lines("../../Keys/airtabler.txt")
+
+## download participant progress data
+pp_dat <- om_download_at(key, tables = "ParticipantProgress")
+
+
+## this parses all Lifehack data so far
+parsed_lh <-  om_parse_lifehacks(pp_dat)
+
+
+## if you just want the newest life hack data you can filter by OpenMind version
+parsed_lh <-  pp_dat \%>\%
+  ## making sure OpenMindVersion is numeric
+  mutate(OpenMindVersion = as.numeric(OpenMindVersion)) \%>\%
+  ## Only include OM Version 3 and above
+  filter(OpenMindVersion >= 3) \%>\%
+  ## parse Life hacks
+  om_parse_lifehacks()
+
+## just select the OMID and all LifeHack data (remove all other PP variables)
+parsed_lh \%>\%
+  select(OMID, LifeHack1:LifeHacksReason5)
+}

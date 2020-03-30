@@ -4,8 +4,13 @@
 \alias{motivation_measures}
 \title{Creates Motivation Atrribution Asymmetry variables}
 \usage{
-motivation_measures(final_dat, MotivationProg1, MotivationCon1,
-  MotivationProg2, MotivationCon2)
+motivation_measures(
+  final_dat,
+  MotivationProg1,
+  MotivationCon1,
+  MotivationProg2,
+  MotivationCon2
+)
 }
 \arguments{
 \item{final_dat}{Assessment data from AirTable}

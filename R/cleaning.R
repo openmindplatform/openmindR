@@ -17,7 +17,25 @@
 #'@param clean clean dataset and construct measures (only works for Assessment V6 and V7)
 #'@param file specify path to download to (only works for Assessment V6 and V7)
 #'@return a list with (several) dataframe(s)
-#'@export
+#'@examples
+#'#Here is a code example that will download Assessment V6,
+#'#clean it, save it into a folder called "Data" under
+#'#Research and filter down to only include V6.1 data.
+#'key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+#'
+#'assessmentv6 <- om_download_at(key,
+#'                               tables = "AssessmentV6",
+#'                               clean = TRUE,
+#'                               file = "../../../Data/assessmentv6.1.csv",
+#'                               v6.1 = TRUE)
+#'
+#'
+#'#Here is another example code for downloading a clean version of Assessment v7:
+#'
+#'assessmentv7 <- om_download_at(key,
+#'                               tables = "AssessmentV7",
+#'                               clean = TRUE)
+#' @export
 om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
 
   if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7"))) {
@@ -164,15 +182,22 @@ om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","
 #'
 #' Usually you would run this function first to filter down your data.
 #'
-#' @section Workflow:
-#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
-#'
 #'
 #' @param app.dat Assessment data from AirTable
 #' @param n_assessments \code{AssessmentsDone} How many assessments do the participants need to have completed? If 1, it will only provide data for people who completed 1 assessment. If 2, it will provide all people who completed exactly 2 assessments. If 3, it will provide all people who completed all 3 assessments. (Should be 1, 2 and/or 3)
 #' @param version \code{AssessmentVersion} Filter down to what asssesment version. This argument either takes a single number or vector.
 #' @param accesscode \code{AccessCode} Filter down to (several) AccessCode(s)
 #' @param exact_search \code{logical} This argument takes TRUE or FALSE. If you want to match AccessCodes exactly set this to TRUE. Default is FALSE. If you want to select multiple AccessCodes by exact name, use an explicit vector instead.
+#' @examples
+#' assessmentv7 %>%
+#'    # specify which number of assessment you want to have
+#'    om_filter_data(n_assessments = 1:2,
+#'               # assessment version?
+#'               version = 7,
+#'               # select Accesscode(s)
+#'               accesscode = "TuttlePen"
+#'               # "TuttlePen" #try this out :)
+#'    )
 #' @export
 om_filter_data <- function(app.dat, n_assessments = NULL,
                        version = NULL, accesscode = NULL, exact_search = F) {
@@ -348,17 +373,17 @@ om_rescale <- function(.data) {
 #'   \item ppol_catmod: a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 #' }
 #'
-#' @section Workflow:
-#' \code{\link{om_filter_data}} -> \code{\link{om_rescale}} -> \code{\link{om_clean_ppol}} -> \code{\link{om_construct_measures}} -> \code{\link{remove_dups}} -> \code{\link{om_gather}}
 #'
-#'
-#' @param app.dat Assessment data from AirTable
+#' @param assessment Assessment data from AirTable
+#' @examples
+#' assessmentv7 %>%
+#'   om_clean_ppol()
 #' @export
-om_clean_ppol <- function(app.dat) {
+om_clean_ppol <- function(assessment) {
 
   ## creates ppol variables
 
-  app.dat %>%
+  assessment %>%
     ## should clean characters in numeric variables first
     ## Making columns numeric where they need to be
     # dplyr::mutate_at(dplyr::vars(dplyr::matches(openmindR::var_strings)), as.numeric) %>%
@@ -808,6 +833,14 @@ coalesce_join <- function(x, y,
 #'
 #' @param .data Assessment data
 #' @param which_strings a string indicating which variables should be parsed out (default is \code{openmindR::q_c_strings})
+#' @examples
+#' # Turn AffPol1 variable from v7 into long format
+#' assessmentv7 %>%
+#'   om_gather(which_strings = "AffPol1")
+#'
+#' # Turn v7 into long format
+#' assessmentv7 %>%
+#'   om_gather(which_strings = v7_var_strings)
 #' @export
 om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
 
@@ -1190,6 +1223,20 @@ clean_assessment6 <- function(assessment) {
 #' @param v4 v4 data
 #' @param v5 v5 data
 #' @param v6 v6 data
+#' @examples
+#' ## get previous assessment dat
+#' v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv")
+#' v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv")
+#'
+#' ## get key
+#' key <- readr::read_lines("../../Keys/airtabler.txt")
+#'
+#' ## get (clean) assessment v6 data
+#' v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+#'
+#'
+#' ## merge all three datasets and only keep common variables
+#' merge_assessments(v4, v5, v6)
 #' @export
 merge_assessments <- function(v4, v5, v6) {
 
@@ -1241,6 +1288,9 @@ merge_assessments <- function(v4, v5, v6) {
 #' Reverse codes items and adds them at the end of the dataset with a "_Rev" at the end.
 #'
 #' @param assessment v7 data
+#' @examples
+#' assessmentv7 %>%
+#'   om_reverse_code()
 #' @export
 om_reverse_code <- function(assessment) {
 

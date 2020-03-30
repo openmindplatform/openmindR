@@ -33,6 +33,7 @@ data <- error_dat %>%
 filter(errors != "No Error")  %>%
 pull(AssessmentAnswers) %>% .[[3]]
 
+
 data <- om_user_data %>%
 filter(OMID %in% error_ids)  %>%
   mutate(OMID = factor(OMID, levels = error_ids)) %>%
@@ -42,6 +43,6 @@ pull(AssessmentAnswers) %>%
 #
 assessment_parser(data)
 
-base_dat$FeedbackAnswers %>%
+ base_dat$FeedbackAnswers %>%
   .[[13]]
 }

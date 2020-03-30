@@ -889,6 +889,30 @@ om_mix_complete <- function(experiment, title) {
 #' This function performs t-tests on v6 and v7 data
 #' @param gathered_dat Long format data
 #' @param comparison Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
+#' @examples
+#' ## Get Key (may differ in your code)
+#' key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+#'
+#' ## get v7 data
+#' assessmentv7 <- om_download_at(key,
+#'                                tables = "AssessmentV7",
+#'                                clean = TRUE)
+#'
+#' ## Perform t-test on a single variable
+#' assessmentv7 %>%
+#'   om_gather("AffPol1") %>%
+#'   om_ttest(comparison = "PrePost")
+#'
+#' ## get results for all variables
+#' assessmentv7  %>%
+#'   ## select only relevant variables and composite scores
+#'   select(OMID, AffPol1Pre:IHCultureSub3FollowUp) %>%
+#'   ## turn data into long format
+#'   om_gather(which_strings = v7_var_strings)  %>%
+#'   ## perform t-test on each variable (for Pre and Post)
+#'   om_ttest("PrePost") %>%
+#'   ## arrange by cohens D
+#'   arrange(desc(cohend))
 #' @export
 om_ttest <- function(gathered_dat, comparison) {
 

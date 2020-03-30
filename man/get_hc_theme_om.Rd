@@ -12,15 +12,15 @@ Blue : #2a98db
 \details{
 Purple : #3d4fa1
 
-Yellow : #e8df15
+ Yellow : #e8df15
 
-Turquoise : #65c6c3
+ Turquoise : #65c6c3
 
-Pink : #ec145b
+ Pink : #ec145b
 
-Green : #94cfa1
+ Green : #94cfa1
 
-Black : #414042
+ Black : #414042
 
 This object contains a palette with the official OpenMind colors
 }

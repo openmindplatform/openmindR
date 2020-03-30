@@ -4,8 +4,7 @@
 \alias{om_compare}
 \title{Conduct t-tests and calculate Cohen's d}
 \usage{
-om_compare(gathered_dat, compare = c("PrePost", "PreFollow",
-  "PrePostFollow"))
+om_compare(gathered_dat, compare = c("PrePost", "PreFollow", "PrePostFollow"))
 }
 \arguments{
 \item{gathered_dat}{Assessment data as long format}

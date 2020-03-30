@@ -16,3 +16,18 @@ merge_assessments(v4, v5, v6)
 \description{
 Merge Assessments
 }
+\examples{
+## get previous assessment dat
+v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv")
+v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv")
+
+## get key
+key <- readr::read_lines("../../Keys/airtabler.txt")
+
+## get (clean) assessment v6 data
+v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+
+
+## merge all three datasets and only keep common variables
+merge_assessments(v4, v5, v6)
+}

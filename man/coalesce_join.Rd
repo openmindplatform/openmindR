@@ -4,8 +4,14 @@
 \alias{coalesce_join}
 \title{Coalescing joints}
 \usage{
-coalesce_join(x, y, by = NULL, suffix = c(".x", ".y"),
-  join = dplyr::full_join, ...)
+coalesce_join(
+  x,
+  y,
+  by = NULL,
+  suffix = c(".x", ".y"),
+  join = dplyr::full_join,
+  ...
+)
 }
 \arguments{
 \item{x}{left hand side data}

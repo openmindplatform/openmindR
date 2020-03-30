@@ -4,9 +4,14 @@
 \alias{om_download_at}
 \title{Download AirTable data}
 \usage{
-om_download_at(key, tables = c("AccessCodes", "ParticipantProgress",
-  "InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL,
-  v6.1 = F)
+om_download_at(
+  key,
+  tables = c("AccessCodes", "ParticipantProgress", "InstructorSurveyV2",
+    "TechnicalInquiries"),
+  clean = F,
+  file = NULL,
+  v6.1 = F
+)
 }
 \arguments{
 \item{key}{key for AirTable API}
@@ -36,3 +41,22 @@ This function downloads current AirTable data
 }
 }
 
+\examples{
+#Here is a code example that will download Assessment V6,
+#clean it, save it into a folder called "Data" under
+#Research and filter down to only include V6.1 data.
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+assessmentv6 <- om_download_at(key,
+                              tables = "AssessmentV6",
+                              clean = TRUE,
+                              file = "../../../Data/assessmentv6.1.csv",
+                              v6.1 = TRUE)
+
+
+#Here is another example code for downloading a clean version of Assessment v7:
+
+assessmentv7 <- om_download_at(key,
+                              tables = "AssessmentV7",
+                              clean = TRUE)
+}
