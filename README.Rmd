@@ -23,6 +23,10 @@ knitr::opts_chunk$set(message = F,
 # AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
 # 
 # usethis::use_data(AssessmentV6Codebook)
+
+# v6_var_strings <- "AffPol1|AffPol2|OutgroupLiking|IngroupLiking|MotivationProg|MotivationCon|CIHS_LIO|GrowthMindset|GBSS|MAA|OutgroupMotivation|IngroupMotivation|Preparedness|C1|C5|C6|IntellectualHumility"
+# 
+# usethis::use_data(v6_var_strings, overwrite = T)
 ```
 
 
@@ -318,12 +322,14 @@ This section introduces the openmindR analysis functions.
 
 ## `om_ttest`
 
-This function performs t-tests on long format data and returns stats on the model (including p-values, t-statistics and Cohen's D effect size).
+This function performs paired t-tests on long format Pre-Post-FollowUp data and returns stats on the model (including p-values, t-statistics and Cohen's D effect size).
 
 `om_ttest` takes two arguments:
 
 + `gathered_dat` OpenMind data in long format (must be created with [om_gather](https://github.com/openmindplatform/openmindR#om_gather))
 + `comparison` Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
+
+PreFollowUpT1T2 performs Pre-Post comparison only for people who completed the FollowUp. PreFollowUpT1T3 is the same sample of people (only those who completed the FollowUp) but compares them Pre-FollowUp. 
     
 First we download v7 data:
 
@@ -357,6 +363,28 @@ assessmentv7  %>%
   select(OMID, AffPol1Pre:IHCultureSub3FollowUp) %>% 
   ## turn data into long format
   om_gather(which_strings = v7_var_strings)  %>%
+  ## perform t-test on each variable (for Pre and Post)
+  om_ttest("PrePost") %>% 
+  ## arrange by cohens D
+  arrange(desc(cohend)) 
+
+
+```
+
+Same process for Assessment v6:
+
+```{r}
+## get results for all variables
+assessmentv6  %>%
+  ## select only relevant variables and composite scores
+  select(OMID, AffPol1Pre:IntellectualHumilityFollowUp, 
+         GrowthMindsetPre, GrowthMindsetPost, GrowthMindsetFollowUp,
+         C1Pre, C5Pre, C6Pre, 
+         C1Post, C5Post, C6Post,
+         C1FollowUp, C5FollowUp, C6FollowUp,
+         -contains("Preparedness3")) %>% 
+  ## turn data into long format
+  om_gather(which_strings = v6_var_strings)  %>%
   ## perform t-test on each variable (for Pre and Post)
   om_ttest("PrePost") %>% 
   ## arrange by cohens D

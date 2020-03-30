@@ -110,9 +110,9 @@ withinSE <- function(x, variable, WaveType) {
 
   SEdat <- summary_se_within(data = SEdat,
                              measurevar = "Response",
-                             withinvars = "Type",
+                             withinvars = "Time",
                              idvar = "OMID") %>%
-    spread(Type, Response) %>%
+    spread(Time, Response) %>%
     mutate(variable_code = variable)
 
   if (nrow(SEdat) == 2) {
@@ -180,21 +180,21 @@ summarize_comparison <- function(x, waves, q14_q17 = F) {
 
   # print(head(x %>% select(variable_code, Response)))
 
-  print(count(x, Type))
+  print(count(x, Time))
   print(vars)
   # print(x)
 
   ## This is one direction
   if (q14_q17) {
     final_dat <- x %>% dplyr::summarize(
-      cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]),
-      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]),
-      tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
-      pvalue = t.test(Response~Type, paired=TRUE)$p.value,
-      df = t.test(Response~Type, paired=TRUE)$parameter,
-      # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
-      percentimproved = sum((Response[Type == "Pre"] > Response[Type == WaveType])==TRUE)/(df+1)
+      cohend = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$estimate),
+      cohendCIlow = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[2]),
+      tstat = abs(t.test(Response~Time, paired=TRUE)$statistic),
+      pvalue = t.test(Response~Time, paired=TRUE)$p.value,
+      df = t.test(Response~Time, paired=TRUE)$parameter,
+      # ttests = list(broom::tidy(t.test(Response~Time, paired=TRUE, data = .))),
+      percentimproved = sum((Response[Time == "Pre"] > Response[Time == WaveType])==TRUE)/(df+1)
     ) %>%
       left_join(within_stats)
 
@@ -210,14 +210,14 @@ summarize_comparison <- function(x, waves, q14_q17 = F) {
   if (magrittr::not(q14_q17)) {
 
     final_dat <- x %>% dplyr::summarize(
-      cohend = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate),
-      cohendCIlow = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]),
-      cohendCIhi = abs(effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]),
-      tstat = abs(t.test(Response~Type, paired = TRUE)$statistic),
-      pvalue = t.test(Response~Type, paired = TRUE)$p.value,
-      df = t.test(Response~Type, paired = TRUE)$parameter,
-      # ttests = list(broom::tidy(t.test(Response~Type, paired=TRUE, data = .))),
-      percentimproved = sum((Response[Type == "Pre"] < Response[Type == WaveType]) == TRUE)/(df+1)
+      cohend = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$estimate),
+      cohendCIlow = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[1]),
+      cohendCIhi = abs(effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[2]),
+      tstat = abs(t.test(Response~Time, paired = TRUE)$statistic),
+      pvalue = t.test(Response~Time, paired = TRUE)$p.value,
+      df = t.test(Response~Time, paired = TRUE)$parameter,
+      # ttests = list(broom::tidy(t.test(Response~Time, paired=TRUE, data = .))),
+      percentimproved = sum((Response[Time == "Pre"] < Response[Time == WaveType]) == TRUE)/(df+1)
     ) %>%
       left_join(within_stats)
 
@@ -316,10 +316,10 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
   if ("PrePostFollow" %in% compare) {
     ## PrePost Data
     compare_dat_prepostfollow <- gathered_dat %>%
-      dplyr::filter(Type %in% c("Pre", "Post", "FollowUp")) %>%
+      dplyr::filter(Time %in% c("Pre", "Post", "FollowUp")) %>%
       tidyr::drop_na(Response) %>%
-      # dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
-      ## count OMIDs and PrePost Type
+      # dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post", "FollowUp"))) %>%
+      ## count OMIDs and PrePost Time
       dplyr::add_count(OMID, variable_code) %>%
       ## only keep cases where Pre, Post and FollowUp exist
       dplyr::filter(n == 3)
@@ -330,8 +330,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
       ## remove vars that depend on moderates being excluded (Q20 only for AV4)
       dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
-      dplyr::filter(Type %in% c("Pre", "Post")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+      dplyr::filter(Time %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
       dplyr::mutate(Comparison = "PrePostFollowT1T2") %>%
@@ -345,8 +345,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     no_moderate_dat_prePostfollow <- compare_dat_prepostfollow %>%
       ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
-      dplyr::filter(Type %in% c("Pre", "Post")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+      dplyr::filter(Time %in% c("Pre", "Post")) %>%
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
       tidyr::drop_na(ppol_cat) %>%
       ## PrePost
       bind_questions(waves = "PrePost") %>%
@@ -359,8 +359,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
     moderate_dat_prepostFollow <- compare_dat_prepostfollow %>%
       ## remove vars that depend on moderates being excluded (Q20 only for AV4)
       dplyr::filter(variable_code %nin% c("Q15", "Q16", "Q17", "Q20", "C1", "C2", "C3") | (variable_code == "Q20" & AssessmentVersion == 4)) %>%
-      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
+      dplyr::filter(Time %in% c("Pre", "FollowUp")) %>%
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "FollowUp"))) %>%
       ## PreFollow
       bind_questions(waves = "PreFollow") %>%
       dplyr::mutate(Comparison = "PrePostFollowT1T3") %>%
@@ -373,8 +373,8 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate scores where Moderates need to be excluded
     no_moderate_dat_prepostFollow <- compare_dat_prepostfollow  %>%
-      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
+      dplyr::filter(Time %in% c("Pre", "FollowUp")) %>%
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "FollowUp"))) %>%
       ## only include vars that depend on moderates being excluded (Q20 only for AV5+)
       dplyr::filter(variable_code %in% c("Q15", "Q16", "Q17") | (variable_code == "Q20" & AssessmentVersion >= 5)) %>%
       tidyr::drop_na(ppol_cat) %>%
@@ -386,15 +386,15 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
 
     ## Calculate scores for C1, C2 and C3
     culture_vars <- gathered_dat %>%
-      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::filter(Time %in% c("Pre", "FollowUp")) %>%
       dplyr::filter(variable_code %in% c("C1", "C2", "C3")) %>%
       tidyr::drop_na(Response) %>%
-      # dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post", "FollowUp"))) %>%
-      ## count OMIDs and PrePost Type
+      # dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post", "FollowUp"))) %>%
+      ## count OMIDs and PrePost Time
       dplyr::add_count(OMID, variable_code) %>%
       ## only keep cases where Pre and Post exist
       dplyr::filter(n == 2) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))  %>%
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "FollowUp")))  %>%
       dplyr::group_by(variable_code) %>%
       ## PreFollow
       summarize_comparison(waves = "PreFollow",
@@ -418,10 +418,10 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
   if ("PrePost" %in% compare) {
     ## PrePost Data
     compare_dat_prepost <- gathered_dat %>%
-      dplyr::filter(Type %in% c("Pre", "Post")) %>%
+      dplyr::filter(Time %in% c("Pre", "Post")) %>%
       tidyr::drop_na(Response) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
-      ## count OMIDs and PrePost Type
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
+      ## count OMIDs and PrePost Time
       dplyr::add_count(OMID, variable_code) %>%
       ## only keep cases where Pre and Post exist
       dplyr::filter(n == 2)
@@ -457,10 +457,10 @@ om_compare <- function(gathered_dat, compare = c("PrePost", "PreFollow", "PrePos
   if ("PreFollow" %in% compare) {
     ## PreFollow Data
     compare_dat_prefollow <- gathered_dat %>%
-      dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
+      dplyr::filter(Time %in% c("Pre", "FollowUp")) %>%
       tidyr::drop_na(Response) %>%
-      dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp"))) %>%
-      ## count OMIDs and PreFollow Type
+      dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "FollowUp"))) %>%
+      ## count OMIDs and PreFollow Time
       dplyr::add_count(OMID, variable_code) %>%
       ## only keep cases where Pre and Post exist
       dplyr::filter(n == 2)
@@ -633,7 +633,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
     openmindR::q_strings_seps %>%
       purrr::map_dfr(~summary_se_within(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
-                                             withinvars = "Type",
+                                             withinvars = "Time",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
       dplyr::mutate(Variant = aversion) ,
@@ -641,7 +641,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
     openmindR::c_strings_seps %>%
       purrr::map_dfr(~summary_se_within(subset(gathered_dat, variable_code == .x),
                                              measurevar = "Response",
-                                             withinvars = "Type",
+                                             withinvars = "Time",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
       mutate(Variant = aversion) ,
@@ -649,7 +649,7 @@ om_label_stats <- function(gathered_dat, aversion = "All") {
     c("Q15", "Q16", "Q17") %>%
       purrr::map_dfr(~summary_se_within(subset(gathered_dat %>% tidyr::drop_na(ppol_cat), variable_code == .x),
                                              measurevar = "Response",
-                                             withinvars = "Type",
+                                             withinvars = "Time",
                                              idvar = "OMID", na.rm = T) %>%
                        dplyr::mutate(variable_code = .x)) %>%
       dplyr::mutate(Variant = aversion)
@@ -685,14 +685,14 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   ## some data wrangling
   mods_dat <- gathered_dat %>%
     dplyr::filter(variable_code == question) %>%
-    dplyr::filter(Type %in% c("Pre", "Post")) %>%
+    dplyr::filter(Time %in% c("Pre", "Post")) %>%
     dplyr::mutate(Condition = as.factor(Condition)) %>%
-    dplyr::mutate(Type = as.factor(Type)) %>%
+    dplyr::mutate(Time = as.factor(Time)) %>%
     dplyr::mutate(OMID = as.factor(OMID)) %>%
     tidyr::drop_na(Response) %>%
     dplyr::add_count(OMID) %>%
     dplyr::filter(n == 2) %>%
-    dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+    dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
     base::as.data.frame()
 
   ## Assign to a symbol that's unlikely to be in use in .GlobalEnv
@@ -704,7 +704,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   individs <- mods_dat %>% dplyr::distinct(OMID) %>% nrow
 
   ## Run model
-  lme_dat <- lme4::lmer(Response ~ Condition*Type +(1+Condition|OMID) + (1+Type|OMID),
+  lme_dat <- lme4::lmer(Response ~ Condition*Time +(1+Condition|OMID) + (1+Time|OMID),
                         data = .TeMpVaR, REML = F,
                         control = lme4::lmerControl(check.nobs.vs.nRE = "ignore"))
 
@@ -713,7 +713,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
   if (plot_model) {
     ## get coefficient plot for model
     ggmod <- lme_dat %>%
-      sjPlot::plot_model(type = "std", show.p = T, show.values = T)# +
+      sjPlot::plot_model(Time = "std", show.p = T, show.values = T)# +
     # ggplot2::theme_minimal()
 
     final <- rlist::list.append(final, ggmod = ggmod)
@@ -728,7 +728,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
     ### (Pre, Post, Follow-up) plotted at 1 sd below (liberal) and above
     ### (conservative) the midpoint (4) for ideology. It uses the info from mod1
     ### above to adjust for the within subjects variance we're throwing out.
-    effects_dat <- ggeffects::ggeffect(lme_dat, c("Condition", "Type" ),
+    effects_dat <- ggeffects::ggeffect(lme_dat, c("Condition", "Time" ),
                                        x.as.factor = T,
                                        ci.lvl = .95,
                                        typical = "mean") %>%
@@ -742,7 +742,7 @@ om_mix_models <- function(gathered_dat, question, plot_model = F, get_effects = 
                        condition = "Delayed Treatment" %in% unique(mods_dat$Condition),
                        call = ~{.x %>% dplyr::mutate(Condition = factor(x,  levels = c("Experimental Treatment", "Delayed Treatment")))}
       ) %>%
-      dplyr::mutate(Type = factor(group, levels = c("Pre", "Post")))
+      dplyr::mutate(Time = factor(group, levels = c("Pre", "Post")))
 
     final <- rlist::list.append(final, effects_dat = effects_dat)
   }
@@ -784,7 +784,7 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
 
   ggmod <-
     effects_dat %>%
-    ggplot2::ggplot(ggplot2::aes(x = Type, y = predicted, fill = Condition))+
+    ggplot2::ggplot(ggplot2::aes(x = Time, y = predicted, fill = Condition))+
     ggplot2::geom_bar(position = ggplot2::position_dodge(),
                       stat = "identity",
                       colour = "black", # Use black outlines,
@@ -827,8 +827,8 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
                            dplyr::mutate(label = dplyr::case_when(
                              term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
                              term == "ConditionExperimental Treatment" ~ stringr::str_glue("Experimental v. Delayed: {cite_stats}\n\n"),
-                             term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
-                             term == "ConditionExperimental Treatment:TypePost" ~ stringr::str_glue("Condition X Time: {cite_stats}")
+                             term == "TimePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
+                             term == "ConditionExperimental Treatment:TimePost" ~ stringr::str_glue("Condition X Time: {cite_stats}")
                            )
                            )}
       ) %>%
@@ -838,8 +838,8 @@ om_mix_plot <- function(effects_dat, tidy_dat = NULL, var_label, show_stats = T)
                            dplyr::mutate(label = dplyr::case_when(
                              term == "(Intercept)" ~ stringr::str_glue("N = {n_dat}\n\n"),
                              term == "ConditionOpenMind" ~ stringr::str_glue("Article v. OpenMind: {cite_stats}\n\n"),
-                             term == "TypePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
-                             term == "ConditionOpenMind:TypePost	" ~ stringr::str_glue("Condition X Time: {cite_stats}")
+                             term == "TimePost" ~ stringr::str_glue("Pre v. Post: {cite_stats}\n\n"),
+                             term == "ConditionOpenMind:TimePost	" ~ stringr::str_glue("Condition X Time: {cite_stats}")
                            )
                            )}
       ) %>%
@@ -887,8 +887,9 @@ om_mix_complete <- function(experiment, title) {
 #' Run T-Tests on Long Format data
 #'
 #' This function performs t-tests on v6 and v7 data
+#'
 #' @param gathered_dat Long format data
-#' @param comparison Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
+#' @param comparison Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3". "PreFollowUpT1T2" performs Pre-Post comparison only for people who completed the FollowUp. "PreFollowUpT1T3" is the same sample of people (only those who completed the FollowUp) but compares them Pre-FollowUp.
 #' @examples
 #' ## Get Key (may differ in your code)
 #' key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
@@ -913,6 +914,28 @@ om_mix_complete <- function(experiment, title) {
 #'   om_ttest("PrePost") %>%
 #'   ## arrange by cohens D
 #'   arrange(desc(cohend))
+#'
+#' ## get v6 data
+#' assessmentv6 <- om_download_at(key,
+#'                                tables = "AssessmentV6",
+#'                                clean = TRUE)
+#'
+#' ## get results for all variables
+#' assessmentv6  %>%
+#'   ## select only relevant variables and composite scores
+#'   select(OMID, AffPol1Pre:IntellectualHumilityFollowUp,
+#'          GrowthMindsetPre, GrowthMindsetPost, GrowthMindsetFollowUp,
+#'          C1Pre, C5Pre, C6Pre,
+#'          C1Post, C5Post, C6Post,
+#'          C1FollowUp, C5FollowUp, C6FollowUp,
+#'          -contains("Preparedness3")) %>%
+#'   ## turn data into long format
+#'   om_gather(which_strings = v6_var_strings)  %>%
+#'   ## perform t-test on each variable (for Pre and Post)
+#'   om_ttest("PrePost") %>%
+#'   ## arrange by cohens D
+#'   arrange(desc(cohend))
+#'
 #' @export
 om_ttest <- function(gathered_dat, comparison) {
 
@@ -924,8 +947,8 @@ om_ttest <- function(gathered_dat, comparison) {
 
       if (comparison == "PrePost"){
         internal <- .x %>%
-          dplyr::filter(Type %in% c("Pre", "Post")) %>%
-          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+          dplyr::filter(Time %in% c("Pre", "Post")) %>%
+          dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
           dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
         if(nrow(internal)==0){
@@ -936,13 +959,13 @@ om_ttest <- function(gathered_dat, comparison) {
       }
       if (comparison == "PreFollowUpT1T2"){
         internal <- .x %>%
-          dplyr::mutate(Type = as.factor(Type)) %>%
+          dplyr::mutate(Time = as.factor(Time)) %>%
           dplyr::mutate(OMID = as.factor(OMID)) %>%
           tidyr::drop_na(Response) %>%
           dplyr::add_count(OMID) %>%
           dplyr::filter(n == 3) %>%
-          dplyr::filter(Type %in% c("Pre", "Post")) %>%
-          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
+          dplyr::filter(Time %in% c("Pre", "Post")) %>%
+          dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post"))) %>%
           dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
         if(nrow(internal)==0){
@@ -962,19 +985,19 @@ om_ttest <- function(gathered_dat, comparison) {
         }
 
         internal <- .x %>%
-          dplyr::mutate(Type = as.factor(Type)) %>%
+          dplyr::mutate(Time = as.factor(Time)) %>%
           dplyr::mutate(OMID = as.factor(OMID)) %>%
           tidyr::drop_na(Response) %>%
           dplyr::add_count(OMID) %>%
           dplyr::filter(n == OMID_n) %>%
-          dplyr::filter(Type %in% c("Pre", "FollowUp")) %>%
-          dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "FollowUp")))
+          dplyr::filter(Time %in% c("Pre", "FollowUp")) %>%
+          dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "FollowUp")))
 
         T2 <- "FollowUp"
       }
 
       ttest_dat <-  internal %>%
-        dplyr::mutate(Type = as.factor(Type)) %>%
+        dplyr::mutate(Time = as.factor(Time)) %>%
         dplyr::mutate(OMID = as.factor(OMID)) %>%
         tidyr::drop_na(Response) %>%
         dplyr::add_count(OMID) %>%
@@ -983,22 +1006,22 @@ om_ttest <- function(gathered_dat, comparison) {
         dplyr::group_by(variable_code) %>%
         dplyr::summarize(
           cohend = abs(
-            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$estimate
+            effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$estimate
           )
           ,
           cohendCIlow = #abs(
-            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[1]
+            effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[1]
           #)
           ,
           cohendCIhi = #abs(
-            effsize::cohen.d(Response~Type, paired = TRUE, conf.level = 0.95)$conf.int[2]
+            effsize::cohen.d(Response~Time, paired = TRUE, conf.level = 0.95)$conf.int[2]
           #)
           ,
-          tstat = abs(t.test(Response~Type, paired=TRUE)$statistic),
-          pvalue = t.test(Response~Type, paired=TRUE)$p.value,
-          df = t.test(Response~Type, paired=TRUE)$parameter,
-          percentimproved = perc_improved(Response[Type == "Pre"],
-                                          Response[Type == T2],
+          tstat = abs(t.test(Response~Time, paired=TRUE)$statistic),
+          pvalue = t.test(Response~Time, paired=TRUE)$p.value,
+          df = t.test(Response~Time, paired=TRUE)$parameter,
+          percentimproved = perc_improved(Response[Time == "Pre"],
+                                          Response[Time == T2],
                                           (df+1),
                                           .data$var_code[1])
 

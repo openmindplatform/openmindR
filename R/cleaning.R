@@ -822,7 +822,7 @@ coalesce_join <- function(x, y,
 #' creates the following variables:
 #' \itemize{
 #'   \item Question: Q1Pre, Q2Pre, Q3Pre etc.
-#'   \item Type: Pre, Post, or FollowUp
+#'   \item Time: Pre, Post, or FollowUp
 #'   \item Response: Values of the Question
 #'   \item variable_code: Q1, Q2, Q3 etc.
 #' }
@@ -849,14 +849,26 @@ om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
   gathered_dat <- .data  %>%
     dplyr::rename_at(dplyr::vars(dplyr::matches("Followup")), ~stringr::str_replace(., "Followup", "FollowUp")) %>%
     tidyr::gather(Question, Response, dplyr::matches(which_strings)) %>%
-    ## filter out pre-post and follow as a variable "Type"
-    dplyr::mutate(Type = dplyr::case_when(
+    ## filter out pre-post and follow as a variable "Time"
+    dplyr::mutate(Time = dplyr::case_when(
       stringr::str_detect(Question, "Pre") ~ "Pre",
       stringr::str_detect(Question, "Post") ~ "Post",
       stringr::str_detect(Question, "FollowUp") ~ "FollowUp"
     ))  %>%
-    dplyr::mutate(variable_code = stringr::str_remove(Question, Type)) %>%
-    dplyr::mutate(Response = as.numeric(Response))
+    dplyr::mutate(variable_code = stringr::str_remove(Question, Time)) %>%
+    dplyr::mutate(Response = as.numeric(Response)) %>%
+    dplyr::mutate(Time = dplyr::case_when(
+      stringr::str_detect(variable_code, "parednessPre") ~ "Pre",
+      stringr::str_detect(variable_code, "parednessPost") ~ "Post",
+      stringr::str_detect(variable_code, "parednessFollowUp") ~ "FollowUp",
+      T ~ Time
+    )) %>%
+    dplyr::mutate(variable_code = dplyr::case_when(
+      stringr::str_detect(variable_code, "parednessPre") ~ "Preparedness",
+      stringr::str_detect(variable_code, "parednessPost") ~ "Preparedness",
+      stringr::str_detect(variable_code, "parednessFollowUp") ~ "Preparedness",
+      T ~ variable_code
+    ))
 
   return(gathered_dat)
 }

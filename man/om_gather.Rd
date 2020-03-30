@@ -16,7 +16,7 @@ This function will turn Assessment data into long format and
 creates the following variables:
 \itemize{
   \item Question: Q1Pre, Q2Pre, Q3Pre etc.
-  \item Type: Pre, Post, or FollowUp
+  \item Time: Pre, Post, or FollowUp
   \item Response: Values of the Question
   \item variable_code: Q1, Q2, Q3 etc.
 }

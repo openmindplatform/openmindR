@@ -9,7 +9,7 @@ om_ttest(gathered_dat, comparison)
 \arguments{
 \item{gathered_dat}{Long format data}
 
-\item{comparison}{Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"}
+\item{comparison}{Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3". "PreFollowUpT1T2" performs Pre-Post comparison only for people who completed the FollowUp. "PreFollowUpT1T3" is the same sample of people (only those who completed the FollowUp) but compares them Pre-FollowUp.}
 }
 \description{
 This function performs t-tests on v6 and v7 data
@@ -38,4 +38,26 @@ assessmentv7  \%>\%
   om_ttest("PrePost") \%>\%
   ## arrange by cohens D
   arrange(desc(cohend))
+
+## get v6 data
+assessmentv6 <- om_download_at(key,
+                               tables = "AssessmentV6",
+                               clean = TRUE)
+
+## get results for all variables
+assessmentv6  \%>\%
+  ## select only relevant variables and composite scores
+  select(OMID, AffPol1Pre:IntellectualHumilityFollowUp,
+         GrowthMindsetPre, GrowthMindsetPost, GrowthMindsetFollowUp,
+         C1Pre, C5Pre, C6Pre,
+         C1Post, C5Post, C6Post,
+         C1FollowUp, C5FollowUp, C6FollowUp,
+         -contains("Preparedness3")) \%>\%
+  ## turn data into long format
+  om_gather(which_strings = v6_var_strings)  \%>\%
+  ## perform t-test on each variable (for Pre and Post)
+  om_ttest("PrePost") \%>\%
+  ## arrange by cohens D
+  arrange(desc(cohend))
+
 }

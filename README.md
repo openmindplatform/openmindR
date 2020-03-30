@@ -77,7 +77,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 208 rows
+    ## Done. AssessmentV7 Data has 214 rows
 
 ## `om_filter_data`
 
@@ -249,8 +249,9 @@ This section introduces the openmindR analysis functions.
 
 ## `om_ttest`
 
-This function performs t-tests on long format data and returns stats on
-the model (including p-values, t-statistics and Cohen’s D effect size).
+This function performs paired t-tests on long format Pre-Post-FollowUp
+data and returns stats on the model (including p-values, t-statistics
+and Cohen’s D effect size).
 
 `om_ttest` takes two arguments:
 
@@ -258,6 +259,10 @@ the model (including p-values, t-statistics and Cohen’s D effect size).
     [om\_gather](https://github.com/openmindplatform/openmindR#om_gather))
   - `comparison` Three possible comparisons “PrePost”, “PreFollowUpT1T2”
     or “PreFollowUpT1T3”
+
+PreFollowUpT1T2 performs Pre-Post comparison only for people who
+completed the FollowUp. PreFollowUpT1T3 is the same sample of people
+(only those who completed the FollowUp) but compares them Pre-FollowUp.
 
 First we download v7 data:
 
@@ -292,6 +297,26 @@ assessmentv7  %>%
   select(OMID, AffPol1Pre:IHCultureSub3FollowUp) %>% 
   ## turn data into long format
   om_gather(which_strings = v7_var_strings)  %>%
+  ## perform t-test on each variable (for Pre and Post)
+  om_ttest("PrePost") %>% 
+  ## arrange by cohens D
+  arrange(desc(cohend)) 
+```
+
+Same process for Assessment v6:
+
+``` r
+## get results for all variables
+assessmentv6  %>%
+  ## select only relevant variables and composite scores
+  select(OMID, AffPol1Pre:IntellectualHumilityFollowUp, 
+         GrowthMindsetPre, GrowthMindsetPost, GrowthMindsetFollowUp,
+         C1Pre, C5Pre, C6Pre, 
+         C1Post, C5Post, C6Post,
+         C1FollowUp, C5FollowUp, C6FollowUp,
+         -contains("Preparedness3")) %>% 
+  ## turn data into long format
+  om_gather(which_strings = v6_var_strings)  %>%
   ## perform t-test on each variable (for Pre and Post)
   om_ttest("PrePost") %>% 
   ## arrange by cohens D
@@ -374,7 +399,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -400,7 +425,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -419,7 +444,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>
