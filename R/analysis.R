@@ -945,7 +945,7 @@ om_ttest <- function(gathered_dat, comparison) {
           dplyr::mutate(Type = forcats::fct_relevel(Type, c("Pre", "Post"))) %>%
           dplyr::filter(variable_code %nin% c("C1", "C5", "C6"))
 
-        if(nrow(gathered_dat)==0){
+        if(nrow(internal)==0){
           return(NULL)
         }
 
