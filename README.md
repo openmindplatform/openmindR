@@ -23,6 +23,51 @@ library(openmindR)
 library(tidyverse)
 ```
 
+# Create Master dataset
+
+This code merges Assessment data with Participant Progress and Access
+Codes tables (to add UserType, OpenMindVersion and other variables).
+
+``` r
+pacman::p_load(tidyverse, openmindR)
+
+
+assessmentv6 <- om_download_at(key, tables = "AssessmentV6",
+                               clean = T, v6.1 = T)
+
+## ParticipantProgress1
+pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished)
+
+## ParticipantProgress2
+pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished)
+
+## AccessCodes
+acs <- om_download_at(key, tables = "AccessCodes") %>%
+  select(AccessCode, UserType, GroupName)
+
+## bring it all together
+cleaned_dat <- pp1  %>%
+  bind_rows(pp2) %>%
+  ## turn dates into date format
+  mutate(DateFinished = lubridate::as_date(DateFinished)) %>%
+  mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
+  ## compute WithinADay
+  mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Access Code Data
+  coalesce_join(acs, join = dplyr::left_join) %>%
+  ## join in Assessment data
+  coalesce_join(assessmentv6, join = dplyr::inner_join) %>% 
+  ## if AccessCode is IndividualUser, then UserType is IndividualUser
+  mutate(UserType = ifelse(AccessCode == "IndividualUser",
+                           "IndividualUser", UserType)) %>%
+  drop_na(UserType) %>%
+  drop_na(DateStarted)
+```
+
 # openmindR Cleaning Functions
 
 The following functions are meant to turn AirTable data into a single
@@ -77,7 +122,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 214 rows
+    ## Done. AssessmentV7 Data has 247 rows
 
 ## `om_filter_data`
 
@@ -399,7 +444,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -425,7 +470,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -444,7 +489,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

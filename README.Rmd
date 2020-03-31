@@ -20,6 +20,25 @@ knitr::opts_chunk$set(message = F,
                       warning = F, 
                       eval = F)
 
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+
+ups <- c("GrowthMindset", "CIHS_LIO",
+         "OutgroupLiking", "OutgroupMotivation",
+         "Preparedness", "C1", "C6",
+         "IntellectualHumility", "GM", 
+         "IHSub1", "IHSub2", "IHSub3",
+         "IHCultureSub1", "IHCultureSub2", "IHCultureSub3", 
+         "SE", "Belong", "Dissent", "Tolerance", 
+         "IngroupLiking", "IngroupMotivation",
+          "OutgroupLiking", "OutgroupMotivation", 
+         "MotivationCon", "MotivationProg")
+
+downs <- c("AffPol1", "AffPol2",
+           "GBSS", "MAA", "C5", 
+           "Anxiety", "Attribution", 
+           "IntAnx", "SocialDistance", 
+           "Avoidance")
 # AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
 # 
 # usethis::use_data(AssessmentV6Codebook)
@@ -38,8 +57,51 @@ library(tidyverse)
 
 ```
 
+# Create Master dataset
+
+This code merges Assessment data with Participant Progress and Access Codes tables (to add UserType, OpenMindVersion and other variables).
+
+```{r}
+pacman::p_load(tidyverse, openmindR)
 
 
+assessmentv6 <- om_download_at(key, tables = "AssessmentV6",
+                               clean = T, v6.1 = T)
+
+## ParticipantProgress1
+pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished)
+
+## ParticipantProgress2
+pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished)
+
+## AccessCodes
+acs <- om_download_at(key, tables = "AccessCodes") %>%
+  select(AccessCode, UserType, GroupName)
+
+## bring it all together
+cleaned_dat <- pp1  %>%
+  bind_rows(pp2) %>%
+  ## turn dates into date format
+  mutate(DateFinished = lubridate::as_date(DateFinished)) %>%
+  mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
+  ## compute WithinADay
+  mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Access Code Data
+  coalesce_join(acs, join = dplyr::left_join) %>%
+  ## join in Assessment data
+  coalesce_join(assessmentv6, join = dplyr::inner_join) %>% 
+  ## if AccessCode is IndividualUser, then UserType is IndividualUser
+  mutate(UserType = ifelse(AccessCode == "IndividualUser",
+                           "IndividualUser", UserType)) %>%
+  drop_na(UserType) %>%
+  drop_na(DateStarted)
+
+
+```
 
 
 
@@ -111,25 +173,9 @@ db_get_data <- function(tbl_dat) {
 #                      mutate(AssessmentVersion = as.numeric(AssessmentVersion)) %>% 
 #                      mutate(AssessmentsDone = as.numeric(AssessmentsDone)))
 
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
-ups <- c("GrowthMindset", "CIHS_LIO",
-         "OutgroupLiking", "OutgroupMotivation",
-         "Preparedness", "C1", "C6",
-         "IntellectualHumility", "GM", 
-         "IHSub1", "IHSub2", "IHSub3",
-         "IHCultureSub1", "IHCultureSub2", "IHCultureSub3", 
-         "SE", "Belong", "Dissent", "Tolerance", 
-         "IngroupLiking", "IngroupMotivation",
-          "OutgroupLiking", "OutgroupMotivation", 
-         "MotivationCon", "MotivationProg")
-
-downs <- c("AffPol1", "AffPol2",
-           "GBSS", "MAA", "C5", 
-           "Anxiety", "Attribution", 
-           "IntAnx", "SocialDistance", 
-           "Avoidance")
 ```
+
 ## `om_download_at`
 
 `openmindR` can download and clean data directly from Airtable. 
