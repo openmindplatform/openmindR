@@ -43,7 +43,7 @@ downs <- c("AffPol1", "AffPol2",
 # 
 # usethis::use_data(AssessmentV6Codebook)
 
-# v6_var_strings <- "AffPol1|AffPol2|OutgroupLiking|IngroupLiking|MotivationProg|MotivationCon|CIHS_LIO|GrowthMindset|GBSS|MAA|OutgroupMotivation|IngroupMotivation|Preparedness|C1|C5|C6|IntellectualHumility"
+# v6_var_strings <- "AffPol1|AffPol2|OutgroupLiking|IngroupLiking|MotivationProg|MotivationCon|CIHS_LIO|GrowthMindset|GBSS|MAA|OutgroupMotivation|IngroupMotivation|Preparedness|C1|C5|C6|IntellectualHumility|SoughtOutDifferent"
 # 
 # usethis::use_data(v6_var_strings, overwrite = T)
 ```
