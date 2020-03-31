@@ -368,7 +368,8 @@ om_rescale <- function(.data) {
 #' \itemize{
 #'   \item ppol_raw: a variable that merges Assessment V4 and V5.1 spelling of Political Orientation (D4)
 #'   \item ppol: a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
-#'   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
+#'   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"#'   \item ppol_num: numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
+#'   \item ppol_extreme: numeric variable ranging from 0 "Moderate/Middle-of-the-road" to 3 "Very Conservative/right" or "Very Progressive/left"
 #'   \item ppol_cat: a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 #'   \item ppol_catmod: a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 #' }
@@ -411,7 +412,14 @@ om_clean_ppol <- function(assessment) {
                                                      "Very Conservative/right"))) %>%
     ## clean politics variable / make it numeric / only use valid cases
     dplyr::mutate(ppol_num = as.numeric(ppol)) %>%
-    # dplyr::select(ppol, ppol_num, D4) %>%
+    ## political extremes
+    dplyr::mutate(ppol_extreme = dplyr::case_when(
+      ppol_num == 4 ~ 0,
+      ppol_num == 5 ~ 1,
+      ppol_num == 6 ~ 2,
+      ppol_num == 7 ~ 3,
+      T ~ ppol_num
+    )) %>%
     dplyr::mutate(ppol_cat = dplyr::case_when(
       ppol_num %in% c(1:3) ~ "Progressives",
       ppol_num %in% c(5:7) ~ "Conservatives",
@@ -960,6 +968,8 @@ clean_assessment7 <- function(assessment) {
                   dplyr::everything()) %>%
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()  %>%
+    om_dummy_nonwhite() %>%
+    om_dummy_nonstraight() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date"),
       dplyr::contains("Time")
@@ -1128,6 +1138,8 @@ clean_assessment6 <- function(assessment) {
     dplyr::filter(!(AccessCode %in% test_acs)) %>%
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()   %>%
+    om_dummy_nonwhite() %>%
+    om_dummy_nonstraight() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date")
     ), ~openmindR::chr_to_datetime(.x)) %>%
@@ -1368,4 +1380,38 @@ om_reverse_code <- function(assessment) {
 
   return(final)
 
+}
+
+
+
+#' Code a dummy variable for white/nonwhite
+#'
+#' This function creates a dummy variable from D3 (Race) called \code{race_nonwhite} and codes people who identify only as white as 0 and everyone else as 1.
+#'
+#' @param assessment assessment data
+#' @examples
+#' assessmentv7 %>%
+#'   om_dummy_nonwhite()
+#' @export
+om_dummy_nonwhite <- function(assessment) {
+  assessment <- assessment %>%
+    dplyr::mutate(race_nonwhite = ifelse(!(stringr::str_detect(D3, "\\)\\(")) & stringr::str_detect(D3, "White/Caucasian"), 0, 1))
+
+  return(assessment)
+}
+
+#' Code a dummy variable for straight/non-straight
+#'
+#' This function creates a dummy variable from D5 (Sexuality) called \code{sex_nonstraight} and codes people who identify as heterosexual as 0 and everyone else as 1.
+#'
+#' @param assessment assessment data
+#' @examples
+#' assessmentv7 %>%
+#'   om_dummy_nonstraight()
+#' @export
+om_dummy_nonstraight <- function(assessment) {
+  assessment <- assessment %>%
+    dplyr::mutate(sex_nonstraight = ifelse(stringr::str_detect(D5, "Heterosexual/straight"), 0, 1))
+
+  return(assessment)
 }

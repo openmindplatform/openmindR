@@ -101,6 +101,9 @@ cleaned_dat <- pp1  %>%
   drop_na(DateStarted)
 
 
+
+
+
 ```
 
 
@@ -114,6 +117,8 @@ The following functions are meant to turn AirTable data into a single clean file
 
 + [om_filter_data](https://github.com/openmindplatform/openmindR#om_filter_data)
 + [om_clean_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
++ [om_dummy_nonwhite](https://github.com/openmindplatform/openmindR#om_dummy_nonwhite)
++ [om_dummy_nonstraight](https://github.com/openmindplatform/openmindR#om_dummy_nonstraight)
 + [om_gather](https://github.com/openmindplatform/openmindR#om_gather)
 + [om_parse_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
 + [merge_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
@@ -264,6 +269,7 @@ Creates the following measures of Political Orientation
 + **ppol_raw:** a variable that merges Assessment V4 and V5.1 spelling of Political Orientation (D4)
 + **ppol:** a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
 + **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
++ **ppol_extreme:** numeric variable ranging from 0 "Moderate/Middle-of-the-road" to 3 "Very Conservative/right" or "Very Progressive/left"
 + **ppol_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
 + **ppol_catmod:** a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 
@@ -271,6 +277,24 @@ Creates the following measures of Political Orientation
 ```{r, eval = F}
 assessmentv7 %>% 
   om_clean_ppol()
+```
+
+## `om_dummy_nonwhite`
+
+This function creates a dummy variable from D3 (Race) called `race_nonwhite` and codes people who identify **only** as white as 0 and everyone else as 1.
+
+```{r, eval = F}
+assessmentv7 %>% 
+  om_dummy_nonwhite()
+```
+
+## `om_dummy_nonstraight`
+
+This function creates a dummy variable from D5 (Sexuality) called `sex_nonstraight` and codes people who identify as heterosexual as 0 and everyone else as 1.
+
+```{r, eval = F}
+assessmentv7 %>% 
+  om_dummy_nonstraight()
 ```
 
 

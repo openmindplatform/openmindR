@@ -79,6 +79,10 @@ clean file that can be analyzed.
 
   - [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
 
+  - [om\_dummy\_nonwhite](https://github.com/openmindplatform/openmindR#om_dummy_nonwhite)
+
+  - [om\_dummy\_nonstraight](https://github.com/openmindplatform/openmindR#om_dummy_nonstraight)
+
   - [om\_gather](https://github.com/openmindplatform/openmindR#om_gather)
 
   - [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
@@ -180,6 +184,9 @@ Creates the following measures of Political Orientation
     (classical liberal etc.)
   - **ppol\_num:** numeric variable ranging from 1 “Very
     Progressive/left” to 7 “Very Conservative/right”
+  - **ppol\_extreme:** numeric variable ranging from 0
+    “Moderate/Middle-of-the-road” to 3 “Very Conservative/right” or
+    “Very Progressive/left”
   - **ppol\_cat:** a factor variable which has two categories
     “Progressive” and “Conservative”. The rest is NA.
   - **ppol\_catmod:** a factor variable which has three categories
@@ -190,6 +197,28 @@ Creates the following measures of Political Orientation
 ``` r
 assessmentv7 %>% 
   om_clean_ppol()
+```
+
+## `om_dummy_nonwhite`
+
+This function creates a dummy variable from D3 (Race) called
+`race_nonwhite` and codes people who identify **only** as white as 0 and
+everyone else as 1.
+
+``` r
+assessmentv7 %>% 
+  om_dummy_nonwhite()
+```
+
+## `om_dummy_nonstraight`
+
+This function creates a dummy variable from D5 (Sexuality) called
+`sex_nonstraight` and codes people who identify as heterosexual as 0 and
+everyone else as 1.
+
+``` r
+assessmentv7 %>% 
+  om_dummy_nonstraight()
 ```
 
 ## `om_gather`
@@ -444,7 +473,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -470,7 +499,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -489,7 +518,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>
