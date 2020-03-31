@@ -996,7 +996,7 @@ clean_assessment7 <- function(assessment) {
                                  dplyr::contains("SocialMediaUse")
     ), ~as.character(.x) %>% readr::parse_number()) %>%
     dplyr::mutate(Issue = readr::parse_number(Issue)) %>%
-    mutate(SocialMediaUse = 7-SocialMediaUse) %>%
+    # mutate(SocialMediaUse = 7-SocialMediaUse) %>%
     ## Temperature Questions
     polar_measures(ProgTempPre, ConTempPre) %>%
     polar_measures(ProgTempPost, ConTempPost) %>%
@@ -1372,7 +1372,7 @@ om_reverse_code <- function(assessment) {
   reverseFollowUp <- reverse %>%
     paste0(., "FollowUp")
 
-  reverse <- c(reversePre, reversePost, reverseFollowUp)
+  reverse <- c(reversePre, reversePost, reverseFollowUp, "SocialMediaUse")
 
 
   final <- final  %>%
