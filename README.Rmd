@@ -106,7 +106,104 @@ cleaned_dat <- pp1  %>%
 
 ```
 
+```{r, eval = F, echo = F}
+pacman::p_load(tidyverse, openmindR)
 
+  # AssessmentV7 <- airtabler::airtable(om_base, "AssessmentV7Copy")$AssessmentV7Copy$select_all() %>% 
+  # janitor::remove_empty()
+key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
+assessmentv7 <- om_download_at(key, tables = "AssessmentV7",
+                               clean = T, v6.1 = T) %>% 
+  janitor::remove_empty()
+  # mutate(DateStarted = lubridate::as_date(DateStarted)) %>% 
+  # mutate(DateFinished = lubridate::as_date(DateFinished))
+
+## ParticipantProgress1
+pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished, StepsComplete, StepScores) %>%
+  mutate(ModsCompleteN = str_count(StepsComplete, "1")) %>% 
+  mutate(QScore = StepScores %>% map_dbl(~{.x %>% 
+      str_split(",") %>% 
+      unlist %>% 
+      parse_number %>% 
+      sum(na.rm = T) %>% 
+      magrittr::divide_by(33) %>% 
+      magrittr::multiply_by(100)
+    }
+    )) %>% 
+  select(-StepsComplete, -StepScores)
+
+## ParticipantProgress2
+pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+  select(OMID, AccessCode, OpenMindVersion, Country, 
+         Research, DateStarted, DateFinished, ModsComplete, ModScores) %>%
+  mutate(ModsCompleteN = str_count(ModsComplete, ",") + 1) %>% 
+  mutate(QScore = ModScores %>% map_dbl(~{.x %>% 
+      str_split(",") %>% 
+      unlist %>% 
+      parse_number %>% 
+      sum(na.rm = T) %>% 
+      magrittr::divide_by(33) %>% 
+      magrittr::multiply_by(100)
+    }
+    )) %>% 
+  select(-ModsComplete, -ModScores)
+
+
+
+
+str_split(pp2$ModScores, ",") %>% 
+  map(unlist)
+
+## AccessCodes
+acs <- om_download_at(key, tables = "AccessCodes") %>%
+  select(AccessCode, UserType, GroupName)
+
+## bring it all together
+cleaned_dat <- pp1   %>% 
+  bind_rows(pp2) %>%
+  ## turn dates into date format
+  mutate(DateFinished = lubridate::as_datetime(DateFinished)) %>%
+  mutate(DateStarted = lubridate::as_datetime(DateStarted)) %>%
+  ## compute WithinADay
+  mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Access Code Data
+  coalesce_join(acs, join = dplyr::left_join) %>%
+  ## join in Assessment data
+  coalesce_join(assessmentv7, join = dplyr::right_join) %>% 
+  ## if AccessCode is IndividualUser, then UserType is IndividualUser
+  # mutate(UserType = ifelse(AccessCode == "IndividualUser",
+                           # "IndividualUser", UserType)) %>%
+  mutate(Research = ifelse(is.na(Research), "No", Research)) %>% 
+  drop_na(UserType) %>%
+  drop_na(DateStarted)
+
+# cleaned_dat %>% View()
+# 
+# assessmentv7$DateStarted
+
+om_base <- "appjU7KUyybZ4rGvT"
+
+
+cleaned_dat %>% 
+  split(1:nrow(.)) %>% 
+      map(
+        ~{
+          airtabler::air_update(om_base, "AssessmentV7Copy", record_id = .x$id, record_data = .x %>% select(OpenMindVersion, UserType, Country, Research, ModsCompleteN, QScore, DateStarted, DateFinished) %>% as.list())
+        }
+      )    
+
+assessmentv7 %>% select(sex_nonstraight) %>% count(sex_nonstraight)
+
+assessmentv7 %>% select(WithinADay) %>% count(WithinADay)
+
+
+assessmentv7 %>%
+  select(OMID, AccessCode, UserType:Research) %>%
+  filter(is.na(OpenMindVersion))
+```
 
 
 # openmindR Cleaning Functions
@@ -185,7 +282,7 @@ db_get_data <- function(tbl_dat) {
 
 `openmindR` can download and clean data directly from Airtable. 
 
-+ `clean`: Whether to return "clean" data (i.e. numeric data is numeric and minors or opt-outs are `NA`. Also constructs measures. (`TRUE`/`FALSE`)
++ `clean`: Whether to return "clean" data (i.e. numeric data is numeric and minors or opt-outs are `NA`. Also constructs measures and computes dummy variables. (`TRUE`/`FALSE`)
 + `file`: give a file path to where the downloaded data should be stored
 + `v6.1`: filter down the dataset to only include Assessment V6.1 (`TRUE/FALSE`)
 
@@ -266,7 +363,7 @@ assessmentv7 %>%
 
 Creates the following measures of Political Orientation
 
-+ **ppol_raw:** a variable that merges Assessment V4 and V5.1 spelling of Political Orientation (D4)
++ **ppol_raw:** a variable that has all political orientation variables across all Assessment Versions (corresponds to `D4`)
 + **ppol:** a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
 + **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
 + **ppol_extreme:** numeric variable ranging from 0 "Moderate/Middle-of-the-road" to 3 "Very Conservative/right" or "Very Progressive/left"
@@ -295,6 +392,20 @@ This function creates a dummy variable from D5 (Sexuality) called `sex_nonstraig
 ```{r, eval = F}
 assessmentv7 %>% 
   om_dummy_nonstraight()
+```
+
+## `om_dummy_ut`
+
+This function creates the dummy variables from UserType
+
++ `ut_college_individ`: College student (0) v. individual user (1)
++ `ut_corp_individ`: Corp (0) v. individual user (1)
++ `ut_college_corp`: College student (0) v. corp (1)
+
+
+```{r, eval = F}
+assessmentv7 %>% 
+  om_dummy_ut()
 ```
 
 

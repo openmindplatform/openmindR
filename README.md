@@ -94,8 +94,8 @@ clean file that can be analyzed.
 `openmindR` can download and clean data directly from Airtable.
 
   - `clean`: Whether to return “clean” data (i.e. numeric data is
-    numeric and minors or opt-outs are `NA`. Also constructs measures.
-    (`TRUE`/`FALSE`)
+    numeric and minors or opt-outs are `NA`. Also constructs measures
+    and computes dummy variables. (`TRUE`/`FALSE`)
   - `file`: give a file path to where the downloaded data should be
     stored
   - `v6.1`: filter down the dataset to only include Assessment V6.1
@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 247 rows
+    ## Done. AssessmentV7 Data has 345 rows
 
 ## `om_filter_data`
 
@@ -177,8 +177,8 @@ assessmentv7 %>%
 
 Creates the following measures of Political Orientation
 
-  - **ppol\_raw:** a variable that merges Assessment V4 and V5.1
-    spelling of Political Orientation (D4)
+  - **ppol\_raw:** a variable that has all political orientation
+    variables across all Assessment Versions (corresponds to `D4`)
   - **ppol:** a factor variable ordered from “Very Progressive/left” to
     “Very Conservative/right”. Excludes all other categories as NA
     (classical liberal etc.)
@@ -219,6 +219,21 @@ everyone else as 1.
 ``` r
 assessmentv7 %>% 
   om_dummy_nonstraight()
+```
+
+## `om_dummy_ut`
+
+This function creates the dummy variables from UserType
+
+  - `ut_college_individ`: College student (0) v. individual user (1)
+  - `ut_corp_individ`: Corp (0) v. individual user (1)
+  - `ut_college_corp`: College student (0) v. corp (1)
+
+<!-- end list -->
+
+``` r
+assessmentv7 %>% 
+  om_dummy_ut()
 ```
 
 ## `om_gather`
@@ -473,7 +488,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -499,7 +514,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -518,7 +533,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

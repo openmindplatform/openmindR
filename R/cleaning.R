@@ -961,15 +961,20 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate_all(~ifelse(magrittr::equals(.x, "99"), NA_character_, .x)) %>%
     dplyr::mutate(D1 = ifelse(D1 == "991", "99", D1)) %>%
     dplyr::mutate(TargetAge = ifelse(TargetAge == "991", "99", TargetAge)) %>%
-    dplyr::filter(!(AccessCode %in% test_acs)) %>%
+    dplyr::filter(!(AccessCode %in% test_acs))  %>%
+    ## if AccessCode is IndividualUser, then UserType is IndividualUser
+    mutate(UserType = ifelse(AccessCode == "IndividualUser",
+                             "IndividualUser", UserType)) %>%
+    mutate(WithinADay = as.numeric(lubridate::as_date(DateStarted)==lubridate::as_date(DateFinished))) %>%
     # dplyr::select(sort(tidyselect::peek_vars(), decreasing = F)) %>%
-    dplyr::select(id, OMID, AccessCode, AssessmentVersion, AssessmentsDone,
+    dplyr::select(id, OMID, AccessCode, UserType:Research, WithinADay, AssessmentVersion, AssessmentsDone,
                   D1, D2, D3, D4, D5, D6,
                   dplyr::everything()) %>%
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()  %>%
     om_dummy_nonwhite() %>%
     om_dummy_nonstraight() %>%
+    om_dummy_ut() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date"),
       dplyr::contains("Time")
@@ -977,6 +982,9 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate_at(dplyr::vars(AssessmentVersion,
                                  AssessmentsDone,
                                  D1,
+                                 ModsCompleteN,
+                                 OpenMindVersion,
+                                 QScore,
                                  dplyr::contains("Motivation"),
                                  dplyr::contains("GBSS"),
                                  dplyr::contains("Temp"),
@@ -1140,7 +1148,7 @@ clean_assessment6 <- function(assessment) {
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()   %>%
     om_dummy_nonwhite() %>%
-    om_dummy_nonstraight() %>%
+    # om_dummy_nonstraight() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date")
     ), ~openmindR::chr_to_datetime(.x)) %>%
@@ -1413,6 +1421,42 @@ om_dummy_nonwhite <- function(assessment) {
 om_dummy_nonstraight <- function(assessment) {
   assessment <- assessment %>%
     dplyr::mutate(sex_nonstraight = ifelse(stringr::str_detect(D5, "Heterosexual/straight"), 0, 1))
+
+  return(assessment)
+}
+
+
+
+#' Code a dummy variables for UserType variables
+#'
+#' This function creates the dummy variables from UserType
+#' \itemize{
+#'   \item ut_college_individ: College student (0) v. individual user (1)
+#'   \item ut_corp_individ: Corp (0) v. individual user (1)
+#'   \item ut_college_corp: College student (0) v. corp (1)
+#' }
+#' @param assessment assessment data
+#' @examples
+#' assessmentv7 %>%
+#'   om_dummy_ut()
+#' @export
+om_dummy_ut <- function(assessment) {
+  assessment <- assessment %>%
+    dplyr::mutate(ut_college_individ = case_when(
+      stringr::str_detect(UserType, "college") ~ 0,
+      stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 1,
+      T ~ NA_real_
+      )) %>%
+    dplyr::mutate(ut_college_corp = case_when(
+      stringr::str_detect(UserType, "college") ~ 0,
+      stringr::str_detect(UserType, "corp") ~ 1,
+      T ~ NA_real_
+    )) %>%
+    dplyr::mutate(ut_corp_individ = case_when(
+      stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 0,
+      stringr::str_detect(UserType, "corp") ~ 1,
+      T ~ NA_real_
+    ))
 
   return(assessment)
 }
