@@ -42,6 +42,12 @@ downs <- c("AffPol1", "AffPol2",
 # AssessmentV6Codebook <- readRDS("data/AssessmentV6Codebook.RDS")
 # 
 # usethis::use_data(AssessmentV6Codebook)
+# 
+# AssessmentV7Codebook <- readRDS("../../Research/Assessments & Codebooks/v7/AssessmentV7Codebook/data/AssessmentV7Codebook.RDS")
+# 
+# usethis::use_data(AssessmentV7Codebook)
+
+
 
 # v6_var_strings <- "AffPol1|AffPol2|OutgroupLiking|IngroupLiking|MotivationProg|MotivationCon|CIHS_LIO|GrowthMindset|GBSS|MAA|OutgroupMotivation|IngroupMotivation|Preparedness|C1|C5|C6|IntellectualHumility|SoughtOutDifferent"
 # 
@@ -198,6 +204,8 @@ cleaned_dat %>%
 assessmentv7 %>% select(sex_nonstraight) %>% count(sex_nonstraight)
 
 assessmentv7 %>% select(WithinADay) %>% count(WithinADay)
+
+assessmentv7 %>% select(ut_college_individ) %>% count(ut_college_individ)
 
 
 assessmentv7 %>%
