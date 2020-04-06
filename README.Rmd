@@ -96,16 +96,15 @@ cleaned_dat <- pp1  %>%
   mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
   ## compute WithinADay
   mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Assessment data
+  coalesce_join(assessmentv6, join = dplyr::right_join) %>% 
   ## join in Access Code Data
   coalesce_join(acs, join = dplyr::left_join) %>%
-  ## join in Assessment data
-  coalesce_join(assessmentv6, join = dplyr::inner_join) %>% 
   ## if AccessCode is IndividualUser, then UserType is IndividualUser
   mutate(UserType = ifelse(AccessCode == "IndividualUser",
                            "IndividualUser", UserType)) %>%
   drop_na(UserType) %>%
   drop_na(DateStarted)
-
 
 
 

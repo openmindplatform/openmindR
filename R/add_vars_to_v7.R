@@ -7,10 +7,12 @@
 # assessmentv7 <- om_download_at(key, tables = "AssessmentV7",
 #                                clean = T, v6.1 = T) %>%
 #   janitor::remove_empty() %>%
-#   filter(is.na(UserType)) %>%
+#   # filter(is.na(UserType)) %>%
+#   filter(OpenMindVersion %in% c("3.9", "4.1")) %>%
 #   select(-OpenMindVersion, -UserType,
 #          -Country, -Research,
-#          -ModsCompleteN, -QScore)
+#          -ModsCompleteN, -QScore,
+#          -DateStarted, -DateFinished)
 # # mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
 # # mutate(DateFinished = lubridate::as_date(DateFinished))
 #
@@ -49,8 +51,8 @@
 #
 #
 #
-# str_split(pp2$ModScores, ",") %>%
-#   map(unlist)
+# # str_split(pp2$ModScores, ",") %>%
+# #   map(unlist)
 #
 # ## AccessCodes
 # acs <- om_download_at(key, tables = "AccessCodes") %>%
@@ -63,14 +65,16 @@
 #   mutate(DateFinished = lubridate::as_datetime(DateFinished)) %>%
 #   mutate(DateStarted = lubridate::as_datetime(DateStarted)) %>%
 #   ## compute WithinADay
-#   mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
-#   ## join in Access Code Data
-#   coalesce_join(acs, join = dplyr::left_join) %>%
+#   # mutate(WithinADay = as.character(DateStarted==DateFinished)) %>%
 #   ## join in Assessment data
 #   coalesce_join(assessmentv7, join = dplyr::right_join) %>%
+#   ## compute WithinADay
+#   # mutate(WithinADay = as.numeric(WithinADay)) %>%
+#   ## join in Access Code Data
+#   coalesce_join(acs, join = dplyr::left_join) %>%
 #   ## if AccessCode is IndividualUser, then UserType is IndividualUser
-#   # mutate(UserType = ifelse(AccessCode == "IndividualUser",
-#   # "IndividualUser", UserType)) %>%
+#   mutate(UserType = ifelse(AccessCode == "IndividualUser",
+#   "IndividualUser", UserType)) %>%
 #   mutate(Research = ifelse(is.na(Research), "No", Research)) %>%
 #   drop_na(UserType) %>%
 #   drop_na(DateStarted) %>%
