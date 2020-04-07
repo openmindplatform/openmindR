@@ -1067,6 +1067,10 @@ perc_improved <- function(all_pre, all_post, total, variable_code){
   downs <- c("AffPol1", "AffPol2",
              "GBSS", "MAA", "C5", "Anxiety", "Attribution", "IntAnx", "SocialDistance", "Avoidance")
 
+  if(variable_code %nin% ups & variable_code %nin% downs){
+    return(NA)
+  }
+
   if (variable_code %in% ups) {
     p_improv <- sum((all_pre < all_post)==TRUE)/total
   }
