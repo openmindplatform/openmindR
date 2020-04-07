@@ -1068,6 +1068,7 @@ perc_improved <- function(all_pre, all_post, total, variable_code){
              "GBSS", "MAA", "C5", "Anxiety", "Attribution", "IntAnx", "SocialDistance", "Avoidance")
 
   if(variable_code %nin% ups & variable_code %nin% downs){
+    message(paste0("Variable '", variable_code, "' has no percent improvement direction. Variable 'percentimproved' set to NA.\n"))
     return(NA)
   }
 
