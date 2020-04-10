@@ -74,9 +74,11 @@ db_get_data <- function(tbl_dat, path = "sql_data/omdata.db") {
 #' @param x a number to be rounded
 #' @param k round to which position after the comma
 #' @export
-specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+specify_decimal <- function(x, k) {
+  trimmed <- trimws(format(round(x, k), nsmall=k))
 
-
+  return(trimmed)
+}
 
 
 #' SQL Database Remove
