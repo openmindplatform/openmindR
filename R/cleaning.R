@@ -921,7 +921,7 @@ get_assessmentv6.1 <- function(assessment) {
                 "IHText", "Preparedness3", "IntellectualHumility1",
                 "IntellectualHumility2", "IntellectualHumility3",
                 "SoughtOutDifferent", "FeedbackAssessment",
-                "GBSS1", "GBSS2", "GBSS3")
+                "GBSS1", "GBSS2", "GBSS3", "C1", "C5", "C6")
 
   assessment61 <- assessment %>%
     dplyr::select(
