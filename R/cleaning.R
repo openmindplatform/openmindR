@@ -414,6 +414,9 @@ om_clean_ppol <- function(assessment) {
     dplyr::mutate(ppol_num = as.numeric(ppol)) %>%
     ## political extremes
     dplyr::mutate(ppol_extreme = dplyr::case_when(
+      ppol_num == 1 ~ 3,
+      ppol_num == 2 ~ 2,
+      ppol_num == 3 ~ 1,
       ppol_num == 4 ~ 0,
       ppol_num == 5 ~ 1,
       ppol_num == 6 ~ 2,
@@ -963,9 +966,9 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate(TargetAge = ifelse(TargetAge == "991", "99", TargetAge)) %>%
     dplyr::filter(!(AccessCode %in% test_acs))  %>%
     ## if AccessCode is IndividualUser, then UserType is IndividualUser
-    mutate(UserType = ifelse(AccessCode == "IndividualUser",
+    dplyr::mutate(UserType = ifelse(AccessCode == "IndividualUser",
                              "IndividualUser", UserType)) %>%
-    mutate(WithinADay = as.numeric(lubridate::as_date(DateStarted)==lubridate::as_date(DateFinished))) %>%
+    dplyr::mutate(WithinADay = as.numeric(lubridate::as_date(DateStarted)==lubridate::as_date(DateFinished))) %>%
     # dplyr::select(sort(tidyselect::peek_vars(), decreasing = F)) %>%
     dplyr::select(id, OMID, AccessCode, UserType:Research, WithinADay, AssessmentVersion, AssessmentsDone,
                   D1, D2, D3, D4, D5, D6,
@@ -1443,17 +1446,17 @@ om_dummy_nonstraight <- function(assessment) {
 #' @export
 om_dummy_ut <- function(assessment) {
   assessment <- assessment %>%
-    dplyr::mutate(ut_college_individ = case_when(
+    dplyr::mutate(ut_college_individ = dplyr::case_when(
       stringr::str_detect(UserType, "college") ~ 0,
       stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 1,
       T ~ NA_real_
       )) %>%
-    dplyr::mutate(ut_college_corp = case_when(
+    dplyr::mutate(ut_college_corp = dplyr::case_when(
       stringr::str_detect(UserType, "college") ~ 0,
       stringr::str_detect(UserType, "corp") ~ 1,
       T ~ NA_real_
     )) %>%
-    dplyr::mutate(ut_corp_individ = case_when(
+    dplyr::mutate(ut_corp_individ = dplyr::case_when(
       stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 0,
       stringr::str_detect(UserType, "corp") ~ 1,
       T ~ NA_real_
