@@ -978,6 +978,7 @@ clean_assessment7 <- function(assessment) {
     om_dummy_nonwhite() %>%
     om_dummy_nonstraight() %>%
     om_dummy_ut() %>%
+    om_dummy_individ() %>%
     om_dummy_gender() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date"),
@@ -1153,7 +1154,7 @@ clean_assessment6 <- function(assessment) {
     om_clean_ppol()   %>%
     om_dummy_nonwhite() %>%
     om_dummy_gender() %>%
-    om_dummy_ut() %>%
+    om_dummy_individ() %>%
     # om_dummy_nonstraight() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date")
@@ -1483,10 +1484,29 @@ om_dummy_ut <- function(assessment) {
       stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 0,
       stringr::str_detect(UserType, "corp") ~ 1,
       T ~ NA_real_
-    )) %>%
+    ))
+
+  return(assessment)
+}
+
+
+
+#' Code a dummy variables for Individual users
+#'
+#' This function creates the dummy variables from AccessCode
+#' \itemize{
+#'   \item ut_individ: Access Codes users (0) v. individual users (1)
+#' }
+#' @param assessment assessment data
+#' @examples
+#' assessmentv7 %>%
+#'   om_dummy_individ()
+#' @export
+om_dummy_individ <- function(assessment) {
+  assessment <- assessment %>%
     dplyr::mutate(ut_individ = dplyr::case_when(
-      stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 1,
-      !(stringr::str_detect(UserType, "IndividualUser")) | !(stringr::str_detect(AccessCode, "IndividualUser")) ~ 0,
+      stringr::str_detect(AccessCode, "IndividualUser") ~ 1,
+      !(stringr::str_detect(AccessCode, "IndividualUser")) ~ 0,
       T ~ NA_real_
     ))
 
