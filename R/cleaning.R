@@ -1446,7 +1446,7 @@ om_dummy_gender <- function(assessment) {
     dplyr::mutate(gender_num = case_when(
       stringr::str_detect(D2, "Male") ~ 0,
       stringr::str_detect(D2, "Female") ~ 1,
-      T ~ NA_integer_
+      T ~ NA_real_
       )) %>%
     dplyr::mutate(gender = ifelse(D2 %nin% c("Male", "Female"), D2, NA_character_))
 
