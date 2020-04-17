@@ -57,10 +57,10 @@ cleaned_dat <- pp1  %>%
   mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
   ## compute WithinADay
   mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Assessment data
+  coalesce_join(assessmentv6, join = dplyr::right_join) %>% 
   ## join in Access Code Data
   coalesce_join(acs, join = dplyr::left_join) %>%
-  ## join in Assessment data
-  coalesce_join(assessmentv6, join = dplyr::inner_join) %>% 
   ## if AccessCode is IndividualUser, then UserType is IndividualUser
   mutate(UserType = ifelse(AccessCode == "IndividualUser",
                            "IndividualUser", UserType)) %>%
@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 345 rows
+    ## Done. AssessmentV7 Data has 758 rows
 
 ## `om_filter_data`
 
@@ -145,9 +145,8 @@ assessmentv7 %>%
   )
 ```
 
-This dataset was filtered down to only AccessCodes that include
-“Wilkes”. The `accesscode` argument is not case-sensitive and can
-both be used with vectors:
+The `accesscode` argument is not case-sensitive and can both be used
+with vectors:
 
 ``` r
 assessmentv7 %>% 
@@ -330,11 +329,22 @@ v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
 merge_assessments(v4, v5, v6)
 ```
 
+## `om_reverse_code`
+
+Reverse codes items and adds them at the end of the dataset with a
+“`*_Rev`” at the end.
+
+``` r
+assessmentv7 %>% 
+  om_reverse_code()
+```
+
 # openmindR Analysis Functions
 
 This section introduces the openmindR analysis functions.
 
   - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
+  - [om\_lm](https://github.com/openmindplatform/openmindR#om_lm)
 
 ## `om_ttest`
 
@@ -440,15 +450,129 @@ improvement:
     ##  [5] "C5"             "Anxiety"        "Attribution"    "IntAnx"        
     ##  [9] "SocialDistance" "Avoidance"
 
-## `om_reverse_code`
+## `om_lm`
 
-Reverse codes items and adds them at the end of the dataset with a
-“`*_Rev`” at the end.
+Run linear regression model (with interactions)
+
+This function performs linear regression and gives back some neat info
+
+Four inputs:
+
+  - *.data* data that was used to fit the model
+
+  - *lm\_model* a fitted model
+
+  - *type* what kind of model (currently only accepts `"int"` for
+    interactions)
+
+  - *switch* logical. Switch variables in interaction plot. Default is
+    `FALSE`
+
+<!-- end list -->
 
 ``` r
-assessmentv7 %>% 
-  om_reverse_code()
+mod1 <- lm(ppol_extreme ~ ppol_cat*gender, 
+           data = assessmentv7)
+
+
+results <- assessmentv7 %>% 
+  om_lm(lm_model = mod1, 
+        type = "int",
+        switch = T)
 ```
+
+### Show the model
+
+``` r
+results$model
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = ppol_extreme ~ ppol_cat * gender, data = assessmentv7)
+    ## 
+    ## Coefficients:
+    ##                        (Intercept)               ppol_catConservatives  
+    ##                             1.6905                              0.2711  
+    ##                       genderFemale  ppol_catConservatives:genderFemale  
+    ##                             0.1703                             -0.2691
+
+### Show a regression table
+
+``` r
+results$table
+```
+
+    ## 
+    ## ==============================================
+    ##                                     Model 1   
+    ## ----------------------------------------------
+    ## (Intercept)                           1.69 ***
+    ##                                      (0.07)   
+    ## ppol_catConservatives                 0.27 *  
+    ##                                      (0.11)   
+    ## genderFemale                          0.17    
+    ##                                      (0.09)   
+    ## ppol_catConservatives:genderFemale   -0.27    
+    ##                                      (0.15)   
+    ## ----------------------------------------------
+    ## R^2                                   0.02    
+    ## Adj. R^2                              0.01    
+    ## Num. obs.                           345       
+    ## RMSE                                  0.65    
+    ## ==============================================
+    ## *** p < 0.001, ** p < 0.01, * p < 0.05
+
+### Show an interpretation of the model
+
+``` r
+results$report %>% 
+  cat()
+```
+
+We fitted a linear model (estimated using OLS) to predict ppol\_extreme
+with ppol\_cat and gender (formula = ppol\_extreme \~ ppol\_cat \*
+gender). Standardized parameters were obtained by fitting the model on a
+standardized version of the dataset. Effect sizes were labelled
+following Funder’s (2019) recommendations.
+
+The model explains a not significant and very weak proportion of
+variance (R2 = 0.02, F(3, 341) = 2.17, p = 0.091, adj. R2 = 0.01). The
+model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
+Progressives and gender = Male, is at 1.69 (SE = 0.07, 95% CI \[1.55,
+1.83\], p \< .001). Within this model:
+
+  - The effect of ppol\_catConservatives is positive and can be
+    considered as medium and significant (beta = 0.27, SE = 0.11, 95% CI
+    \[0.05, 0.50\], std. beta = 0.42, p \< .05).
+  - The effect of genderFemale is positive and can be considered as
+    small and not significant (beta = 0.17, SE = 0.09, 95% CI \[0.00,
+    0.34\], std. beta = 0.26, p = 0.052).
+  - The effect of ppol\_catConservatives:genderFemale is negative and
+    can be considered as medium and not significant (beta = -0.27, SE =
+    0.15, 95% CI \[-0.57, 0.04\], std. beta = -0.41, p = 0.083).
+
+### Show estimated means
+
+``` r
+results$estimated_means %>% 
+  knitr::kable()
+```
+
+| ppol\_cat     | gender |     Mean |        SE |  CI\_low | CI\_high |
+| :------------ | :----- | -------: | --------: | -------: | -------: |
+| Progressives  | Male   | 1.690476 | 0.0706196 | 1.551571 | 1.829381 |
+| Conservatives | Male   | 1.961539 | 0.0897560 | 1.784993 | 2.138084 |
+| Progressives  | Female | 1.860759 | 0.0514916 | 1.759478 | 1.962041 |
+| Conservatives | Female | 1.862745 | 0.0906317 | 1.684478 | 2.041013 |
+
+### Show a plot of the means
+
+``` r
+results$plot
+```
+
+![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 # openmindR ggplot2 theme
 
@@ -488,7 +612,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -514,7 +638,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -533,7 +657,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

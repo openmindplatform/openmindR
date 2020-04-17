@@ -336,7 +336,7 @@ assessmentv7 %>%
   )
 ```
 
-This dataset was filtered down to only AccessCodes that include "Wilkes". The `accesscode` argument is not case-sensitive and can both be used with vectors:
+The `accesscode` argument is not case-sensitive and can both be used with vectors:
 
 ```{r}
 assessmentv7 %>% 
@@ -615,17 +615,20 @@ Run linear regression model (with interactions)
 
 This function performs linear regression and gives back some neat info
 
-Three inputs:
-+ *.data* data
+Four inputs:
+
++ *.data* data that was used to fit the model
+
 + *lm_model* a fitted model
+
 + *type* what kind of model (currently only accepts `"int"` for interactions)
+
 + *switch* logical. Switch variables in interaction plot. Default is `FALSE`
 
 ```{r, eval = T}
 mod1 <- lm(ppol_extreme ~ ppol_cat*gender, 
            data = assessmentv7)
 
-debugonce(om_lm)
 
 results <- assessmentv7 %>% 
   om_lm(lm_model = mod1, 
@@ -649,9 +652,10 @@ results$table
 
 ### Show an interpretation of the model
 
-```{r, eval = T}
+```{r, eval = T, results="asis"}
 
-cat(results$report)
+results$report %>% 
+  cat()
 
 ```
 
@@ -659,7 +663,8 @@ cat(results$report)
 
 ```{r, eval = T}
 
-results$estimated_means
+results$estimated_means %>% 
+  knitr::kable()
 ```
 
 ### Show a plot of the means
