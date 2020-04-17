@@ -15,6 +15,7 @@ This function creates the dummy variables from UserType
   \item ut_college_individ: College student (0) v. individual user (1)
   \item ut_corp_individ: Corp (0) v. individual user (1)
   \item ut_college_corp: College student (0) v. corp (1)
+  \item ut_individ: Access Codes users (0) v. individual users (1)
 }
 }
 \examples{
