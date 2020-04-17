@@ -678,7 +678,7 @@ results$plot  +
 
 When interacting a numeric with a factor variable, the function will return the mean as well as one SD below/above the numeric response.
 
-```{r}
+```{r, eval = T}
 mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre, 
            data = assessmentv7)
 
