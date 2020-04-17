@@ -978,6 +978,7 @@ clean_assessment7 <- function(assessment) {
     om_dummy_nonwhite() %>%
     om_dummy_nonstraight() %>%
     om_dummy_ut() %>%
+    om_dummy_gender() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date"),
       dplyr::contains("Time")
@@ -1151,6 +1152,8 @@ clean_assessment6 <- function(assessment) {
     dplyr::mutate_all(as.character) %>%
     om_clean_ppol()   %>%
     om_dummy_nonwhite() %>%
+    om_dummy_gender() %>%
+    om_dummy_ut() %>%
     # om_dummy_nonstraight() %>%
     dplyr::mutate_at(dplyr::vars(
       dplyr::contains("Date")
@@ -1429,7 +1432,26 @@ om_dummy_nonstraight <- function(assessment) {
   return(assessment)
 }
 
+#' Code a dummy variable for gender
+#'
+#' This function creates two dummy variables from D2 (Gender) called \code{gender} and \code{gender_num} which codes people who identify as male as 0 and females else as 1.
+#'
+#' @param assessment assessment data
+#' @examples
+#' assessmentv7 %>%
+#'   om_dummy_gender()
+#' @export
+om_dummy_gender <- function(assessment) {
+  assessment <- assessment %>%
+    dplyr::mutate(gender_num = case_when(
+      stringr::str_detect(D2, "Male") ~ 0,
+      stringr::str_detect(D2, "Female") ~ 1,
+      T ~ NA_integer_
+      )) %>%
+    dplyr::mutate(gender = ifelse(D2 %nin% c("Male", "Female"), D2, NA_character_))
 
+  return(assessment)
+}
 
 #' Code a dummy variables for UserType variables
 #'
@@ -1438,6 +1460,7 @@ om_dummy_nonstraight <- function(assessment) {
 #'   \item ut_college_individ: College student (0) v. individual user (1)
 #'   \item ut_corp_individ: Corp (0) v. individual user (1)
 #'   \item ut_college_corp: College student (0) v. corp (1)
+#'   \item ut_individ: Access Codes users (0) v. individual users (1)
 #' }
 #' @param assessment assessment data
 #' @examples
@@ -1460,7 +1483,15 @@ om_dummy_ut <- function(assessment) {
       stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 0,
       stringr::str_detect(UserType, "corp") ~ 1,
       T ~ NA_real_
+    )) %>%
+    dplyr::mutate(ut_individ = dplyr::case_when(
+      stringr::str_detect(UserType, "IndividualUser") | stringr::str_detect(AccessCode, "IndividualUser") ~ 1,
+      !(stringr::str_detect(UserType, "IndividualUser")) | !(stringr::str_detect(AccessCode, "IndividualUser")) ~ 0,
+      T ~ NA_real_
     ))
 
   return(assessment)
 }
+
+
+
