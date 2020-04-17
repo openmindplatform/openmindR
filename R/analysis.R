@@ -261,6 +261,97 @@ bind_questions <- function(.data, waves) {
   )
 }
 
+#' Run linear regression model (with interactions)
+#'
+#' This function performs linear regression and gives back some neat info
+#' @param .data data
+#' @param lm_model a fitted model
+#' @param type what kind of model (currently only accepts \code{"int"} for interactions)
+#' @param switch logical. Switch variables in interaction plot. Default is \code{FALSE}
+#' @export
+om_lm <- function(.data,
+                  lm_model,
+                  type = "int",
+                  switch = F) {
+
+    skip_report <- F
+  if(!check_for_pkg("report")){
+    message('You are missing the "report" package which returns neat interprations of the models. If you want to see the report output please install this package from GitHub: devtools::install_github("easystats/report")
+')
+    skip_report <- T
+  }
+
+  if(type == "int"){
+    interactions <- lm_model %>%
+      insight::find_interactions()
+
+    if(is.null(interactions)){
+      stop("Model does not include an interaction.")
+    }
+
+    int_vars <- interactions$conditional %>%
+      stringr::str_split(":") %>%
+      unlist()
+
+    ## setting default values for int plot
+    V1 <- 1
+    V2 <- 2
+
+    if(switch == T){
+      int_vars <- rev(int_vars)
+      V1 <- 2
+      V2 <- 1
+    }
+  }
+
+
+
+  means_dat <- lm_model %>%
+    modelbased::estimate_means(data = .data) %>%
+    tibble::as_tibble()
+
+
+  int_plot <- means_dat %>%
+    dplyr::select(Var1 = tidyselect::all_of(V1),
+                  Var2 = tidyselect::all_of(V2),
+                  tidyselect::everything()) %>%
+    dplyr::mutate(mean_lab = specify_decimal(Mean, 2)) %>%
+    ggplot2::ggplot(ggplot2::aes(Var1, Mean, fill = Var1)) +
+    ggplot2::geom_col() +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = CI_low,
+                                        ymax = CI_high),
+                           width = 0.3) +
+    ggplot2::facet_wrap(~Var2) +
+    ggplot2::labs(x = int_vars[1], y = "Average Response") +
+    ggplot2::geom_text(aes(label = mean_lab),
+                       nudge_y = -0.5,
+                       color = "white") +
+    scale_fill_om(name = int_vars[2]) +
+    ggplot2::theme(legend.position = "none")
+
+
+
+
+  results <- list(
+    model = lm_model,
+    table = texreg::screenreg(lm_model),
+    estimated_means = means_dat,
+    plot = int_plot
+  )
+
+  if(!skip_report){
+    ## report
+    report_text <- lm_model %>%
+      report::report() %>%
+      report::text_long()
+
+    results <- c(results, report = report_text)
+  }
+
+
+
+  return(results)
+}
 
 
 #' A pipable if statement

@@ -498,6 +498,14 @@ merge_assessments(v4, v5, v6)
 ```
 
 
+## `om_reverse_code`
+
+Reverse codes items and adds them at the end of the dataset with a "`*_Rev`" at the end.
+
+```{r, eval = F}
+assessmentv7 %>% 
+  om_reverse_code()
+```
 
 
 # openmindR Analysis Functions
@@ -505,7 +513,7 @@ merge_assessments(v4, v5, v6)
 This section introduces the openmindR analysis functions.
 
 + [om_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
-
++ [om_lm](https://github.com/openmindplatform/openmindR#om_lm)
 
 
 ## `om_ttest`
@@ -601,13 +609,63 @@ downs #%>%
   # htmltools::HTML()
 ```
 
-## `om_reverse_code`
+## `om_lm`
 
-Reverse codes items and adds them at the end of the dataset with a "`*_Rev`" at the end.
+Run linear regression model (with interactions)
 
-```{r, eval = F}
-assessmentv7 %>% 
-  om_reverse_code()
+This function performs linear regression and gives back some neat info
+
+Three inputs:
++ *.data* data
++ *lm_model* a fitted model
++ *type* what kind of model (currently only accepts `"int"` for interactions)
++ *switch* logical. Switch variables in interaction plot. Default is `FALSE`
+
+```{r, eval = T}
+mod1 <- lm(ppol_extreme ~ ppol_cat*gender, 
+           data = assessmentv7)
+
+debugonce(om_lm)
+
+results <- assessmentv7 %>% 
+  om_lm(lm_model = mod1, 
+        type = "int",
+        switch = T)
+
+
+```
+### Show the model
+
+```{r, eval = T}
+results$model
+```
+
+### Show a regression table
+
+```{r, eval = T}
+
+results$table
+```
+
+### Show an interpretation of the model
+
+```{r, eval = T}
+
+cat(results$report)
+
+```
+
+### Show estimated means
+
+```{r, eval = T}
+
+results$estimated_means
+```
+
+### Show a plot of the means
+
+```{r, eval = T}
+results$plot
 ```
 
 

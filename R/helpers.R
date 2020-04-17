@@ -27,6 +27,21 @@ install_openmindR <- function(...) {
 
 }
 
+#' @export
+check_for_pkg <- function(pkg) {
+  n_package <- tibble::as_tibble(installed.packages()) %>%
+    dplyr::filter(Package == pkg) %>%
+    nrow
+
+  result <- F
+  if(n_package == 1){
+    result <- T
+  }
+
+  return(result)
+}
+
+
 
 #' SQL Database Append
 #'
