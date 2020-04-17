@@ -1449,7 +1449,8 @@ om_dummy_gender <- function(assessment) {
       stringr::str_detect(D2, "Female") ~ 1,
       T ~ NA_real_
       )) %>%
-    dplyr::mutate(gender = ifelse(D2 %in% c("Male", "Female"), D2, NA_character_))
+    dplyr::mutate(gender = ifelse(D2 %in% c("Male", "Female"), D2, NA_character_)) %>%
+    dplyr::mutate(gender = forcats::fct_relevel(gender, c("Male", "Female")))
 
   return(assessment)
 }
