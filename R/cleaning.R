@@ -436,7 +436,7 @@ om_clean_ppol <- function(assessment) {
       ppol_num == 4 ~ "Moderates",
       T ~ NA_character_
     )) %>%
-    dplyr::mutate(ppol_cat = forcats::fct_relevel(ppol_catmod, c("Progressives",
+    dplyr::mutate(ppol_catmod = forcats::fct_relevel(ppol_catmod, c("Progressives",
                                                               "Moderates",
                                                               "Conservatives")))
   # TODO: For future make more ppol variants
