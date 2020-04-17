@@ -274,10 +274,9 @@ om_lm <- function(.data,
                   type = "int",
                   switch = F) {
 
-    skip_report <- F
+  skip_report <- F
   if(!check_for_pkg("report")){
-    message('You are missing the "report" package which returns neat interprations of the models. If you want to see the report output please install this package from GitHub: devtools::install_github("easystats/report")
-')
+    message('You are missing the "report" package which returns neat interprations of the models. If you want to see the report output please install this package from GitHub: devtools::install_github("easystats/report")')
     skip_report <- T
   }
 
@@ -304,12 +303,92 @@ om_lm <- function(.data,
     }
   }
 
+  var_types <- .data %>%
+    select(int_vars[V1],  int_vars[V2]) %>%
+    map_dfr(class) %>%
+    gather(var, class_type)
+
+  any_numeric <- any(var_types %>% pull(class_type) %in% c("numeric"))
+  all_numeric <- all(var_types %>% pull(class_type) %in% c("numeric"))
 
 
-  means_dat <- lm_model %>%
-    modelbased::estimate_means(data = .data) %>%
-    tibble::as_tibble()
 
+  if(any_numeric & !all_numeric){
+
+    num_var <- var_types %>%
+      filter(class_type == "numeric") %>%
+      pull(var)
+
+    num_position <- which(var_types[,2]=="numeric")
+
+    means_dat <- lm_model %>%
+      modelbased::estimate_link(length=3,
+                                numerics = "combination",
+                                standardize = TRUE) %>%
+      select(col = tidyselect::all_of(num_position), everything()) %>%
+      rename(Mean = Predicted)
+
+    groupings <- means_dat %>%
+      group_indices(col)
+
+    means_dat <- means_dat %>%
+      mutate(lab = groupings) %>%
+      mutate(lab = case_when(
+        lab == 1 ~ "-1 SD",
+        lab == 2 ~ "Mean",
+        lab == 3 ~ "+ 1 SD"
+      )) %>%
+      mutate_at(vars(col), ~facet_labs({{num_var}}, lab, .x))
+
+    factor_order <- means_dat %>%
+      pull(col) %>%
+      unique()
+
+    means_dat <- means_dat %>%
+      mutate(col = fct_relevel(col, factor_order))
+  }
+
+
+  if(all_numeric){
+    stop("Data all numeric. Not supported yet")
+    means_dat <- lm_model %>%
+      modelbased::estimate_link(length=3,
+                                numerics = "combination",
+                                standardize = TRUE) %>%
+      select(col = tidyselect::all_of(1), everything()) %>%
+      rename(Mean = Predicted)
+
+    groupings <- means_dat %>%
+      group_indices(col)
+
+    means_dat <- means_dat %>%
+      mutate(lab = groupings) %>%
+      mutate(lab = case_when(
+        lab == 1 ~ "-1 SD",
+        lab == 2 ~ "Mean",
+        lab == 3 ~ "+ 1 SD"
+      )) %>%
+      mutate_at(vars(col), ~facet_labs({{num_var}}, lab, .x))
+
+    factor_order <- means_dat %>%
+      pull(col) %>%
+      unique()
+
+    means_dat <- means_dat %>%
+      mutate(col = fct_relevel(col, factor_order))
+  }
+  # lm_model %>%
+  #   sjPlot::plot_model(type = "int") #%>%
+  #    as_tibble()
+
+  # .data <- .data %>%
+  #   mutate(ppol_extreme = as.factor(ppol_extreme))
+  if(!any_numeric){
+
+    means_dat <- lm_model %>%
+      modelbased::estimate_means(data = .data) %>%
+      tibble::as_tibble()
+  }
 
   int_plot <- means_dat %>%
     dplyr::select(Var1 = tidyselect::all_of(V1),
@@ -322,11 +401,11 @@ om_lm <- function(.data,
                                         ymax = CI_high),
                            width = 0.3) +
     ggplot2::facet_wrap(~Var2) +
-    ggplot2::labs(x = int_vars[1], y = "Average Response") +
+    ggplot2::labs(x = int_vars[V1], y = "Average Response") +
     ggplot2::geom_text(aes(label = mean_lab),
                        nudge_y = -0.5,
                        color = "white") +
-    scale_fill_om(name = int_vars[2]) +
+    scale_fill_om(name = int_vars[V2]) +
     ggplot2::theme(legend.position = "none")
 
 
@@ -345,12 +424,19 @@ om_lm <- function(.data,
       report::report() %>%
       report::text_long()
 
-    results <- c(results, report = report_text)
+    results <- c(results, report_text)
   }
 
 
 
   return(results)
+}
+
+#' @export
+facet_labs <- function(varname, lab, varvalue) {
+
+  glue::glue("{varname} {lab} ({specify_decimal(varvalue, 2)})")
+
 }
 
 

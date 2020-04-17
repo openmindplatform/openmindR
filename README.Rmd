@@ -670,8 +670,28 @@ results$estimated_means %>%
 ### Show a plot of the means
 
 ```{r, eval = T}
-results$plot
+results$plot  +
+  ylab("Political Extremity")
 ```
+
+### Interaction with Numeric and Factor variable
+
+When interacting a numeric with a factor variable, the function will return the mean as well as one SD below/above the numeric response.
+
+```{r}
+mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre, 
+           data = assessmentv7)
+
+
+results <- assessmentv7 %>% 
+  om_lm(lm_model = mod1, 
+        type = "int",
+        switch = T)
+
+results$plot +
+  ylab("Political Extremity")
+```
+
 
 
 # openmindR ggplot2 theme
