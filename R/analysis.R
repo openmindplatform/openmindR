@@ -268,11 +268,13 @@ bind_questions <- function(.data, waves) {
 #' @param lm_model a fitted model
 #' @param type what kind of model (currently only accepts \code{"int"} for interactions)
 #' @param switch logical. Switch variables in interaction plot. Default is \code{FALSE}
+#' @param nudge_y Decide the absolute value by which text label should be nudged (defaults to -0.5)
 #' @export
 om_lm <- function(.data,
                   lm_model,
                   type = "int",
-                  switch = F) {
+                  switch = F,
+                  nudge_y = -0.5) {
 
   skip_report <- F
   if(!check_for_pkg("report")){
@@ -292,6 +294,10 @@ om_lm <- function(.data,
       stringr::str_split(":") %>%
       unlist()
 
+    if(length(int_vars) > 2) {
+      stop(("Threeway interactions not supported yet."))
+    }
+
     ## setting default values for int plot
     V1 <- 1
     V2 <- 2
@@ -304,95 +310,118 @@ om_lm <- function(.data,
   }
 
   var_types <- .data %>%
-    select(int_vars[V1],  int_vars[V2]) %>%
-    map_dfr(class) %>%
-    gather(var, class_type)
+    dplyr::select(int_vars[V1],  int_vars[V2]) %>%
+    purrr::map_dfr(class) %>%
+    tidyr::gather(var, class_type)
 
-  any_numeric <- any(var_types %>% pull(class_type) %in% c("numeric"))
-  all_numeric <- all(var_types %>% pull(class_type) %in% c("numeric"))
+  any_numeric <- any(var_types %>% dplyr::pull(class_type) %in% c("numeric"))
+  all_numeric <- all(var_types %>% dplyr::pull(class_type) %in% c("numeric"))
 
 
-
+  ## if there is only one numeric variable
   if(any_numeric & !all_numeric){
 
+    ## which is the numeric variable?
     num_var <- var_types %>%
-      filter(class_type == "numeric") %>%
-      pull(var)
+      dplyr::filter(class_type == "numeric") %>%
+      dplyr::pull(var)
 
     num_position <- which(var_types[,2]=="numeric")
 
+    ## estimate response
     means_dat <- lm_model %>%
       modelbased::estimate_link(length=3,
                                 numerics = "combination",
                                 standardize = TRUE) %>%
-      select(col = tidyselect::all_of(num_position), everything()) %>%
-      rename(Mean = Predicted)
+      dplyr::rename(col = tidyselect::all_of(num_position)) %>%
+      dplyr::rename(Mean = Predicted)
 
+    ## get factors
     groupings <- means_dat %>%
-      group_indices(col)
+      dplyr::group_indices(col)
 
+    ## rename variable labels
     means_dat <- means_dat %>%
-      mutate(lab = groupings) %>%
-      mutate(lab = case_when(
+      dplyr::mutate(lab = groupings) %>%
+      dplyr::mutate(lab = dplyr::case_when(
         lab == 1 ~ "-1 SD",
         lab == 2 ~ "Mean",
-        lab == 3 ~ "+ 1 SD"
+        lab == 3 ~ "+1 SD"
       )) %>%
-      mutate_at(vars(col), ~facet_labs({{num_var}}, lab, .x))
+      dplyr::mutate_at(dplyr::vars(col), ~facet_labs({{num_var}}, lab, .x))
 
     factor_order <- means_dat %>%
-      pull(col) %>%
+      dplyr::pull(col) %>%
       unique()
 
+    ## sort dataset
     means_dat <- means_dat %>%
-      mutate(col = fct_relevel(col, factor_order))
+      dplyr::mutate(col = forcats::fct_relevel(col, factor_order)) %>%
+      dplyr::select(col1 = tidyselect::all_of(V1),
+             col2 = tidyselect::all_of(V2),
+             dplyr::everything())
   }
 
 
   if(all_numeric){
-    stop("Data all numeric. Not supported yet")
-    means_dat <- lm_model %>%
-      modelbased::estimate_link(length=3,
-                                numerics = "combination",
-                                standardize = TRUE) %>%
-      select(col = tidyselect::all_of(1), everything()) %>%
-      rename(Mean = Predicted)
+    # stop("Data all numeric. Not supported yet")
+    means_dat <- modelbased::estimate_link(lm_model,
+                                           length=3,
+                                           numerics = "combination",
+                                           standardize = TRUE) %>%
+      dplyr::select(col1 = tidyselect::all_of(V1),
+             col2 = tidyselect::all_of(V2),
+             dplyr::everything()) %>%
+      dplyr::rename(Mean = Predicted)
 
-    groupings <- means_dat %>%
-      group_indices(col)
+    groupings1 <- means_dat %>%
+      dplyr::group_indices(col1)
+    groupings2 <- means_dat %>%
+      dplyr::group_indices(col2)
 
     means_dat <- means_dat %>%
-      mutate(lab = groupings) %>%
-      mutate(lab = case_when(
-        lab == 1 ~ "-1 SD",
-        lab == 2 ~ "Mean",
-        lab == 3 ~ "+ 1 SD"
-      )) %>%
-      mutate_at(vars(col), ~facet_labs({{num_var}}, lab, .x))
+      dplyr::mutate(lab1 = groupings1) %>%
+      dplyr::mutate(lab1 = dplyr::case_when(
+        lab1 == 1 ~ "-1 SD",
+        lab1 == 2 ~ "Mean",
+        lab1 == 3 ~ "+1 SD"
+      ))  %>%
+      dplyr::mutate_at(dplyr::vars(col1), ~facet_labs(int_vars[1], lab1, .x)) %>%
+      dplyr::mutate(lab2 = groupings2) %>%
+      dplyr::mutate(lab2 = dplyr::case_when(
+        lab2 == 1 ~ "-1 SD",
+        lab2 == 2 ~ "Mean",
+        lab2 == 3 ~ "+1 SD"
+      ))  %>%
+      dplyr::mutate_at(dplyr::vars(col2), ~facet_labs(int_vars[2], lab2, .x))
 
-    factor_order <- means_dat %>%
-      pull(col) %>%
+    factor_order1 <- means_dat %>%
+      dplyr::pull(col1) %>%
+      unique()
+
+    factor_order2 <- means_dat %>%
+      dplyr::pull(col2) %>%
       unique()
 
     means_dat <- means_dat %>%
-      mutate(col = fct_relevel(col, factor_order))
+      dplyr::mutate(col1 = forcats::fct_relevel(col1, factor_order1))       %>%
+      dplyr::mutate(col2 = forcats::fct_relevel(col2, factor_order2))
   }
-  # lm_model %>%
-  #   sjPlot::plot_model(type = "int") #%>%
-  #    as_tibble()
 
-  # .data <- .data %>%
-  #   mutate(ppol_extreme = as.factor(ppol_extreme))
+
   if(!any_numeric){
 
     means_dat <- lm_model %>%
       modelbased::estimate_means(data = .data) %>%
-      tibble::as_tibble()
+      tibble::as_tibble()  %>%
+      dplyr::select(col1 = tidyselect::all_of(V1),
+             col2 = tidyselect::all_of(V2),
+             dplyr::everything())
   }
 
   int_plot <- means_dat %>%
-    dplyr::select(Var1 = tidyselect::all_of(V1),
-                  Var2 = tidyselect::all_of(V2),
+    dplyr::select(Var1 = tidyselect::all_of(1),
+                  Var2 = tidyselect::all_of(2),
                   tidyselect::everything()) %>%
     dplyr::mutate(mean_lab = specify_decimal(Mean, 2)) %>%
     ggplot2::ggplot(ggplot2::aes(Var1, Mean, fill = Var1)) +
@@ -401,11 +430,11 @@ om_lm <- function(.data,
                                         ymax = CI_high),
                            width = 0.3) +
     ggplot2::facet_wrap(~Var2) +
-    ggplot2::labs(x = int_vars[V1], y = "Average Response") +
+    ggplot2::labs(x = int_vars[1], y = "Average Response") +
     ggplot2::geom_text(aes(label = mean_lab),
-                       nudge_y = -0.5,
+                       nudge_y = nudge_y,
                        color = "white") +
-    scale_fill_om(name = int_vars[V2]) +
+    scale_fill_om(name = int_vars[2]) +
     ggplot2::theme(legend.position = "none")
 
 
@@ -424,7 +453,7 @@ om_lm <- function(.data,
       report::report() %>%
       report::text_long()
 
-    results <- c(results, report_text)
+    results <- c(results, report = report_text)
   }
 
 

@@ -637,6 +637,18 @@ results <- assessmentv7 %>%
 
 
 ```
+
+The function returns 5 outputs (in list format).
+
+```{r}
+results$model
+results$table
+results$estimated_means
+results$plot
+results$report
+```
+
+
 ### Show the model
 
 ```{r, eval = T}
@@ -652,7 +664,7 @@ results$table
 
 ### Show an interpretation of the model
 
-```{r, eval = T, results="asis"}
+```{r, eval = T, results='asisd'}
 
 results$report %>% 
   cat()
@@ -674,7 +686,7 @@ results$plot  +
   ylab("Political Extremity")
 ```
 
-### Interaction with Numeric and Factor variable
+### Interaction with Numeric variables
 
 When interacting a numeric with a factor variable, the function will return the mean as well as one SD below/above the numeric response.
 
@@ -686,12 +698,27 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre,
 results <- assessmentv7 %>% 
   om_lm(lm_model = mod1, 
         type = "int",
-        switch = T)
+        switch = F)
 
 results$plot +
   ylab("Political Extremity")
 ```
 
+When both interaction variables are numeric, the function will return the mean as well as one SD below/above for both numeric responsse.
+
+```{r, eval = T, fig.width = 15, height = 5}
+mod1 <- lm(ppol_extreme ~ GMPre*AffPol1Pre, 
+           data = assessmentv7)
+
+
+results <- assessmentv7 %>% 
+  om_lm(lm_model = mod1, 
+        type = "int",
+        switch = T)
+
+results$plot +
+  ylab("Political Extremity")
+```
 
 
 # openmindR ggplot2 theme

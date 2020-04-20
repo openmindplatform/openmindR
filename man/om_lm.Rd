@@ -4,7 +4,7 @@
 \alias{om_lm}
 \title{Run linear regression model (with interactions)}
 \usage{
-om_lm(.data, lm_model, type = "int", switch = F)
+om_lm(.data, lm_model, type = "int", switch = F, nudge_y = -0.5)
 }
 \arguments{
 \item{.data}{data}
@@ -14,6 +14,8 @@ om_lm(.data, lm_model, type = "int", switch = F)
 \item{type}{what kind of model (currently only accepts \code{"int"} for interactions)}
 
 \item{switch}{logical. Switch variables in interaction plot. Default is \code{FALSE}}
+
+\item{nudge_y}{Decide the absolute value by which text label should be nudged (defaults to -0.5)}
 }
 \description{
 This function performs linear regression and gives back some neat info

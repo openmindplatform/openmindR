@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 768 rows
+    ## Done. AssessmentV7 Data has 813 rows
 
 ## `om_filter_data`
 
@@ -481,6 +481,16 @@ results <- assessmentv7 %>%
         switch = T)
 ```
 
+The function returns 5 outputs (in list format).
+
+``` r
+results$model
+results$table
+results$estimated_means
+results$plot
+results$report
+```
+
 ### Show the model
 
 ``` r
@@ -493,9 +503,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                             1.6854                              0.2761  
+    ##                             1.7021                              0.2251  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                             0.1780                             -0.2768
+    ##                             0.1855                             -0.2764
 
 ### Show a regression table
 
@@ -507,19 +517,19 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.69 ***
+    ## (Intercept)                           1.70 ***
     ##                                      (0.07)   
-    ## ppol_catConservatives                 0.28 *  
+    ## ppol_catConservatives                 0.23 *  
     ##                                      (0.11)   
-    ## genderFemale                          0.18 *  
-    ##                                      (0.09)   
+    ## genderFemale                          0.19 *  
+    ##                                      (0.08)   
     ## ppol_catConservatives:genderFemale   -0.28    
     ##                                      (0.15)   
     ## ----------------------------------------------
     ## R^2                                   0.02    
     ## Adj. R^2                              0.01    
-    ## Num. obs.                           353       
-    ## RMSE                                  0.65    
+    ## Num. obs.                           382       
+    ## RMSE                                  0.66    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -530,6 +540,14 @@ results$report %>%
   cat()
 ```
 
+    ## We fitted a linear model (estimated using OLS) to predict ppol_extreme with ppol_cat and gender (formula = ppol_extreme ~ ppol_cat * gender). Standardized parameters were obtained by fitting the model on a standardized version of the dataset. Effect sizes were labelled following Funder's (2019) recommendations.
+    ## 
+    ## The model explains a not significant and very weak proportion of variance (R2 = 0.02, F(3, 378) = 2.02, p = 0.110, adj. R2 = 0.01). The model's intercept, corresponding to ppol_extreme = 0, ppol_cat = Progressives and gender = Male, is at 1.70 (SE = 0.07, 95% CI [1.57, 1.84], p < .001). Within this model:
+    ## 
+    ##   - The effect of ppol_catConservatives is positive and can be considered as small and significant (beta = 0.23, SE = 0.11, 95% CI [0.01, 0.44], std. beta = 0.34, p < .05).
+    ##   - The effect of genderFemale is positive and can be considered as small and significant (beta = 0.19, SE = 0.08, 95% CI [0.02, 0.35], std. beta = 0.28, p < .05).
+    ##   - The effect of ppol_catConservatives:genderFemale is negative and can be considered as medium and not significant (beta = -0.28, SE = 0.15, 95% CI [-0.57, 0.02], std. beta = -0.42, p = 0.067).
+
 ### Show estimated means
 
 ``` r
@@ -537,12 +555,12 @@ results$estimated_means %>%
   knitr::kable()
 ```
 
-| ppol\_cat     | gender |     Mean |        SE |  CI\_low | CI\_high |
-| :------------ | :----- | -------: | --------: | -------: | -------: |
-| Progressives  | Male   | 1.685393 | 0.0690620 | 1.549563 | 1.821223 |
-| Conservatives | Male   | 1.961539 | 0.0903508 | 1.783838 | 2.139239 |
-| Progressives  | Female | 1.863354 | 0.0513477 | 1.762364 | 1.964344 |
-| Conservatives | Female | 1.862745 | 0.0912323 | 1.683311 | 2.042179 |
+| col1   | col2          |     Mean |        SE |  CI\_low | CI\_high |
+| :----- | :------------ | -------: | --------: | -------: | -------: |
+| Male   | Progressives  | 1.702128 | 0.0676574 | 1.569096 | 1.835160 |
+| Male   | Conservatives | 1.927273 | 0.0884501 | 1.753357 | 2.101189 |
+| Female | Progressives  | 1.887640 | 0.0491665 | 1.790966 | 1.984315 |
+| Female | Conservatives | 1.836364 | 0.0884501 | 1.662448 | 2.010279 |
 
 ### Show a plot of the means
 
@@ -551,9 +569,9 @@ results$plot  +
   ylab("Political Extremity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
-### Interaction with Numeric and Factor variable
+### Interaction with Numeric variables
 
 When interacting a numeric with a factor variable, the function will
 return the mean as well as one SD below/above the numeric response.
@@ -566,13 +584,32 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre,
 results <- assessmentv7 %>% 
   om_lm(lm_model = mod1, 
         type = "int",
+        switch = F)
+
+results$plot +
+  ylab("Political Extremity")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+
+When both interaction variables are numeric, the function will return
+the mean as well as one SD below/above for both numeric responsse.
+
+``` r
+mod1 <- lm(ppol_extreme ~ GMPre*AffPol1Pre, 
+           data = assessmentv7)
+
+
+results <- assessmentv7 %>% 
+  om_lm(lm_model = mod1, 
+        type = "int",
         switch = T)
 
 results$plot +
   ylab("Political Extremity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 # openmindR ggplot2 theme
 
@@ -612,7 +649,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -638,7 +675,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -657,7 +694,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>
