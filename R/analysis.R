@@ -431,19 +431,21 @@ om_lm <- function(.data,
                            width = 0.3) +
     ggplot2::facet_wrap(~Var2) +
     ggplot2::labs(x = int_vars[1], y = "Average Response") +
-    ggplot2::geom_text(aes(label = mean_lab),
+    ggplot2::geom_text(ggplot2::aes(label = mean_lab),
                        nudge_y = nudge_y,
                        color = "white") +
     scale_fill_om(name = int_vars[2]) +
     ggplot2::theme(legend.position = "none")
 
+  means_dat_names <- colnames(means_dat)
 
-
+  means_dat_names[1] <- int_vars[1]
+  means_dat_names[2] <- int_vars[2]
 
   results <- list(
     model = lm_model,
     table = texreg::screenreg(lm_model),
-    estimated_means = means_dat,
+    estimated_means = means_dat %>% purrr::set_names(means_dat_names),
     plot = int_plot
   )
 

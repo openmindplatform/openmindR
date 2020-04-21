@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 813 rows
+    ## Done. AssessmentV7 Data has 844 rows
 
 ## `om_filter_data`
 
@@ -503,9 +503,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                             1.7021                              0.2251  
+    ##                             1.7320                              0.1628  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                             0.1855                             -0.2764
+    ##                             0.1485                             -0.2068
 
 ### Show a regression table
 
@@ -517,18 +517,18 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.70 ***
+    ## (Intercept)                           1.73 ***
     ##                                      (0.07)   
-    ## ppol_catConservatives                 0.23 *  
+    ## ppol_catConservatives                 0.16    
     ##                                      (0.11)   
-    ## genderFemale                          0.19 *  
+    ## genderFemale                          0.15    
     ##                                      (0.08)   
-    ## ppol_catConservatives:genderFemale   -0.28    
+    ## ppol_catConservatives:genderFemale   -0.21    
     ##                                      (0.15)   
     ## ----------------------------------------------
-    ## R^2                                   0.02    
-    ## Adj. R^2                              0.01    
-    ## Num. obs.                           382       
+    ## R^2                                   0.01    
+    ## Adj. R^2                              0.00    
+    ## Num. obs.                           393       
     ## RMSE                                  0.66    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
@@ -542,11 +542,11 @@ results$report %>%
 
     ## We fitted a linear model (estimated using OLS) to predict ppol_extreme with ppol_cat and gender (formula = ppol_extreme ~ ppol_cat * gender). Standardized parameters were obtained by fitting the model on a standardized version of the dataset. Effect sizes were labelled following Funder's (2019) recommendations.
     ## 
-    ## The model explains a not significant and very weak proportion of variance (R2 = 0.02, F(3, 378) = 2.02, p = 0.110, adj. R2 = 0.01). The model's intercept, corresponding to ppol_extreme = 0, ppol_cat = Progressives and gender = Male, is at 1.70 (SE = 0.07, 95% CI [1.57, 1.84], p < .001). Within this model:
+    ## The model explains a not significant and very weak proportion of variance (R2 = 0.01, F(3, 389) = 1.23, p = 0.299, adj. R2 = 0.00). The model's intercept, corresponding to ppol_extreme = 0, ppol_cat = Progressives and gender = Male, is at 1.73 (SE = 0.07, 95% CI [1.60, 1.86], p < .001). Within this model:
     ## 
-    ##   - The effect of ppol_catConservatives is positive and can be considered as small and significant (beta = 0.23, SE = 0.11, 95% CI [0.01, 0.44], std. beta = 0.34, p < .05).
-    ##   - The effect of genderFemale is positive and can be considered as small and significant (beta = 0.19, SE = 0.08, 95% CI [0.02, 0.35], std. beta = 0.28, p < .05).
-    ##   - The effect of ppol_catConservatives:genderFemale is negative and can be considered as medium and not significant (beta = -0.28, SE = 0.15, 95% CI [-0.57, 0.02], std. beta = -0.42, p = 0.067).
+    ##   - The effect of ppol_catConservatives is positive and can be considered as small and not significant (beta = 0.16, SE = 0.11, 95% CI [-0.05, 0.38], std. beta = 0.25, p = 0.140).
+    ##   - The effect of genderFemale is positive and can be considered as small and not significant (beta = 0.15, SE = 0.08, 95% CI [-0.01, 0.31], std. beta = 0.22, p = 0.074).
+    ##   - The effect of ppol_catConservatives:genderFemale is negative and can be considered as small and not significant (beta = -0.21, SE = 0.15, 95% CI [-0.50, 0.09], std. beta = -0.31, p = 0.168).
 
 ### Show estimated means
 
@@ -557,10 +557,10 @@ results$estimated_means %>%
 
 | col1   | col2          |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.702128 | 0.0676574 | 1.569096 | 1.835160 |
-| Male   | Conservatives | 1.927273 | 0.0884501 | 1.753357 | 2.101189 |
-| Female | Progressives  | 1.887640 | 0.0491665 | 1.790966 | 1.984315 |
-| Female | Conservatives | 1.836364 | 0.0884501 | 1.662448 | 2.010279 |
+| Male   | Progressives  | 1.731959 | 0.0669827 | 1.600265 | 1.863652 |
+| Male   | Conservatives | 1.894737 | 0.0873799 | 1.722941 | 2.066533 |
+| Female | Progressives  | 1.880435 | 0.0486340 | 1.784816 | 1.976053 |
+| Female | Conservatives | 1.836364 | 0.0889544 | 1.661472 | 2.011255 |
 
 ### Show a plot of the means
 

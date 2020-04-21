@@ -1444,7 +1444,7 @@ om_dummy_nonstraight <- function(assessment) {
 #' @export
 om_dummy_gender <- function(assessment) {
   assessment <- assessment %>%
-    dplyr::mutate(gender_num = case_when(
+    dplyr::mutate(gender_num = dplyr::case_when(
       stringr::str_detect(D2, "Male") ~ 0,
       stringr::str_detect(D2, "Female") ~ 1,
       T ~ NA_real_

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(message = F,
                       warning = F, 
                       eval = F)
 
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+key <- readr::read_lines("../../Keys/airtabler.txt")
 
 
 ups <- c("GrowthMindset", "CIHS_LIO",
