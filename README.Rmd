@@ -619,7 +619,7 @@ Four inputs:
 
 + *.data* data that was used to fit the model
 
-+ *lm_model* a fitted model
++ *lin_mod* a fitted model
 
 + *type* what kind of model (currently only accepts `"int"` for interactions)
 
@@ -631,7 +631,7 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*gender,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = T)
 
@@ -696,7 +696,7 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = F)
 
@@ -712,7 +712,7 @@ mod1 <- lm(ppol_extreme ~ GMPre*AffPol1Pre,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = T)
 

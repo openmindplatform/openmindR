@@ -4,12 +4,12 @@
 \alias{om_lm}
 \title{Run linear regression model (with interactions)}
 \usage{
-om_lm(.data, lm_model, type = "int", switch = F, nudge_y = -0.5)
+om_lm(.data, lin_mod, type = "int", switch = F, nudge_y = -0.5)
 }
 \arguments{
 \item{.data}{data}
 
-\item{lm_model}{a fitted model}
+\item{lin_mod}{a fitted model}
 
 \item{type}{what kind of model (currently only accepts \code{"int"} for interactions)}
 

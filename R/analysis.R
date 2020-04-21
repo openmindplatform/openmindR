@@ -265,13 +265,13 @@ bind_questions <- function(.data, waves) {
 #'
 #' This function performs linear regression and gives back some neat info
 #' @param .data data
-#' @param lm_model a fitted model
+#' @param lin_mod a fitted model
 #' @param type what kind of model (currently only accepts \code{"int"} for interactions)
 #' @param switch logical. Switch variables in interaction plot. Default is \code{FALSE}
 #' @param nudge_y Decide the absolute value by which text label should be nudged (defaults to -0.5)
 #' @export
 om_lm <- function(.data,
-                  lm_model,
+                  lin_mod,
                   type = "int",
                   switch = F,
                   nudge_y = -0.5) {
@@ -283,7 +283,7 @@ om_lm <- function(.data,
   }
 
   if(type == "int"){
-    interactions <- lm_model %>%
+    interactions <- lin_mod %>%
       insight::find_interactions()
 
     if(is.null(interactions)){
@@ -329,7 +329,7 @@ om_lm <- function(.data,
     num_position <- which(var_types[,2]=="numeric")
 
     ## estimate response
-    means_dat <- lm_model %>%
+    means_dat <- lin_mod %>%
       modelbased::estimate_link(length=3,
                                 numerics = "combination",
                                 standardize = TRUE) %>%
@@ -365,7 +365,7 @@ om_lm <- function(.data,
 
   if(all_numeric){
     # stop("Data all numeric. Not supported yet")
-    means_dat <- modelbased::estimate_link(lm_model,
+    means_dat <- modelbased::estimate_link(lin_mod,
                                            length=3,
                                            numerics = "combination",
                                            standardize = TRUE) %>%
@@ -411,7 +411,7 @@ om_lm <- function(.data,
 
   if(!any_numeric){
 
-    means_dat <- lm_model %>%
+    means_dat <- lin_mod %>%
       modelbased::estimate_means(data = .data) %>%
       tibble::as_tibble()  %>%
       dplyr::select(col1 = tidyselect::all_of(V1),
@@ -443,15 +443,15 @@ om_lm <- function(.data,
   means_dat_names[2] <- int_vars[2]
 
   results <- list(
-    model = lm_model,
-    table = texreg::screenreg(lm_model),
+    model = lin_mod,
+    table = texreg::screenreg(lin_mod),
     estimated_means = means_dat %>% purrr::set_names(means_dat_names),
     plot = int_plot
   )
 
   if(!skip_report){
     ## report
-    report_text <- lm_model %>%
+    report_text <- lin_mod %>%
       report::report() %>%
       report::text_long()
 
