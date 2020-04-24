@@ -881,6 +881,30 @@ om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
       T ~ variable_code
     ))
 
+  TimeVars <- gathered_dat %>%
+    dplyr::select(Time) %>%
+    dplyr::pull() %>%
+    unique()
+
+  T2 <-"Post"
+  if(length(TimeVars==2)){
+    if("FollowUp" %in% TimeVars){
+      T2 <-"FollowUp"
+    }
+  }
+
+  gathered_dat <- gathered_dat %>%
+    do_if(length(TimeVars) == 2,
+          ~{.x %>%
+              dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", T2)))
+          }
+    )  %>%
+    do_if(length(TimeVars) == 3,
+            ~{.x %>%
+              dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", "Post", "FollowUp")))
+          }
+    )
+
   return(gathered_dat)
 }
 

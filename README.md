@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 844 rows
+    ## Done. AssessmentV7 Data has 984 rows
 
 ## `om_filter_data`
 
@@ -460,7 +460,7 @@ Four inputs:
 
   - *.data* data that was used to fit the model
 
-  - *lm\_model* a fitted model
+  - *lin\_mod* a fitted model
 
   - *type* what kind of model (currently only accepts `"int"` for
     interactions)
@@ -476,7 +476,7 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*gender,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = T)
 ```
@@ -503,9 +503,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                             1.7320                              0.1628  
+    ##                            1.75000                             0.08824  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                             0.1485                             -0.2068
+    ##                            0.09404                            -0.13227
 
 ### Show a regression table
 
@@ -517,19 +517,19 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.73 ***
-    ##                                      (0.07)   
-    ## ppol_catConservatives                 0.16    
-    ##                                      (0.11)   
-    ## genderFemale                          0.15    
+    ## (Intercept)                           1.75 ***
+    ##                                      (0.06)   
+    ## ppol_catConservatives                 0.09    
+    ##                                      (0.10)   
+    ## genderFemale                          0.09    
     ##                                      (0.08)   
-    ## ppol_catConservatives:genderFemale   -0.21    
-    ##                                      (0.15)   
+    ## ppol_catConservatives:genderFemale   -0.13    
+    ##                                      (0.14)   
     ## ----------------------------------------------
-    ## R^2                                   0.01    
-    ## Adj. R^2                              0.00    
-    ## Num. obs.                           393       
-    ## RMSE                                  0.66    
+    ## R^2                                   0.00    
+    ## Adj. R^2                             -0.00    
+    ## Num. obs.                           454       
+    ## RMSE                                  0.67    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -540,13 +540,27 @@ results$report %>%
   cat()
 ```
 
-    ## We fitted a linear model (estimated using OLS) to predict ppol_extreme with ppol_cat and gender (formula = ppol_extreme ~ ppol_cat * gender). Standardized parameters were obtained by fitting the model on a standardized version of the dataset. Effect sizes were labelled following Funder's (2019) recommendations.
-    ## 
-    ## The model explains a not significant and very weak proportion of variance (R2 = 0.01, F(3, 389) = 1.23, p = 0.299, adj. R2 = 0.00). The model's intercept, corresponding to ppol_extreme = 0, ppol_cat = Progressives and gender = Male, is at 1.73 (SE = 0.07, 95% CI [1.60, 1.86], p < .001). Within this model:
-    ## 
-    ##   - The effect of ppol_catConservatives is positive and can be considered as small and not significant (beta = 0.16, SE = 0.11, 95% CI [-0.05, 0.38], std. beta = 0.25, p = 0.140).
-    ##   - The effect of genderFemale is positive and can be considered as small and not significant (beta = 0.15, SE = 0.08, 95% CI [-0.01, 0.31], std. beta = 0.22, p = 0.074).
-    ##   - The effect of ppol_catConservatives:genderFemale is negative and can be considered as small and not significant (beta = -0.21, SE = 0.15, 95% CI [-0.50, 0.09], std. beta = -0.31, p = 0.168).
+We fitted a linear model (estimated using OLS) to predict ppol\_extreme
+with ppol\_cat and gender (formula = ppol\_extreme \~ ppol\_cat \*
+gender). Standardized parameters were obtained by fitting the model on a
+standardized version of the dataset. Effect sizes were labelled
+following Funder’s (2019) recommendations.
+
+The model explains a not significant and very weak proportion of
+variance (R2 = 0.00, F(3, 450) = 0.51, p = 0.673, adj. R2 = 0.00). The
+model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
+Progressives and gender = Male, is at 1.75 (SE = 0.06, 95% CI \[1.62,
+1.88\], p \< .001). Within this model:
+
+  - The effect of ppol\_catConservatives is positive and can be
+    considered as very small and not significant (beta = 0.09, SE =
+    0.10, 95% CI \[-0.12, 0.29\], std. beta = 0.13, p = 0.395).
+  - The effect of genderFemale is positive and can be considered as very
+    small and not significant (beta = 0.09, SE = 0.08, 95% CI \[-0.06,
+    0.25\], std. beta = 0.14, p = 0.233).
+  - The effect of ppol\_catConservatives:genderFemale is negative and
+    can be considered as very small and not significant (beta = -0.13,
+    SE = 0.14, 95% CI \[-0.41, 0.15\], std. beta = -0.20, p = 0.353).
 
 ### Show estimated means
 
@@ -555,12 +569,12 @@ results$estimated_means %>%
   knitr::kable()
 ```
 
-| col1   | col2          |     Mean |        SE |  CI\_low | CI\_high |
+| gender | ppol\_cat     |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.731959 | 0.0669827 | 1.600265 | 1.863652 |
-| Male   | Conservatives | 1.894737 | 0.0873799 | 1.722941 | 2.066533 |
-| Female | Progressives  | 1.880435 | 0.0486340 | 1.784816 | 1.976053 |
-| Female | Conservatives | 1.836364 | 0.0889544 | 1.661472 | 2.011255 |
+| Male   | Progressives  | 1.750000 | 0.0644329 | 1.623373 | 1.876627 |
+| Male   | Conservatives | 1.838235 | 0.0812017 | 1.678654 | 1.997817 |
+| Female | Progressives  | 1.844037 | 0.0453515 | 1.754910 | 1.933164 |
+| Female | Conservatives | 1.800000 | 0.0864458 | 1.630112 | 1.969888 |
 
 ### Show a plot of the means
 
@@ -582,7 +596,7 @@ mod1 <- lm(ppol_extreme ~ ppol_cat*AffPol1Pre,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = F)
 
@@ -601,7 +615,7 @@ mod1 <- lm(ppol_extreme ~ GMPre*AffPol1Pre,
 
 
 results <- assessmentv7 %>% 
-  om_lm(lm_model = mod1, 
+  om_lm(lin_mod = mod1, 
         type = "int",
         switch = T)
 
@@ -610,6 +624,161 @@ results$plot +
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+
+## `om_lmer`
+
+Run mixed models (with interactions)
+
+This function performs a mixed model and gives back some neat info
+
+Three inputs:
+
+  - *modd* a fitted model
+
+  - *type* what kind of model (currently only accepts `"int"` for
+    interactions)
+
+  - *mod\_transform* Indicates which values of the moderator variable
+    should be used when plotting interaction terms (i.e. `type =
+    "int"`).
+    
+      - `"minmax"` (default) minimum and maximum values (lower and upper
+        bounds) of the moderator are used to plot the interaction
+        between independent variable and moderator(s).}
+      - `"meansd"` uses the mean value of the moderator as well as one
+        standard deviation below and above mean value to plot the effect
+        of the moderator on the independent variable (following the
+        convention suggested by Cohen and Cohen and popularized by Aiken
+        and West (1991), i.e. using the mean, the value one standard
+        deviation above, and the value one standard deviation below the
+        mean as values of the moderator.
+      - `"zeromax"` is similar to the `"minmax"` option, however, `0` is
+        always used as minimum value for the moderator. This may be
+        useful for predictors that don’t have an empirical zero-value,
+        but absence of moderation should be simulated by using 0 as
+        minimum. `"quart"` calculates and uses the quartiles (lower,
+        median and upper) of the moderator value.
+      - `"all"` uses all values of the moderator variable.
+
+First you need to fit to bring the data into long format and fit the
+model.
+
+``` r
+cleaned_dat_long <- openmindR::om_gather(assessmentv7, which_strings = "AffPol1")
+
+mixed <- lme4::lmer(Response~Time * gender + (1|OMID), data = cleaned_dat_long)
+```
+
+Next you can use `om_lmer`.
+
+``` r
+results <- om_lmer(mixed,
+                   type = "int",
+                   mod_transform = "meansd")
+```
+
+### Show the model
+
+``` r
+results$model
+```
+
+    ## Linear mixed model fit by REML ['lmerMod']
+    ## Formula: Response ~ Time * gender + (1 | OMID)
+    ##    Data: cleaned_dat_long
+    ## REML criterion at convergence: 5309.335
+    ## Random effects:
+    ##  Groups   Name        Std.Dev.
+    ##  OMID     (Intercept) 25.24   
+    ##  Residual             11.68   
+    ## Number of obs: 588, groups:  OMID, 364
+    ## Fixed Effects:
+    ##           (Intercept)               TimePost           genderFemale  
+    ##                25.073                 -4.449                 11.622  
+    ## TimePost:genderFemale  
+    ##                -5.897
+
+### Show a regression table
+
+``` r
+results$table
+```
+
+    ## 
+    ## ===================================
+    ##                        Model 1     
+    ## -----------------------------------
+    ## (Intercept)               25.07 ***
+    ##                           (2.26)   
+    ## TimePost                  -4.45 *  
+    ##                           (1.79)   
+    ## genderFemale              11.62 ***
+    ##                           (2.96)   
+    ## TimePost:genderFemale     -5.90 ** 
+    ##                           (2.25)   
+    ## -----------------------------------
+    ## AIC                     5321.33    
+    ## BIC                     5347.60    
+    ## Log Likelihood         -2654.67    
+    ## Num. obs.                588       
+    ## Num. groups: OMID        364       
+    ## Var: OMID (Intercept)    637.16    
+    ## Var: Residual            136.38    
+    ## ===================================
+    ## *** p < 0.001, ** p < 0.01, * p < 0.05
+
+### Show an interpretation of the model
+
+``` r
+results$report %>% 
+  cat()
+```
+
+We fitted a linear mixed model (estimated using REML and nloptwrap
+optimizer) to predict Response with Time and gender (formula = Response
+\~ Time \* gender). The model included OMID as random effects (formula =
+\~1 | OMID). Standardized parameters were obtained by fitting the model
+on a standardized version of the dataset. Effect sizes were labelled
+following Funder’s (2019) recommendations.The model’s total explanatory
+power is substantial (conditional R2 = 0.83) and the part related to the
+fixed effects alone (marginal R2) is of 0.05. The model’s intercept,
+corresponding to Response = 0, Time = Pre, gender = Male and OMID =
+1002059522913, is at 25.07 (SE = 2.26, 95% CI \[20.64, 29.51\], p \<
+.001). Within this model:
+
+  - The effect of TimePost is negative and can be considered as very
+    small and significant (beta = -4.45, SE = 1.79, 95% CI \[-7.95,
+    -0.95\], std. beta = -0.16, p \< .05).
+  - The effect of genderFemale is positive and can be considered as
+    small and significant (beta = 11.62, SE = 2.96, 95% CI \[5.82,
+    17.42\], std. beta = 0.41, p \< .001).
+  - The effect of TimePost:genderFemale is negative and can be
+    considered as small and significant (beta = -5.90, SE = 2.25, 95% CI
+    \[-10.30, -1.49\], std. beta = -0.21, p \< .01).
+
+### Show estimated means
+
+``` r
+results$estimated_means %>% 
+  knitr::kable()
+```
+
+| Time | predicted | std.error | conf.low | conf.high | group  | group\_col |
+| ---: | --------: | --------: | -------: | --------: | :----- | :--------- |
+|    1 |  25.07285 |  2.263358 | 20.63675 |  29.50895 | Male   | Male       |
+|    1 |  36.69484 |  1.905688 | 32.95976 |  40.42992 | Female | Female     |
+|    2 |  20.62430 |  2.551229 | 15.62398 |  25.62462 | Male   | Male       |
+|    2 |  26.34953 |  2.053164 | 22.32541 |  30.37366 | Female | Female     |
+
+### Show a plot of the means
+
+``` r
+results$plot  +
+  ggplot2::ylab("Affective Polarization") +
+  ggplot2::ylim(0, 50)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
 
 # openmindR ggplot2 theme
 
@@ -649,7 +818,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -675,7 +844,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -694,7 +863,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

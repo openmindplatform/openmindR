@@ -20,6 +20,7 @@ Imports:
     lme4,
     readr,
     glue,
+    knitr,
     highcharter,
     janitor,
     tidyr,

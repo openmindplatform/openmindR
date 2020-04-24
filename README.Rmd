@@ -664,7 +664,7 @@ results$table
 
 ### Show an interpretation of the model
 
-```{r, eval = T, results='asisd'}
+```{r, eval = T, results='asis'}
 
 results$report %>% 
   cat()
@@ -720,6 +720,95 @@ results$plot +
   ylab("Political Extremity")
 ```
 
+## `om_lmer`
+
+Run mixed models (with interactions)
+
+This function performs a mixed model and gives back some neat info
+
+Three inputs:
+
+
++ *modd* a fitted model
+
++ *type* what kind of model (currently only accepts `"int"` for interactions)
+
++ *mod_transform* Indicates which values of the moderator variable should be used when plotting interaction terms (i.e. `type = "int"`). 
+   + `"minmax"` (default) minimum and maximum values (lower and
+   upper bounds) of the moderator are used to plot the interaction between
+   independent variable and moderator(s).} 
+   + `"meansd"` uses the mean value of the moderator as well as one standard deviation below and
+   above mean value to plot the effect of the moderator on the independent
+   variable (following the convention suggested by Cohen and Cohen and
+   popularized by Aiken and West (1991), i.e. using the mean, the value one
+   standard deviation above, and the value one standard deviation below the
+   mean as values of the moderator.
+   + `"zeromax"`  is similar to the `"minmax"` option, however,
+   `0` is always used as minimum value for the moderator. This may be
+   useful for predictors that don't have an empirical zero-value, but absence
+   of moderation should be simulated by using 0 as minimum.
+   `"quart"` calculates and uses the quartiles (lower, median and
+   upper) of the moderator value.
+   + `"all"` uses all values of the moderator variable.
+   
+   
+First you need to fit to bring the data into long format and fit the model.
+   
+```{r, eval = T}
+cleaned_dat_long <- openmindR::om_gather(assessmentv7, which_strings = "AffPol1")
+
+mixed <- lme4::lmer(Response~Time * gender + (1|OMID), data = cleaned_dat_long)
+```
+  
+  
+Next you can use `om_lmer`.
+
+```{r, eval = T}
+results <- om_lmer(mixed,
+                   type = "int",
+                   mod_transform = "meansd")
+
+```
+
+
+
+### Show the model
+
+```{r, eval = T}
+results$model
+```
+
+### Show a regression table
+
+```{r, eval = T}
+
+results$table
+```
+
+### Show an interpretation of the model
+
+```{r, eval = T, results='asis'}
+
+results$report %>% 
+  cat()
+
+```
+
+### Show estimated means
+
+```{r, eval = T}
+
+results$estimated_means %>% 
+  knitr::kable()
+```
+
+### Show a plot of the means
+
+```{r, eval = T}
+results$plot  +
+  ggplot2::ylab("Affective Polarization") +
+  ggplot2::ylim(0, 50)
+```
 
 # openmindR ggplot2 theme
 

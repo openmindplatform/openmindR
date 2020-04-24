@@ -507,6 +507,89 @@ do_if <- function(.data, condition, call){
   }
 }
 
+#' Run mixed models (with interactions)
+#'
+#' This function performs a mixed model and gives back some neat info
+#' @param mod a fitted model
+#' @param type what kind of model (currently only accepts \code{"int"} for interactions)
+#' @param mod_transform Indicates which values of the moderator variable should be
+#'   used when plotting interaction terms (i.e. \code{type = "int"}). \describe{
+#'   \item{\code{"minmax"}}{(default) minimum and maximum values (lower and
+#'   upper bounds) of the moderator are used to plot the interaction between
+#'   independent variable and moderator(s).} \item{\code{"meansd"}}{uses the
+#'   mean value of the moderator as well as one standard deviation below and
+#'   above mean value to plot the effect of the moderator on the independent
+#'   variable (following the convention suggested by Cohen and Cohen and
+#'   popularized by Aiken and West (1991), i.e. using the mean, the value one
+#'   standard deviation above, and the value one standard deviation below the
+#'   mean as values of the moderator, see
+#'   \href{http://www.theanalysisfactor.com/3-tips-interpreting-moderation/}{Grace-Martin
+#'   K: 3 Tips to Make Interpreting Moderation Effects Easier}).}
+#'   \item{\code{"zeromax"}}{is similar to the \code{"minmax"} option, however,
+#'   \code{0} is always used as minimum value for the moderator. This may be
+#'   useful for predictors that don't have an empirical zero-value, but absence
+#'   of moderation should be simulated by using 0 as minimum.}
+#'   \item{\code{"quart"}}{calculates and uses the quartiles (lower, median and
+#'   upper) of the moderator value.} \item{\code{"all"}}{uses all values of the
+#'   moderator variable.} }
+#' @export
+om_lmer <- function(mod, type = "int", mod_transform = "minmax"){
+
+  skip_report <- F
+  if(!check_for_pkg("report")){
+    message('You are missing the "report" package which returns neat interprations of the models. If you want to see the report output please install this package from GitHub: devtools::install_github("easystats/report")')
+    skip_report <- T
+  }
+
+  if(type == "int"){
+    interactions <- mod %>%
+      insight::find_interactions()
+
+    if(is.null(interactions)){
+      stop("Model does not include an interaction.")
+    }
+
+    int_vars <- interactions$conditional %>%
+      stringr::str_split(":") %>%
+      unlist()
+
+    if(length(int_vars) > 2) {
+      stop(("Threeway interactions not supported yet."))
+    }
+
+  }
+
+
+
+  means_dat <- sjPlot::get_model_data(mod,
+                                      type = "int", mdrt.values = mod_transform) %>%
+    tibble::as_tibble() %>%
+    dplyr::rename(Time = x)
+
+  int_plot <- sjPlot::plot_model(mod,
+                                 type = "int", mdrt.values = mod_transform,
+                                 title = knitr::combine_words(int_vars), colors = pal_om(7))
+
+  results <- list(
+    model = mod,
+    table = texreg::screenreg(mod),
+    estimated_means = means_dat,
+    plot = int_plot
+  )
+
+  if(!skip_report){
+    ## report
+    report_text <- mod %>%
+      report::report() %>%
+      report::text_long()
+
+    results <- c(results, report = report_text)
+  }
+
+  return(results)
+
+}
+
 
 
 #' Conduct t-tests and calculate Cohen's d
