@@ -886,17 +886,19 @@ om_gather <- function(.data, which_strings = openmindR::q_c_strings) {
     dplyr::pull() %>%
     unique()
 
-  T2 <-"Post"
+  T2 <- "Post"
   if(length(TimeVars==2)){
     if("FollowUp" %in% TimeVars){
       T2 <-"FollowUp"
     }
   }
 
+  prepost_lvls <- c("Pre", T2)
+
   gathered_dat <- gathered_dat %>%
     do_if(length(TimeVars) == 2,
           ~{.x %>%
-              dplyr::mutate(Time = forcats::fct_relevel(Time, c("Pre", T2)))
+              dplyr::mutate(Time = forcats::fct_relevel(Time, prepost_lvls))
           }
     )  %>%
     do_if(length(TimeVars) == 3,
