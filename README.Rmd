@@ -729,7 +729,7 @@ This function performs a mixed model and gives back some neat info
 Three inputs:
 
 
-+ *modd* a fitted model
++ *mod* a fitted model
 
 + *type* what kind of model (currently only accepts `"int"` for interactions)
 
@@ -765,8 +765,7 @@ Next you can use `om_lmer`.
 
 ```{r, eval = T}
 results <- om_lmer(mixed,
-                   type = "int",
-                   mod_transform = "meansd")
+                   type = "int")
 
 ```
 

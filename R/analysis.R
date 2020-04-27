@@ -568,7 +568,7 @@ om_lmer <- function(mod, type = "int", mod_transform = "minmax"){
 
   int_plot <- sjPlot::plot_model(mod,
                                  type = "int", mdrt.values = mod_transform,
-                                 title = knitr::combine_words(int_vars), colors = pal_om(7))
+                                 title = paste0("IVs: ", knitr::combine_words(int_vars)), colors = pal_om(7))
 
   results <- list(
     model = mod,
