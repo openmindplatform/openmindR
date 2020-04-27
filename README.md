@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 984 rows
+    ## Done. AssessmentV7 Data has 1084 rows
 
 ## `om_filter_data`
 
@@ -345,6 +345,7 @@ This section introduces the openmindR analysis functions.
 
   - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
   - [om\_lm](https://github.com/openmindplatform/openmindR#om_lm)
+  - [om\_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
 
 ## `om_ttest`
 
@@ -503,9 +504,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                            1.75000                             0.08824  
+    ##                            1.72358                             0.12149  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                            0.09404                            -0.13227
+    ##                            0.09275                            -0.16363
 
 ### Show a regression table
 
@@ -517,19 +518,19 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.75 ***
+    ## (Intercept)                           1.72 ***
     ##                                      (0.06)   
-    ## ppol_catConservatives                 0.09    
+    ## ppol_catConservatives                 0.12    
     ##                                      (0.10)   
     ## genderFemale                          0.09    
-    ##                                      (0.08)   
-    ## ppol_catConservatives:genderFemale   -0.13    
+    ##                                      (0.07)   
+    ## ppol_catConservatives:genderFemale   -0.16    
     ##                                      (0.14)   
     ## ----------------------------------------------
     ## R^2                                   0.00    
     ## Adj. R^2                             -0.00    
-    ## Num. obs.                           454       
-    ## RMSE                                  0.67    
+    ## Num. obs.                           501       
+    ## RMSE                                  0.66    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -547,20 +548,20 @@ standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.
 
 The model explains a not significant and very weak proportion of
-variance (R2 = 0.00, F(3, 450) = 0.51, p = 0.673, adj. R2 = 0.00). The
+variance (R2 = 0.00, F(3, 497) = 0.71, p = 0.546, adj. R2 = 0.00). The
 model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
-Progressives and gender = Male, is at 1.75 (SE = 0.06, 95% CI \[1.62,
-1.88\], p \< .001). Within this model:
+Progressives and gender = Male, is at 1.72 (SE = 0.06, 95% CI \[1.61,
+1.84\], p \< .001). Within this model:
 
   - The effect of ppol\_catConservatives is positive and can be
-    considered as very small and not significant (beta = 0.09, SE =
-    0.10, 95% CI \[-0.12, 0.29\], std. beta = 0.13, p = 0.395).
+    considered as very small and not significant (beta = 0.12, SE =
+    0.10, 95% CI \[-0.07, 0.32\], std. beta = 0.18, p = 0.221).
   - The effect of genderFemale is positive and can be considered as very
-    small and not significant (beta = 0.09, SE = 0.08, 95% CI \[-0.06,
-    0.25\], std. beta = 0.14, p = 0.233).
+    small and not significant (beta = 0.09, SE = 0.07, 95% CI \[-0.05,
+    0.24\], std. beta = 0.14, p = 0.207).
   - The effect of ppol\_catConservatives:genderFemale is negative and
-    can be considered as very small and not significant (beta = -0.13,
-    SE = 0.14, 95% CI \[-0.41, 0.15\], std. beta = -0.20, p = 0.353).
+    can be considered as small and not significant (beta = -0.16, SE =
+    0.14, 95% CI \[-0.43, 0.11\], std. beta = -0.25, p = 0.232).
 
 ### Show estimated means
 
@@ -571,10 +572,10 @@ results$estimated_means %>%
 
 | gender | ppol\_cat     |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.750000 | 0.0644329 | 1.623373 | 1.876627 |
-| Male   | Conservatives | 1.838235 | 0.0812017 | 1.678654 | 1.997817 |
-| Female | Progressives  | 1.844037 | 0.0453515 | 1.754910 | 1.933164 |
-| Female | Conservatives | 1.800000 | 0.0864458 | 1.630112 | 1.969888 |
+| Male   | Progressives  | 1.723577 | 0.0599180 | 1.605853 | 1.841301 |
+| Male   | Conservatives | 1.845070 | 0.0788644 | 1.690122 | 2.000019 |
+| Female | Progressives  | 1.816326 | 0.0424548 | 1.732913 | 1.899740 |
+| Female | Conservatives | 1.774193 | 0.0843945 | 1.608380 | 1.940008 |
 
 ### Show a plot of the means
 
@@ -633,7 +634,7 @@ This function performs a mixed model and gives back some neat info
 
 Three inputs:
 
-  - *modd* a fitted model
+  - *mod* a fitted model
 
   - *type* what kind of model (currently only accepts `"int"` for
     interactions)
@@ -673,8 +674,7 @@ Next you can use `om_lmer`.
 
 ``` r
 results <- om_lmer(mixed,
-                   type = "int",
-                   mod_transform = "meansd")
+                   type = "int")
 ```
 
 ### Show the model
@@ -686,17 +686,17 @@ results$model
     ## Linear mixed model fit by REML ['lmerMod']
     ## Formula: Response ~ Time * gender + (1 | OMID)
     ##    Data: cleaned_dat_long
-    ## REML criterion at convergence: 5309.335
+    ## REML criterion at convergence: 5789.496
     ## Random effects:
     ##  Groups   Name        Std.Dev.
-    ##  OMID     (Intercept) 25.24   
-    ##  Residual             11.68   
-    ## Number of obs: 588, groups:  OMID, 364
+    ##  OMID     (Intercept) 25.00   
+    ##  Residual             11.84   
+    ## Number of obs: 640, groups:  OMID, 403
     ## Fixed Effects:
     ##           (Intercept)               TimePost           genderFemale  
-    ##                25.073                 -4.449                 11.622  
+    ##                23.560                 -4.098                 12.592  
     ## TimePost:genderFemale  
-    ##                -5.897
+    ##                -6.261
 
 ### Show a regression table
 
@@ -708,22 +708,22 @@ results$table
     ## ===================================
     ##                        Model 1     
     ## -----------------------------------
-    ## (Intercept)               25.07 ***
-    ##                           (2.26)   
-    ## TimePost                  -4.45 *  
-    ##                           (1.79)   
-    ## genderFemale              11.62 ***
-    ##                           (2.96)   
-    ## TimePost:genderFemale     -5.90 ** 
-    ##                           (2.25)   
+    ## (Intercept)               23.56 ***
+    ##                           (2.15)   
+    ## TimePost                  -4.10 *  
+    ##                           (1.78)   
+    ## genderFemale              12.59 ***
+    ##                           (2.80)   
+    ## TimePost:genderFemale     -6.26 ** 
+    ##                           (2.22)   
     ## -----------------------------------
-    ## AIC                     5321.33    
-    ## BIC                     5347.60    
-    ## Log Likelihood         -2654.67    
-    ## Num. obs.                588       
-    ## Num. groups: OMID        364       
-    ## Var: OMID (Intercept)    637.16    
-    ## Var: Residual            136.38    
+    ## AIC                     5801.50    
+    ## BIC                     5828.26    
+    ## Log Likelihood         -2894.75    
+    ## Num. obs.                640       
+    ## Num. groups: OMID        403       
+    ## Var: OMID (Intercept)    624.80    
+    ## Var: Residual            140.22    
     ## ===================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -743,18 +743,18 @@ following Funder’s (2019) recommendations.The model’s total explanatory
 power is substantial (conditional R2 = 0.83) and the part related to the
 fixed effects alone (marginal R2) is of 0.05. The model’s intercept,
 corresponding to Response = 0, Time = Pre, gender = Male and OMID =
-1002059522913, is at 25.07 (SE = 2.26, 95% CI \[20.64, 29.51\], p \<
+1002059522913, is at 23.56 (SE = 2.15, 95% CI \[19.35, 27.77\], p \<
 .001). Within this model:
 
   - The effect of TimePost is negative and can be considered as very
-    small and significant (beta = -4.45, SE = 1.79, 95% CI \[-7.95,
-    -0.95\], std. beta = -0.16, p \< .05).
+    small and significant (beta = -4.10, SE = 1.78, 95% CI \[-7.58,
+    -0.62\], std. beta = -0.14, p \< .05).
   - The effect of genderFemale is positive and can be considered as
-    small and significant (beta = 11.62, SE = 2.96, 95% CI \[5.82,
-    17.42\], std. beta = 0.41, p \< .001).
+    medium and significant (beta = 12.59, SE = 2.80, 95% CI \[7.10,
+    18.08\], std. beta = 0.44, p \< .001).
   - The effect of TimePost:genderFemale is negative and can be
-    considered as small and significant (beta = -5.90, SE = 2.25, 95% CI
-    \[-10.30, -1.49\], std. beta = -0.21, p \< .01).
+    considered as small and significant (beta = -6.26, SE = 2.22, 95% CI
+    \[-10.62, -1.91\], std. beta = -0.22, p \< .01).
 
 ### Show estimated means
 
@@ -765,10 +765,10 @@ results$estimated_means %>%
 
 | Time | predicted | std.error | conf.low | conf.high | group  | group\_col |
 | ---: | --------: | --------: | -------: | --------: | :----- | :--------- |
-|    1 |  25.07285 |  2.263358 | 20.63675 |  29.50895 | Male   | Male       |
-|    1 |  36.69484 |  1.905688 | 32.95976 |  40.42992 | Female | Female     |
-|    2 |  20.62430 |  2.551229 | 15.62398 |  25.62462 | Male   | Male       |
-|    2 |  26.34953 |  2.053164 | 22.32541 |  30.37366 | Female | Female     |
+|    1 |  23.56024 |  2.146757 | 19.35267 |  27.76781 | Male   | Male       |
+|    1 |  36.15190 |  1.796647 | 32.63053 |  39.67326 | Female | Female     |
+|    2 |  19.46213 |  2.463927 | 14.63292 |  24.29133 | Male   | Male       |
+|    2 |  25.79242 |  1.956786 | 21.95719 |  29.62765 | Female | Female     |
 
 ### Show a plot of the means
 

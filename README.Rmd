@@ -514,6 +514,7 @@ This section introduces the openmindR analysis functions.
 
 + [om_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
 + [om_lm](https://github.com/openmindplatform/openmindR#om_lm)
++ [om_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
 
 
 ## `om_ttest`
