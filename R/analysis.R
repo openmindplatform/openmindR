@@ -95,13 +95,13 @@ withinSE <- function(x, variable, WaveType) {
   # variable <- "C1"
 
   SEdat <- x %>%
-    filter(variable_code == variable)
+    dplyr::filter(variable_code == variable)
 
   var <- SEdat %>% distinct(variable_code) %>% pull(variable_code)
 
   # if (WaveType == "Post" & var %in% c("C1", "C2", "C3")) {
   #
-  #   # SEdat <- SEdat %>% filter(variable_code %nin% c("C1", "C2", "C3"))
+  #   # SEdat <- SEdat %>% dplyr::filter(variable_code %nin% c("C1", "C2", "C3"))
   #
   #   return(tibble(variable_code = variable))
   #
@@ -169,7 +169,7 @@ summarize_comparison <- function(x, waves, q14_q17 = F) {
 
   if (any(c("C1", "C2", "C3") %in% vars) & WaveType == "Post") {
     x <- x %>%
-      filter(variable_code %nin% c("C1", "C2", "C3"))
+      dplyr::filter(variable_code %nin% c("C1", "C2", "C3"))
 
     vars <- x %>% select(variable_code) %>% distinct() %>% pull()
   }
@@ -1372,4 +1372,405 @@ perc_improved <- function(all_pre, all_post, total, variable_code){
   }
 
   return(p_improv)
+}
+
+get_vader <- function(x) {
+  tibble::enframe(vader::getVader(x)) %>%
+    dplyr::filter(name != "") %>%
+    t() %>%
+    as.data.frame() %>%
+    janitor::clean_names() %>%
+    janitor::row_to_names(1) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(compound = as.character(compound)) %>%
+    dplyr::mutate(compound = as.numeric(compound)) %>%
+    tibble::as_tibble()
+}
+
+
+
+
+
+get_blob <- function(string) {
+
+  blob <- textblob::text_blob(string)
+
+  tibble::tibble(polarity = as.character(blob$sentiment[0]),
+         subjectivity = as.character(blob$sentiment[1])) %>%
+    dplyr::mutate_all(as.numeric)
+
+}
+
+
+
+get_nrc_sentiment <- function(nrc_dat) {
+  nrc_sentiment <- nrc_dat %>%
+    ## we only want sentiments here
+    dplyr::filter(sentiment %in% c("positive", "negative")) %>%
+    ## count how often negative and positive sentiment appears per author
+    dplyr::count(OMID, sentiment, .drop = F) %>%
+    ## calculate word count per author
+    dplyr::group_by(OMID, .drop = F) %>%
+    dplyr::mutate(total = sum(n)) %>%
+    dplyr::ungroup() %>%
+    ## we only need positive sentiment because negative is just the inverse
+    dplyr::filter(sentiment == "positive") %>%
+    ## percentage of positive words
+    dplyr::mutate(nrc = n / total) %>%
+    ## rescale sentiment -1 to +1
+    dplyr::mutate(nrc_rescaled = scales::rescale(nrc, from = c(0, 1), to = c(-1,1))) %>%
+    ## remove variables that we will not need
+    dplyr::select(-n, -total, -sentiment)
+
+  return(nrc_sentiment)
+}
+
+get_nrc_emotions <- function(nrc_dat){
+  total_emotions <- nrc_dat %>%
+    ## we only want emotions here
+    dplyr::filter(!(sentiment %in% c("positive", "negative"))) %>%
+    ## group by author
+    dplyr::group_by(OMID, .drop = F) %>%
+    ## only keep distinct words
+    dplyr::distinct(word, .keep_all = T) %>%
+    ## count the number of distinct words per author
+    dplyr::tally(name = "total") %>%
+    dplyr::ungroup()
+
+  nrc_emotions <- nrc_dat %>%
+    ## we only want emotions here
+    dplyr::filter(!(sentiment %in% c("positive", "negative"))) %>%
+    ## count how often emotions appear per author
+    dplyr::count(OMID, sentiment, .drop = F) %>%
+    ## add the total unique word count
+    dplyr::left_join(total_emotions, by = "OMID") %>%
+    ## percentage of emotion words
+    dplyr::mutate(perc = n / total) %>%
+    ## remove variables that we will not need
+    dplyr::select(-total, -n) %>%
+    ## turn data into long format
+    tidyr::spread(sentiment, perc, fill = 0) %>%
+    ## add rescaled variables
+    dplyr::mutate_at(dplyr::vars(anger:trust), list(rescaled = ~scales::rescale(.x,
+                                                          from = c(0, 1),
+                                                          to =    c(-1,1))))
+}
+
+get_nrc_emotions <- purrr::possibly(get_nrc_emotions, otherwise = tibble::tibble(OMID = "0", anger = NA, trust = NA))
+
+get_nrc <- function(author_words, sentiment_dat){
+  ## nrc
+  nrc_dat <- author_words %>%
+    ## nrc sentiment/emotion analysis
+    dplyr::inner_join(tidytext::get_sentiments("nrc"), by = "word")
+
+
+  nrc_sentiment <- get_nrc_sentiment(nrc_dat)
+  nrc_emotions <- get_nrc_emotions(nrc_dat)
+
+  sentiment_dat <- sentiment_dat %>%
+    dplyr::left_join(nrc_sentiment, by = "OMID") %>%
+    dplyr::left_join(nrc_emotions, by = "OMID")
+
+}
+
+
+#' Use various text analysis tools
+#'
+#' This function performs sentiment analysis and other text tools on any custom strings that you supply.
+#' @param .data dataset including text and a personal identifier (must be named `OMID`)
+#' @param method which method(s) should be applied? Currently supports: "nrc", "bing", "afinn", "textblob", "vader", "sentiment_stanford", "sentimentr_polarity", "affect3d", "receptiveness", and "toxicity"
+#' @param text specify the text variable which should be scored
+#' @export
+om_textscore <- function(.data, method, text) {
+  ## words by author
+  author_words <- .data %>%
+    ## get tokens from text (here: individual words)
+    tidytext::unnest_tokens(word, {{ text }})
+
+  sentiment_dat <- .data %>%
+    dplyr::select(OMID, {{ text }}) %>%
+    tidyr::drop_na({{ text }})
+
+  .data <- .data %>%
+    dplyr::mutate(body = {{ text }}) %>%
+    tidyr::drop_na(body)
+
+  # skip_report <- F
+  if("vader" %in% method & !check_for_pkg("vader")){
+    stop('You are missing the "vader" package. Please install it like this: install.packages("vader")')
+  }
+
+  if("textblob" %in% method & !check_for_pkg("textblob")){
+    stop('You are missing the "textblob" package. Please install it like this: devtools::install_github("news-r/textblob")\n\nCheck out instructions for setting up textblob here: https://github.com/news-r/textblob')
+  }
+
+  if("toxicity" %in% method & !check_for_pkg("peRspective")){
+    stop('You are missing the "peRspective" package. Please install it like this: devtools::install_github("favstats/openmindR")')
+  }
+
+  if("sentiment_stanford" %in% method & !check_for_pkg("stansent")){
+    stop('You are missing the "stansent" package. Please install it like this: devtools::install_github("trinker/stansent").\n\nAlso make sure that you have the "coreNLPsetup" package installed. Install it like this: devtools::install_github("trinker/coreNLPsetup")\n\nCheck out instructions for setting up stansent here. https://github.com/trinker/stansent')
+  }
+
+  if("sentimentr_polarity" %in% method & !check_for_pkg("sentimentr")){
+    stop('You are missing the "sentimentr" package. Please install it like this: devtools::install_github("trinker/sentimentr").\n\nAlso make sure that you have the "lexicon" package installed. Install it like this: devtools::install_github("trinker/lexicon")')
+  }
+
+  if("affect3d" %in% method & !check_for_pkg("affectr")){
+    stop('You are missing the "affectr" package. Please install it like this: devtools::install_github("markallenthornton/affectr").')
+  }
+
+  if("receptiveness" %in% method & !check_for_pkg("politeness")){
+    stop('You are missing the "politeness" package. Please install it like this: install.packages("politeness").')
+  }
+
+  if ("nrc" %in% method){
+    message("\nCalculating NRC scores")
+    t1 <- Sys.time()
+
+
+
+
+
+
+    sentiment_dat <- get_nrc(author_words, sentiment_dat)
+
+
+
+
+
+
+    t2 <- Sys.time()
+
+    print(round(t2 - t1))
+  }
+
+  if("bing" %in% method){
+    message("\nCalculating BING scores")
+    t1 <- Sys.time()
+
+    bing_dat <- author_words %>%
+      dplyr::inner_join(tidytext::get_sentiments("bing"), by = "word") %>%
+      ## count how often negative and positive sentiment appears per author
+      dplyr::count(OMID, sentiment, .drop = F) %>%
+      ## calculate word count per author
+      dplyr::group_by(OMID, .drop = F) %>%
+      dplyr::mutate(total = sum(n)) %>%
+      dplyr::ungroup() %>%
+      # dplyr::filter(total != 0) %>%
+      ## we only need positive sentiment because negative is just the inverse
+      dplyr::filter(sentiment == "positive") %>%
+      ## percentage of positive words
+      dplyr::mutate(bing = n / total) %>%
+      ## rescale sentiment -1 to +1
+      dplyr::mutate(bing_rescaled = scales::rescale(bing, from = c(0, 1), to = c(-1,1))) %>%
+      ## remove variables that we will not need
+      dplyr::select(-n, -total, -sentiment)
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(bing_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("afinn" %in% method){
+    message("\nCalculating AFINN scores")
+    t1 <- Sys.time()
+
+
+    afinn_dat <- author_words %>%
+      dplyr::inner_join(tidytext::get_sentiments("afinn"), by = "word") %>%
+      dplyr::group_by(OMID) %>%
+      dplyr::summarise(afinn = mean(value, na.rm = T),
+                afinn_sd = sd(value, na.rm = T)) %>%
+      dplyr::ungroup() %>%
+      ## rescale sentiment -1 to +1
+      dplyr::mutate(afinn_rescaled = scales::rescale(afinn, from = c(-5, 5), to = c(-1,1)))
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(afinn_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("sentimentr_polarity" %in% method){
+    message("\nCalculating sentimentr_polarity scores")
+    t1 <- Sys.time()
+
+    sentimentr_polarity_dat <- .data %>%
+      dplyr::mutate(dialogue_split = sentimentr::get_sentences(body)) %$%
+      sentimentr::sentiment_by(text.var = dialogue_split,
+                   by = list(OMID),
+                   polarity_dt = lexicon::hash_sentiment_jockers_rinker) %>%
+      dplyr::rename(sentimentr_polarity_sd = sd,
+             sentimentr_polarity = ave_sentiment) %>%
+      dplyr::select(-word_count) %>%
+      ## rescale sentiment -1 to +1
+      dplyr::mutate(sentimentr_polarity_rescaled = scales::rescale(sentimentr_polarity, to = c(-1,1)))
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(sentimentr_polarity_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+
+
+  if("sentiment_stanford" %in% method){
+    message("\nCalculating sentiment_stanford scores")
+    t1 <- Sys.time()
+
+    sentiment_stanford_dat <- .data  %$%
+      # dplyr::mutate(dialogue_split = sentimentr::get_sentences(body)) %$%
+      stansent::sentiment_stanford_by(text.var = body,
+                            by = list(OMID)) %>%
+      dplyr::rename(sentiment_stanford_sd = sd,
+             sentiment = ave_sentiment) %>%
+      dplyr::select(-word_count) %>%
+      ## rescale sentiment -1 to +1
+      dplyr::mutate(sentiment_stanford_rescaled = scales::rescale(sentiment, to = c(-1,1))) %>%
+      dplyr::rename(sentiment_stanford = sentiment)
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(sentiment_stanford_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("vader"  %in% method){
+    message("\nCalculating vader scores")
+    # get_vader <- suppressWarnings(get_vader)
+    # get_vader <- suppressMessages(get_vader)
+    # get_vader <- purrr::possibly(get_vader, otherwise = NULL, quiet = F)
+    t1 <- Sys.time()
+
+    vaderscoring_dat <- .data %>%
+      ## apply vader
+      dplyr::mutate(vader = body %>% purrr::map(~suppressWarnings(get_vader(.x))))
+
+    vader_dat <- vaderscoring_dat %>%
+      tidyr::unnest(vader) %>%
+      dplyr::mutate(compound = as.numeric(compound)) %>%
+      dplyr::select(OMID, compound) %>%
+      ## get mean vader scores per author
+      dplyr::group_by(OMID) %>%
+      dplyr::summarize(vader = mean(compound, na.rm = T))  %>%
+      dplyr::ungroup()
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(vader_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("textblob" %in% method){
+    message("\nCalculating textblob scores")
+    t1 <- Sys.time()
+
+    textblob_dat <- .data %>%
+      ## apply textblob
+      dplyr::mutate(textblob = body %>% purrr::map(get_blob)) %>%
+      tidyr::unnest(textblob) %>%
+      ## get mean textblob scores per author
+      dplyr::group_by(OMID) %>%
+      dplyr::summarize_at(dplyr::vars(polarity, subjectivity), ~mean(.x, na.rm = T)) %>%
+      dplyr::rename(textblob = polarity) %>%
+      dplyr::rename(textblob_subjectivity = subjectivity)
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(textblob_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("affect3d" %in% method){
+    message("\nCalculating affect3d scores")
+    t1 <- Sys.time()
+
+    affect3d_dat <- .data %>%
+      dplyr::pull(body) %>%
+      affectr::affect3d() %>%
+      dplyr::as_tibble() %>%
+      janitor::clean_names() %>%
+      dplyr::bind_cols(.data, .) %>%
+      dplyr::select(OMID,
+             rationality_affect3d = rationality,
+             social_impact_affect3d = social_impact,
+             valence_affect3d = valence) %>%
+      ## get mean affect3d scores per author
+      dplyr::group_by(OMID) %>%
+      dplyr::summarize_at(dplyr::vars(rationality_affect3d, social_impact_affect3d, valence_affect3d),
+                   ~mean(.x, na.rm = T)) %>%
+      dplyr::ungroup()
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(affect3d_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+  if("receptiveness"  %in% method){
+    message("\nCalculating receptiveness scores")
+    t1 <- Sys.time()
+
+    receptiveness_dat <- .data %>%
+      dplyr::mutate(receptiveness = politeness::receptiveness(body)) %>%
+      dplyr::group_by(OMID) %>%
+      dplyr::summarize(receptiveness = mean(receptiveness)) %>%
+      dplyr::ungroup() %>%
+      ## add rescaled variables
+      dplyr::mutate(receptiveness_rescaled = scales::rescale(receptiveness, from = c(1, 7),
+                                              to = c(-1,1)))
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(receptiveness_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+
+
+  if("toxicity"  %in% method){
+    message("\nCalculating toxicity scores")
+    t1 <- Sys.time()
+    ## apply toxicity
+    toxic_transcripts <- .data %>%
+      dplyr::mutate(OMID = as.character(OMID)) %>%
+      peRspective::prsp_stream(body,
+                               text_id = OMID,
+                               verbose = F,
+                               safe_output = T,
+                               score_model = prsp_models)
+
+    toxicity_dat <- toxic_transcripts %>%
+      ## make sure message_id is numeric
+      dplyr::mutate(OMID = as.character(text_id)) %>%
+      ## add transcripts data
+      dplyr::left_join(.data, by = "OMID") %>%
+      ## get mean toxicity scores per author
+      dplyr::group_by(OMID) %>%
+      dplyr::summarize_at(dplyr::vars(TOXICITY:UNSUBSTANTIAL), ~mean(.x, na.rm = T)) %>%
+      dplyr::select(OMID, TOXICITY:UNSUBSTANTIAL) %>%
+      ## add rescaled variables
+      dplyr::mutate_at(dplyr::vars(TOXICITY:UNSUBSTANTIAL), list(rescaled = ~scales::rescale(.x, from = c(0, 1),   to = c(-1,1))))
+
+    sentiment_dat <- sentiment_dat %>%
+      dplyr::left_join(toxicity_dat, by = "OMID")
+
+    t2 <- Sys.time()
+    print(round(t2 - t1))
+  }
+
+
+
+  return(sentiment_dat)
 }

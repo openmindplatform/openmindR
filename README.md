@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 1084 rows
+    ## Done. AssessmentV7 Data has 1321 rows
 
 ## `om_filter_data`
 
@@ -346,6 +346,7 @@ This section introduces the openmindR analysis functions.
   - [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
   - [om\_lm](https://github.com/openmindplatform/openmindR#om_lm)
   - [om\_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
+  - [om\_textscore](https://github.com/openmindplatform/openmindR#om_textscore)
 
 ## `om_ttest`
 
@@ -504,9 +505,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                            1.72358                             0.12149  
+    ##                            1.70504                             0.09496  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                            0.09275                            -0.16363
+    ##                            0.08581                            -0.17331
 
 ### Show a regression table
 
@@ -518,19 +519,19 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.72 ***
+    ## (Intercept)                           1.71 ***
     ##                                      (0.06)   
-    ## ppol_catConservatives                 0.12    
-    ##                                      (0.10)   
+    ## ppol_catConservatives                 0.09    
+    ##                                      (0.09)   
     ## genderFemale                          0.09    
     ##                                      (0.07)   
-    ## ppol_catConservatives:genderFemale   -0.16    
-    ##                                      (0.14)   
+    ## ppol_catConservatives:genderFemale   -0.17    
+    ##                                      (0.12)   
     ## ----------------------------------------------
     ## R^2                                   0.00    
     ## Adj. R^2                             -0.00    
-    ## Num. obs.                           501       
-    ## RMSE                                  0.66    
+    ## Num. obs.                           625       
+    ## RMSE                                  0.68    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -548,20 +549,20 @@ standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.
 
 The model explains a not significant and very weak proportion of
-variance (R2 = 0.00, F(3, 497) = 0.71, p = 0.546, adj. R2 = 0.00). The
+variance (R2 = 0.00, F(3, 621) = 0.76, p = 0.516, adj. R2 = 0.00). The
 model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
-Progressives and gender = Male, is at 1.72 (SE = 0.06, 95% CI \[1.61,
-1.84\], p \< .001). Within this model:
+Progressives and gender = Male, is at 1.71 (SE = 0.06, 95% CI \[1.59,
+1.82\], p \< .001). Within this model:
 
   - The effect of ppol\_catConservatives is positive and can be
-    considered as very small and not significant (beta = 0.12, SE =
-    0.10, 95% CI \[-0.07, 0.32\], std. beta = 0.18, p = 0.221).
+    considered as very small and not significant (beta = 0.09, SE =
+    0.09, 95% CI \[-0.08, 0.27\], std. beta = 0.14, p = 0.285).
   - The effect of genderFemale is positive and can be considered as very
     small and not significant (beta = 0.09, SE = 0.07, 95% CI \[-0.05,
-    0.24\], std. beta = 0.14, p = 0.207).
+    0.22\], std. beta = 0.13, p = 0.215).
   - The effect of ppol\_catConservatives:genderFemale is negative and
-    can be considered as small and not significant (beta = -0.16, SE =
-    0.14, 95% CI \[-0.43, 0.11\], std. beta = -0.25, p = 0.232).
+    can be considered as small and not significant (beta = -0.17, SE =
+    0.12, 95% CI \[-0.41, 0.07\], std. beta = -0.26, p = 0.159).
 
 ### Show estimated means
 
@@ -572,10 +573,10 @@ results$estimated_means %>%
 
 | gender | ppol\_cat     |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.723577 | 0.0599180 | 1.605853 | 1.841301 |
-| Male   | Conservatives | 1.845070 | 0.0788644 | 1.690122 | 2.000019 |
-| Female | Progressives  | 1.816326 | 0.0424548 | 1.732913 | 1.899740 |
-| Female | Conservatives | 1.774193 | 0.0843945 | 1.608380 | 1.940008 |
+| Male   | Progressives  | 1.705036 | 0.0573503 | 1.592412 | 1.817660 |
+| Male   | Conservatives | 1.800000 | 0.0676150 | 1.667218 | 1.932782 |
+| Female | Progressives  | 1.790850 | 0.0386529 | 1.714943 | 1.866756 |
+| Female | Conservatives | 1.712500 | 0.0755959 | 1.564045 | 1.860955 |
 
 ### Show a plot of the means
 
@@ -677,6 +678,13 @@ results <- om_lmer(mixed,
                    type = "int")
 ```
 
+    ## Error: Confidence intervals could not be computed.
+    ## * Reason: "non-conformable arguments"
+    ## * Source: mm %*% vcm
+    ## Error: Confidence intervals could not be computed.
+    ## * Reason: "non-conformable arguments"
+    ## * Source: mm %*% vcm
+
 ### Show the model
 
 ``` r
@@ -686,17 +694,19 @@ results$model
     ## Linear mixed model fit by REML ['lmerMod']
     ## Formula: Response ~ Time * gender + (1 | OMID)
     ##    Data: cleaned_dat_long
-    ## REML criterion at convergence: 5789.496
+    ## REML criterion at convergence: 7076.794
     ## Random effects:
     ##  Groups   Name        Std.Dev.
-    ##  OMID     (Intercept) 25.00   
-    ##  Residual             11.84   
-    ## Number of obs: 640, groups:  OMID, 403
+    ##  OMID     (Intercept) 24.23   
+    ##  Residual             13.32   
+    ## Number of obs: 776, groups:  OMID, 491
     ## Fixed Effects:
-    ##           (Intercept)               TimePost           genderFemale  
-    ##                23.560                 -4.098                 12.592  
-    ## TimePost:genderFemale  
-    ##                -6.261
+    ##           (Intercept)               TimePost           TimeFollowUp  
+    ##                24.877                 -5.141                 -3.341  
+    ##          genderFemale  TimePost:genderFemale  
+    ##                11.736                 -6.320  
+    ## fit warnings:
+    ## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
 
 ### Show a regression table
 
@@ -708,22 +718,24 @@ results$table
     ## ===================================
     ##                        Model 1     
     ## -----------------------------------
-    ## (Intercept)               23.56 ***
-    ##                           (2.15)   
-    ## TimePost                  -4.10 *  
+    ## (Intercept)               24.88 ***
+    ##                           (1.97)   
+    ## TimePost                  -5.14 ** 
     ##                           (1.78)   
-    ## genderFemale              12.59 ***
-    ##                           (2.80)   
-    ## TimePost:genderFemale     -6.26 ** 
-    ##                           (2.22)   
+    ## TimeFollowUp              -3.34    
+    ##                          (11.30)   
+    ## genderFemale              11.74 ***
+    ##                           (2.55)   
+    ## TimePost:genderFemale     -6.32 ** 
+    ##                           (2.26)   
     ## -----------------------------------
-    ## AIC                     5801.50    
-    ## BIC                     5828.26    
-    ## Log Likelihood         -2894.75    
-    ## Num. obs.                640       
-    ## Num. groups: OMID        403       
-    ## Var: OMID (Intercept)    624.80    
-    ## Var: Residual            140.22    
+    ## AIC                     7090.79    
+    ## BIC                     7123.37    
+    ## Log Likelihood         -3538.40    
+    ## Num. obs.                776       
+    ## Num. groups: OMID        491       
+    ## Var: OMID (Intercept)    586.86    
+    ## Var: Residual            177.45    
     ## ===================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -740,21 +752,24 @@ optimizer) to predict Response with Time and gender (formula = Response
 \~1 | OMID). Standardized parameters were obtained by fitting the model
 on a standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.The model’s total explanatory
-power is substantial (conditional R2 = 0.83) and the part related to the
+power is substantial (conditional R2 = 0.78) and the part related to the
 fixed effects alone (marginal R2) is of 0.05. The model’s intercept,
 corresponding to Response = 0, Time = Pre, gender = Male and OMID =
-1002059522913, is at 23.56 (SE = 2.15, 95% CI \[19.35, 27.77\], p \<
+1002059522913, is at 24.88 (SE = 1.97, 95% CI \[21.01, 28.75\], p \<
 .001). Within this model:
 
   - The effect of TimePost is negative and can be considered as very
-    small and significant (beta = -4.10, SE = 1.78, 95% CI \[-7.58,
-    -0.62\], std. beta = -0.14, p \< .05).
+    small and significant (beta = -5.14, SE = 1.78, 95% CI \[-8.63,
+    -1.65\], std. beta = -0.18, p \< .01).
+  - The effect of TimeFollowUp is negative and can be considered as very
+    small and not significant (beta = -3.34, SE = 11.30, 95% CI
+    \[-25.49, 18.81\], std. beta = -0.12, p = 0.768).
   - The effect of genderFemale is positive and can be considered as
-    medium and significant (beta = 12.59, SE = 2.80, 95% CI \[7.10,
-    18.08\], std. beta = 0.44, p \< .001).
+    medium and significant (beta = 11.74, SE = 2.55, 95% CI \[6.74,
+    16.73\], std. beta = 0.41, p \< .001).
   - The effect of TimePost:genderFemale is negative and can be
-    considered as small and significant (beta = -6.26, SE = 2.22, 95% CI
-    \[-10.62, -1.91\], std. beta = -0.22, p \< .01).
+    considered as small and significant (beta = -6.32, SE = 2.26, 95% CI
+    \[-10.74, -1.90\], std. beta = -0.22, p \< .01).
 
 ### Show estimated means
 
@@ -763,12 +778,14 @@ results$estimated_means %>%
   knitr::kable()
 ```
 
-| Time | predicted | std.error | conf.low | conf.high | group  | group\_col |
-| ---: | --------: | --------: | -------: | --------: | :----- | :--------- |
-|    1 |  23.56024 |  2.146757 | 19.35267 |  27.76781 | Male   | Male       |
-|    1 |  36.15190 |  1.796647 | 32.63053 |  39.67326 | Female | Female     |
-|    2 |  19.46213 |  2.463927 | 14.63292 |  24.29133 | Male   | Male       |
-|    2 |  25.79242 |  1.956786 | 21.95719 |  29.62765 | Female | Female     |
+| Time | predicted | group  | group\_col |
+| ---: | --------: | :----- | :--------- |
+|    1 |  24.87748 | Male   | Male       |
+|    1 |  36.61356 | Female | Female     |
+|    2 |  19.73681 | Male   | Male       |
+|    2 |  25.15255 | Female | Female     |
+|    3 |  21.53614 | Male   | Male       |
+|    3 |  33.27222 | Female | Female     |
 
 ### Show a plot of the means
 
@@ -779,6 +796,27 @@ results$plot  +
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+
+## `om_textscore`
+
+This function performs sentiment analysis and other text tools on any
+custom strings that you supply.
+
+  - **`.data`** dataset including text and a personal identifier (must
+    be named `OMID`)
+  - **`method`** which method(s) should be applied? Currently supports:
+    “nrc”, “bing”, “afinn”, “textblob”, “vader”,
+    “sentiment\_stanford”, “sentimentr\_polarity”, “affect3d”,
+    “receptiveness”, and “toxicity”
+  - **`text`** specify the text variable which should be scored
+
+<!-- end list -->
+
+``` r
+assessmentv7 %>% 
+ om_textscore(method = c("bing", "nrc", "afinn"), 
+              text = IssueFreeTextPre) 
+```
 
 # openmindR ggplot2 theme
 
@@ -818,7 +856,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Age and Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
 **Adapt `theme_om`**
 
@@ -844,7 +882,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
 
 Or all text sizes at once
 
@@ -863,7 +901,7 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 In case your pandoc is having problems check out this very neat fix:
 <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>

@@ -515,6 +515,7 @@ This section introduces the openmindR analysis functions.
 + [om_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
 + [om_lm](https://github.com/openmindplatform/openmindR#om_lm)
 + [om_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
++ [om_textscore](https://github.com/openmindplatform/openmindR#om_textscore)
 
 
 ## `om_ttest`
@@ -809,6 +810,22 @@ results$plot  +
   ggplot2::ylab("Affective Polarization") +
   ggplot2::ylim(0, 50)
 ```
+
+## `om_textscore`
+
+This function performs sentiment analysis and other text tools on any custom strings that you supply.
+
++ **`.data`** dataset including text and a personal identifier (must be named `OMID`)
++ **`method`** which method(s) should be applied? Currently supports: "nrc", "bing", "afinn", "textblob", "vader", "sentiment_stanford", "sentimentr_polarity", "affect3d", "receptiveness", and "toxicity"
++ **`text`** specify the text variable which should be scored
+
+```{r, eval = F}
+
+assessmentv7 %>% 
+ om_textscore(method = c("bing", "nrc", "afinn"), 
+              text = IssueFreeTextPre) 
+```
+
 
 # openmindR ggplot2 theme
 
