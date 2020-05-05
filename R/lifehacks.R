@@ -17,13 +17,21 @@ parse_lifehacks <- function(x, var) {
     }
   }
 
+  if (!is.na(x)) {
+    if (nchar(x) == 0) {
+      x <- NA_character_
+    }
+  }
+
   var_names <- paste0(var, 1:5)
 
-  if (is.na(x)) {
+  len_string <- x %>% stringr::str_split(",") %>% unlist %>% length()
+
+  if (is.na(x) | len_string != 5 ) {
     na_dat <- rep(NA_character_, 5) %>%
       tibble::tibble() %>% t() %>%
       tibble::as_tibble() %>%
-      purrr::set_names(var_names)
+      magrittr::set_colnames(var_names)
 
     return(na_dat)
   }
@@ -35,7 +43,7 @@ parse_lifehacks <- function(x, var) {
     purrr::map(stringr::str_trim) %>%
     purrr::map(t) %>%
     purrr::map_dfr(tibble::as_tibble) %>%
-    purrr::set_names(var_names)
+    magrittr::set_colnames(var_names)
 }
 
 
@@ -74,7 +82,7 @@ lh_chosen_completed <- function(lh_data, lifehack, lifehackcomplete, step) {
     dplyr::rename(LifeHacksCompleteN = n) %>%
     dplyr::mutate(LifeHacksCompletePerc = specify_decimal(LifeHacksCompleteN/LifeHacksN * 100, 2)) %>%
     dplyr::mutate(Step = step) %>%
-    purrr::set_names(c("LifeHack", "LifeHacksN", "LifeHacksPerc",
+    magrittr::set_colnames(c("LifeHack", "LifeHacksN", "LifeHacksPerc",
                        "LifeHacksTotal", "LifeHacksComplete",
                        "LifeHacksCompleteN", "LifeHacksCompletePerc",
                        "Step")) %>%
@@ -119,7 +127,7 @@ lh_useful <- function(lh_data, lifehack, lifehackcomplete, useful, step) {
     dplyr::mutate(LifeHackUsefulTotal = sum(n)) %>%
     dplyr::mutate(LifeHackUsefulPerc = specify_decimal(n/LifeHackUsefulTotal * 100, 2)) %>%
     dplyr::ungroup() %>%
-    purrr::set_names(c("LifeHack", "LifeHackComplete", "LifeHackUseful", "LifeHackUsefulN",
+    magrittr::set_colnames(c("LifeHack", "LifeHackComplete", "LifeHackUseful", "LifeHackUsefulN",
                 "LifeHackUsefulTotal", "LifeHackUsefulPerc")) %>%
     dplyr::select(LifeHack, LifeHackComplete, LifeHackUseful, LifeHackUsefulN, LifeHackUsefulPerc, LifeHackUsefulTotal) %>%
     dplyr::mutate(LifeHackUseful = forcats::fct_relevel(LifeHackUseful, c("Yes", "No"))) %>%
@@ -129,6 +137,16 @@ lh_useful <- function(lh_data, lifehack, lifehackcomplete, useful, step) {
 }
 
 
+lh_useful_num <- function(lh_data, lifehack, lifehackuseful, mod) {
+  lh_data %>%
+    group_by({{ lifehack }}) %>%
+    summarize(LifeHacksUsefulMean = mean({{ lifehackuseful }}, na.rm = T)) %>%
+    set_names(c("LifeHack", "LifeHacksUsefulMean")) %>%
+    filter(LifeHack != "No Life Hack") %>%
+    drop_na(LifeHack) %>%
+    dplyr::mutate(Step = paste("Step ", mod)) %>%
+    dplyr::select(Step, tidyselect::everything())
+}
 #' Count LifeHacks Reason
 #'
 #' Happens for each Step.
@@ -170,7 +188,7 @@ lh_reason <- function(lh_data, lifehack, lifehackcomplete, reason, step) {
     dplyr::ungroup() %>%
     dplyr::mutate(perc = paste0(round((n/total*100)), "%")) %>%
     dplyr::select(LifeHacksReason, tidyselect::everything()) %>%
-    purrr::set_names(c("LifeHacksReason", "LifeHack", "LifeHacksComplete", "LifeHacksReasonN", "LifeHacksReasonTotal", "LifeHacksReasonPerc")) %>%
+    magrittr::set_colnames(c("LifeHacksReason", "LifeHack", "LifeHacksComplete", "LifeHacksReasonN", "LifeHacksReasonTotal", "LifeHacksReasonPerc")) %>%
     dplyr::mutate(Step = paste0("Step ", step)) %>%
     dplyr::arrange(LifeHacksReasonTotal) %>%
     dplyr::select(Step, LifeHack, LifeHacksComplete, LifeHacksReason, LifeHacksReasonN, LifeHacksReasonPerc, LifeHacksReasonTotal)
@@ -207,7 +225,7 @@ lh_reason <- function(lh_data, lifehack, lifehackcomplete, reason, step) {
 #' parsed_lh %>%
 #'   select(OMID, LifeHack1:LifeHacksReason5)
 #' @export
-om_parse_lifehacks <- function(cleaned_dat) {
+om_parse_lifehacks <- function(cleaned_dat, OpenMindVersion = "Before 4.0") {
   lifehacks_dat <- cleaned_dat %>%
     dplyr::arrange(LifeHacksChosen) %>%
     # slice(9856) %>%
@@ -226,33 +244,57 @@ om_parse_lifehacks <- function(cleaned_dat) {
     tidyr::unnest(LifeHacksReason_data)
 
   ## TODO: Make lifehacks so that you can specify in top level functions which ones you want to provide
+  if (OpenMindVersion == "Before 4.0") {
+    step1_hacks <- c("Understand what's influencing your viewpoint",
+                     "Engage in perspective taking",
+                     "Seek out diverse perspectives")
 
-  step1_hacks <- c("Understand what's influencing your viewpoint",
-                   "Engage in perspective taking",
-                   "Seek out diverse perspectives")
+    step2_hacks <- c("Acknowledge that your abilities are fluid",
+                     "View each mistake as a learning opportunity",
+                     "Challenge yourself to do things you haven't already mastered",
+                     "Approach disagreements like a detective",
+                     "Vanquish your fear of being wrong")
 
-  step2_hacks <- c("Acknowledge that your abilities are fluid",
-                   "View each mistake as a learning opportunity",
-                   "Challenge yourself to do things you haven't already mastered",
-                   "Approach disagreements like a detective",
-                   "Vanquish your fear of being wrong")
-
-  step3_hacks <- c("Challenge your motivated reasoning",
-                   "Challenge your confirmation bias")
+    step3_hacks <- c("Challenge your motivated reasoning",
+                     "Challenge your confirmation bias")
 
 
 
-  step4_hacks <- c("Analyze your own beliefs",
-                   "Dig deeper on disagreement",
-                   "Mind travel",
-                   "Examine different moral matrices")
+    step4_hacks <- c("Analyze your own beliefs",
+                     "Dig deeper on disagreement",
+                     "Mind travel",
+                     "Examine different moral matrices")
 
-  step5_hacks <- c("Respect and understand other people's elephants",
-                   "Be intellectually humble",
-                   "Appeal to other people's elephants",
-                   "Appeal to others people's elephants",
-                   "Challenge your assumptions")
+    step5_hacks <- c("Respect and understand other people's elephants",
+                     "Be intellectually humble",
+                     "Appeal to other people's elephants",
+                     "Appeal to others people's elephants",
+                     "Challenge your assumptions")
+  }
 
+  if (OpenMindVersion == "4.0+") {
+
+    step1_hacks <- c("Challenge your motivated reasoning",
+                     "Challenge your confirmation bias")
+
+    step2_hacks <- c("Analyze your own beliefs",
+                     "Mind travel",
+                     "Examine different moral matrices")
+
+    step3_hacks <- c("Vanquish your fear of being wrong",
+                     "Acknowledge that your abilities are fluid",
+                     "Approach disagreements like a detective")
+
+    step4_hacks <- c("Understand what's influencing your viewpoint",
+                     "Engage in perspective taking",
+                     "Seek out diverse perspectives")
+
+    step5_hacks <- c("Respect and understand other people's elephants",
+                     "Be intellectually humble",
+                     "Appeal to other people's elephants",
+                     "Appeal to others people's elephants",
+                     "Challenge your assumptions")
+  }
 
   lifehacks_dat <- lifehacks_dat %>%
     dplyr::mutate(LifeHack1 = ifelse(LifeHack1 %in% step1_hacks | LifeHack1 == 0, LifeHack1, NA)) %>%
@@ -410,3 +452,134 @@ om_lifehacks_summary <- function(lh_data, ut_filter = "All") {
   return(lifehacks_summary)
 }
 
+
+
+#' Parse LifeHacks
+#'
+#' Parse LifeHacks and make sure that they all make sense by checking them.
+#'
+#' @param cleaned_dat a dataset which includes LifeHacks to be parsed and checked
+#' @export
+om_lifehacks_summary2 <- function(lh_data, ut_filter = "All") {
+
+  if (!any(colnames(lh_data) %in% c("LifeHack1", "LifeHacksComplete1"))) {
+    stop("Parsed LifeHack data not found. You first need to run om_parse_lifehacks.")
+  }
+
+
+  # lh_data <- lh_data %>%
+  #   dplyr::mutate(UserType = as.character(UserType)) %>%
+  #   dplyr::mutate(UserType = ifelse(AccessCode == "IndividualUser", "IndividualUser", UserType)) %>%
+  #   dplyr::mutate(UserType = dplyr::case_when(
+  #     UserType == "college" ~ "College Users",
+  #     UserType == "corp" ~ "Corporate Users",
+  #     UserType == "highschool" ~ "High School Users",
+  #     UserType == "orgadult" ~ "Adult Organization Users",
+  #     UserType == "orgstudent" ~ "College Organization Users",
+  #     UserType == "IndividualUser" ~ "Individual Users",
+  #     T ~ UserType
+  #   ))
+
+  if (ut_filter == "All") {
+    lh_data <- lh_data
+  } else if(ut_filter != "All") {
+    lh_data <- lh_data %>%
+      dplyr::filter(UserType == ut_filter)
+  }
+
+
+  # lh_data <- cleaned_dat
+
+  # debugonce(lh_chosen_completed)
+
+  lh_chosen <- dplyr::bind_rows(
+    lh_data %>%
+      lh_chosen_completed(LifeHack1, LifeHacksComplete1, step = 1),
+    lh_data %>%
+      lh_chosen_completed(LifeHack2, LifeHacksComplete2, step = 2),
+    lh_data %>%
+      lh_chosen_completed(LifeHack3, LifeHacksComplete3, step = 3),
+    lh_data %>%
+      lh_chosen_completed(LifeHack4, LifeHacksComplete4, step = 4)
+  )
+
+
+
+  lh_useful_data <- bind_rows(
+    lh_data %>%
+      lh_useful_num(LifeHack1, LifeHacksUseful1, "1"),
+    lh_data %>%
+      lh_useful_num(LifeHack2, LifeHacksUseful2, "2"),
+    lh_data %>%
+      lh_useful_num(LifeHack3, LifeHacksUseful3, "3"),
+    lh_data %>%
+      lh_useful_num(LifeHack4, LifeHacksUseful4, "4")
+  )
+
+
+  lh_reason_data <- dplyr::bind_rows(
+
+    lh_data %>%
+      dplyr::select(-LifeHacksReason) %>%
+      lh_reason(LifeHack1, LifeHacksComplete1, LifeHacksReason1, step = 1),
+
+    lh_data %>%
+      dplyr::select(-LifeHacksReason) %>%
+      lh_reason(LifeHack2, LifeHacksComplete2, LifeHacksReason2, step = 2),
+
+    lh_data %>%
+      dplyr::select(-LifeHacksReason) %>%
+      lh_reason(LifeHack3, LifeHacksComplete3, LifeHacksReason3, step = 3),
+
+    lh_data %>%
+      dplyr::select(-LifeHacksReason) %>%
+      lh_reason(LifeHack4, LifeHacksComplete4, LifeHacksReason4, step = 4)
+
+  )
+
+
+
+
+  lifehacks_summary <-  left_join(
+    lh_chosen %>%
+      dplyr::filter(LifeHacksComplete == "Yes") %>%
+      dplyr::select(Step, LifeHack, LifeHacksPerc, LifeHacksCompletePerc),
+
+    lh_useful_data %>%
+      dplyr::select(Step, LifeHack, LifeHacksUsefulMean)
+  ) %>%
+    dplyr::bind_cols(
+      lh_reason_data %>%
+        dplyr::group_by(Step, LifeHack) %>%
+        dplyr::slice(1:3) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(LifeHacksReason = paste0(rep(1:3, 9), ". ", LifeHacksReason, " (", LifeHacksReasonPerc, ")")) %>%
+        # dplyr::mutate(LifeHacksReason = )
+        dplyr::select(Step, LifeHack, LifeHacksReason) %>%
+        dplyr::group_by(Step, LifeHack) %>%
+        dplyr::summarise(LifeHacksReason = paste0(LifeHacksReason, collapse = "<br>")) %>% dplyr::select(LifeHacksReason) %>%
+        dplyr::ungroup()
+    )
+
+
+  step5_data <- lh_data %>%
+    count(LifeHack5) %>%
+    dplyr::filter(LifeHack5 != "No Life Hack") %>%
+    dplyr::mutate(total = sum(n)) %>%
+    dplyr::mutate(perc = specify_decimal(n/total*100, 2)) %>%
+    dplyr::rename(LifeHack = LifeHack5) %>%
+    dplyr::mutate(Step = "Step 5") %>%
+    dplyr::rename(LifeHacksPerc = perc) %>%
+    dplyr::select(Step, LifeHack, LifeHacksPerc)
+
+
+  lifehacks_summary <- lifehacks_summary %>%
+    dplyr::select(-Step1) %>%
+    dplyr::bind_rows(
+      step5_data
+    ) %>%
+    dplyr::mutate(Type = ut_filter)
+
+
+  return(lifehacks_summary)
+}

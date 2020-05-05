@@ -476,6 +476,7 @@ parsed_lh %>%
   select(OMID, LifeHack1:LifeHacksReason5)
 ```
 
+
 ## `merge_assessments`
 
 This function merges assessment v4, v5 and v6 data and only keeps common variables. 
@@ -813,14 +814,19 @@ results$plot  +
 
 ## `om_textscore`
 
-This function performs sentiment analysis and other text tools on any custom strings that you supply.
+This function performs sentiment analysis and other methods from different text tools on any dataset with a text colum that you supply.
+
+Note: `openmindR` will not automatically install all the packages necessary for each text tool because it is quite a lot and there are many dependencies. Instead, it will check whether the specified method is installed on your computer before it executes the code. If it's not, it asks you to install the relevant package. That way you only need to install what you actually use.
+
+Arguments:
 
 + **`.data`** dataset including text and a personal identifier (must be named `OMID`)
-+ **`method`** which method(s) should be applied? Currently supports: "nrc", "bing", "afinn", "textblob", "vader", "sentiment_stanford", "sentimentr_polarity", "affect3d", "receptiveness", and "toxicity"
++ **`method`** which method(s) should be applied? Currently supports: `"nrc"`, `"bing"`, `"afinn"`, `"textblob"`, `"vader"`, `"sentiment_stanford"`, `"sentimentr_polarity"`, `"affect3d"`, `"receptiveness"`, and `"toxicity"`.
 + **`text`** specify the text variable which should be scored
 
-```{r, eval = F}
+Here an example code that scores the free text from v7 with `bing`, `nrc` and `afinn` sentiment dictionaries.
 
+```{r, eval = F}
 assessmentv7 %>% 
  om_textscore(method = c("bing", "nrc", "afinn"), 
               text = IssueFreeTextPre) 

@@ -126,7 +126,7 @@ assessmentv7 <- om_download_at(key,
 
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 1321 rows
+    ## Done. AssessmentV7 Data has 1322 rows
 
 ## `om_filter_data`
 
@@ -505,9 +505,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                            1.70504                             0.09496  
+    ##                            1.70714                             0.09286  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                            0.08581                            -0.17331
+    ##                            0.08371                            -0.17121
 
 ### Show a regression table
 
@@ -523,14 +523,14 @@ results$table
     ##                                      (0.06)   
     ## ppol_catConservatives                 0.09    
     ##                                      (0.09)   
-    ## genderFemale                          0.09    
+    ## genderFemale                          0.08    
     ##                                      (0.07)   
     ## ppol_catConservatives:genderFemale   -0.17    
     ##                                      (0.12)   
     ## ----------------------------------------------
     ## R^2                                   0.00    
     ## Adj. R^2                             -0.00    
-    ## Num. obs.                           625       
+    ## Num. obs.                           626       
     ## RMSE                                  0.68    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
@@ -549,20 +549,20 @@ standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.
 
 The model explains a not significant and very weak proportion of
-variance (R2 = 0.00, F(3, 621) = 0.76, p = 0.516, adj. R2 = 0.00). The
+variance (R2 = 0.00, F(3, 622) = 0.74, p = 0.528, adj. R2 = 0.00). The
 model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
 Progressives and gender = Male, is at 1.71 (SE = 0.06, 95% CI \[1.59,
 1.82\], p \< .001). Within this model:
 
   - The effect of ppol\_catConservatives is positive and can be
     considered as very small and not significant (beta = 0.09, SE =
-    0.09, 95% CI \[-0.08, 0.27\], std. beta = 0.14, p = 0.285).
+    0.09, 95% CI \[-0.08, 0.27\], std. beta = 0.14, p = 0.294).
   - The effect of genderFemale is positive and can be considered as very
-    small and not significant (beta = 0.09, SE = 0.07, 95% CI \[-0.05,
-    0.22\], std. beta = 0.13, p = 0.215).
+    small and not significant (beta = 0.08, SE = 0.07, 95% CI \[-0.05,
+    0.22\], std. beta = 0.12, p = 0.225).
   - The effect of ppol\_catConservatives:genderFemale is negative and
     can be considered as small and not significant (beta = -0.17, SE =
-    0.12, 95% CI \[-0.41, 0.07\], std. beta = -0.26, p = 0.159).
+    0.12, 95% CI \[-0.41, 0.07\], std. beta = -0.25, p = 0.163).
 
 ### Show estimated means
 
@@ -573,10 +573,10 @@ results$estimated_means %>%
 
 | gender | ppol\_cat     |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.705036 | 0.0573503 | 1.592412 | 1.817660 |
-| Male   | Conservatives | 1.800000 | 0.0676150 | 1.667218 | 1.932782 |
-| Female | Progressives  | 1.790850 | 0.0386529 | 1.714943 | 1.866756 |
-| Female | Conservatives | 1.712500 | 0.0755959 | 1.564045 | 1.860955 |
+| Male   | Progressives  | 1.707143 | 0.0571079 | 1.594995 | 1.819290 |
+| Male   | Conservatives | 1.800000 | 0.0675709 | 1.667305 | 1.932695 |
+| Female | Progressives  | 1.790850 | 0.0386277 | 1.714993 | 1.866706 |
+| Female | Conservatives | 1.712500 | 0.0755466 | 1.564143 | 1.860857 |
 
 ### Show a plot of the means
 
@@ -694,17 +694,17 @@ results$model
     ## Linear mixed model fit by REML ['lmerMod']
     ## Formula: Response ~ Time * gender + (1 | OMID)
     ##    Data: cleaned_dat_long
-    ## REML criterion at convergence: 7076.794
+    ## REML criterion at convergence: 7103.671
     ## Random effects:
     ##  Groups   Name        Std.Dev.
-    ##  OMID     (Intercept) 24.23   
-    ##  Residual             13.32   
-    ## Number of obs: 776, groups:  OMID, 491
+    ##  OMID     (Intercept) 24.14   
+    ##  Residual             13.38   
+    ## Number of obs: 779, groups:  OMID, 492
     ## Fixed Effects:
     ##           (Intercept)               TimePost           TimeFollowUp  
-    ##                24.877                 -5.141                 -3.341  
+    ##                24.797                 -5.385                 -3.355  
     ##          genderFemale  TimePost:genderFemale  
-    ##                11.736                 -6.320  
+    ##                11.816                 -6.128  
     ## fit warnings:
     ## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
 
@@ -718,24 +718,24 @@ results$table
     ## ===================================
     ##                        Model 1     
     ## -----------------------------------
-    ## (Intercept)               24.88 ***
+    ## (Intercept)               24.80 ***
     ##                           (1.97)   
-    ## TimePost                  -5.14 ** 
+    ## TimePost                  -5.39 ** 
     ##                           (1.78)   
-    ## TimeFollowUp              -3.34    
-    ##                          (11.30)   
-    ## genderFemale              11.74 ***
-    ##                           (2.55)   
-    ## TimePost:genderFemale     -6.32 ** 
+    ## TimeFollowUp              -3.36    
+    ##                          (11.35)   
+    ## genderFemale              11.82 ***
+    ##                           (2.54)   
+    ## TimePost:genderFemale     -6.13 ** 
     ##                           (2.26)   
     ## -----------------------------------
-    ## AIC                     7090.79    
-    ## BIC                     7123.37    
-    ## Log Likelihood         -3538.40    
-    ## Num. obs.                776       
-    ## Num. groups: OMID        491       
-    ## Var: OMID (Intercept)    586.86    
-    ## Var: Residual            177.45    
+    ## AIC                     7117.67    
+    ## BIC                     7150.28    
+    ## Log Likelihood         -3551.84    
+    ## Num. obs.                779       
+    ## Num. groups: OMID        492       
+    ## Var: OMID (Intercept)    582.52    
+    ## Var: Residual            178.99    
     ## ===================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -755,21 +755,21 @@ following Funder’s (2019) recommendations.The model’s total explanatory
 power is substantial (conditional R2 = 0.78) and the part related to the
 fixed effects alone (marginal R2) is of 0.05. The model’s intercept,
 corresponding to Response = 0, Time = Pre, gender = Male and OMID =
-1002059522913, is at 24.88 (SE = 1.97, 95% CI \[21.01, 28.75\], p \<
+1002059522913, is at 24.80 (SE = 1.97, 95% CI \[20.94, 28.65\], p \<
 .001). Within this model:
 
   - The effect of TimePost is negative and can be considered as very
-    small and significant (beta = -5.14, SE = 1.78, 95% CI \[-8.63,
-    -1.65\], std. beta = -0.18, p \< .01).
+    small and significant (beta = -5.39, SE = 1.78, 95% CI \[-8.87,
+    -1.90\], std. beta = -0.19, p \< .01).
   - The effect of TimeFollowUp is negative and can be considered as very
-    small and not significant (beta = -3.34, SE = 11.30, 95% CI
-    \[-25.49, 18.81\], std. beta = -0.12, p = 0.768).
+    small and not significant (beta = -3.36, SE = 11.35, 95% CI
+    \[-25.60, 18.89\], std. beta = -0.12, p = 0.767).
   - The effect of genderFemale is positive and can be considered as
-    medium and significant (beta = 11.74, SE = 2.55, 95% CI \[6.74,
-    16.73\], std. beta = 0.41, p \< .001).
+    medium and significant (beta = 11.82, SE = 2.54, 95% CI \[6.84,
+    16.79\], std. beta = 0.42, p \< .001).
   - The effect of TimePost:genderFemale is negative and can be
-    considered as small and significant (beta = -6.32, SE = 2.26, 95% CI
-    \[-10.74, -1.90\], std. beta = -0.22, p \< .01).
+    considered as small and significant (beta = -6.13, SE = 2.26, 95% CI
+    \[-10.55, -1.71\], std. beta = -0.22, p \< .01).
 
 ### Show estimated means
 
@@ -780,12 +780,12 @@ results$estimated_means %>%
 
 | Time | predicted | group  | group\_col |
 | ---: | --------: | :----- | :--------- |
-|    1 |  24.87748 | Male   | Male       |
+|    1 |  24.79708 | Male   | Male       |
 |    1 |  36.61356 | Female | Female     |
-|    2 |  19.73681 | Male   | Male       |
-|    2 |  25.15255 | Female | Female     |
-|    3 |  21.53614 | Male   | Male       |
-|    3 |  33.27222 | Female | Female     |
+|    2 |  19.41176 | Male   | Male       |
+|    2 |  25.09980 | Female | Female     |
+|    3 |  21.44186 | Male   | Male       |
+|    3 |  33.25834 | Female | Female     |
 
 ### Show a plot of the means
 
@@ -799,18 +799,28 @@ results$plot  +
 
 ## `om_textscore`
 
-This function performs sentiment analysis and other text tools on any
-custom strings that you supply.
+This function performs sentiment analysis and other methods from
+different text tools on any dataset with a text colum that you supply.
+
+Note: `openmindR` will not automatically install all the packages
+necessary for each text tool because it is quite a lot and there are
+many dependencies. Instead, it will check whether the specified method
+is installed on your computer before it executes the code. If it’s not,
+it asks you to install the relevant package. That way you only need to
+install what you actually use.
+
+Arguments:
 
   - **`.data`** dataset including text and a personal identifier (must
     be named `OMID`)
   - **`method`** which method(s) should be applied? Currently supports:
-    “nrc”, “bing”, “afinn”, “textblob”, “vader”,
-    “sentiment\_stanford”, “sentimentr\_polarity”, “affect3d”,
-    “receptiveness”, and “toxicity”
+    `"nrc"`, `"bing"`, `"afinn"`, `"textblob"`, `"vader"`,
+    `"sentiment_stanford"`, `"sentimentr_polarity"`, `"affect3d"`,
+    `"receptiveness"`, and `"toxicity"`.
   - **`text`** specify the text variable which should be scored
 
-<!-- end list -->
+Here an example code that scores the free text from v7 with `bing`,
+`nrc` and `afinn` sentiment dictionaries.
 
 ``` r
 assessmentv7 %>% 
