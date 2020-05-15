@@ -244,7 +244,7 @@ om_parse_lifehacks <- function(cleaned_dat, OpenMindVersion = "Before 4.0") {
     tidyr::unnest(LifeHacksReason_data)
 
   ## TODO: Make lifehacks so that you can specify in top level functions which ones you want to provide
-  if (OpenMindVersion == "Before 4.0") {
+  if (OpenMindVersion == "Before 3.0") {
     step1_hacks <- c("Understand what's influencing your viewpoint",
                      "Engage in perspective taking",
                      "Seek out diverse perspectives")
@@ -272,6 +272,31 @@ om_parse_lifehacks <- function(cleaned_dat, OpenMindVersion = "Before 4.0") {
                      "Challenge your assumptions")
   }
 
+
+
+    if (OpenMindVersion == "Before 4.0") {
+    step1_hacks <- c("Understand what's influencing your viewpoint",
+                     "Engage in perspective taking",
+                     "Seek out diverse perspectives")
+
+    step2_hacks <- c("Acknowledge that your abilities are fluid",
+                     "Approach disagreements like a detective",
+                     "Vanquish your fear of being wrong")
+
+    step3_hacks <- c("Challenge your motivated reasoning",
+                     "Challenge your confirmation bias")
+
+
+
+    step4_hacks <- c("Analyze your own beliefs",
+                     "Mind travel",
+                     "Examine different moral matrices")
+
+    step5_hacks <- c("Respect and understand other people's elephants",
+                     "Be intellectually humble",
+                     "Challenge your assumptions")
+  }
+
   if (OpenMindVersion == "4.0+") {
 
     step1_hacks <- c("Challenge your motivated reasoning",
@@ -291,8 +316,6 @@ om_parse_lifehacks <- function(cleaned_dat, OpenMindVersion = "Before 4.0") {
 
     step5_hacks <- c("Respect and understand other people's elephants",
                      "Be intellectually humble",
-                     "Appeal to other people's elephants",
-                     "Appeal to others people's elephants",
                      "Challenge your assumptions")
   }
 

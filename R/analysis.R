@@ -1482,7 +1482,7 @@ get_nrc <- function(author_words, sentiment_dat){
 #' @param method which method(s) should be applied? Currently supports: "nrc", "bing", "afinn", "textblob", "vader", "sentiment_stanford", "sentimentr_polarity", "affect3d", "receptiveness", and "toxicity"
 #' @param text specify the text variable which should be scored
 #' @export
-om_textscore <- function(.data, method, text) {
+om_textscore <- function(.data, method, text, verbose = T) {
   ## words by author
   author_words <- .data %>%
     ## get tokens from text (here: individual words)
@@ -1747,7 +1747,7 @@ om_textscore <- function(.data, method, text) {
       dplyr::mutate(OMID = as.character(OMID)) %>%
       peRspective::prsp_stream(body,
                                text_id = OMID,
-                               verbose = F,
+                               verbose = verbose,
                                safe_output = T,
                                score_model = prsp_models)
 

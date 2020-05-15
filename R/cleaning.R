@@ -1270,6 +1270,9 @@ clean_assessment6 <- function(assessment) {
     dplyr::mutate(MAAPost = abs(IngroupMotivationPost - OutgroupMotivationPost)) %>%
     # compute ingroup v outgroup motivation attribution
     dplyr::mutate(MAAFollowUp = abs(IngroupMotivationFollowUp - OutgroupMotivationFollowUp)) %>%
+    mutate(IntellectualHumility2Pre = 8-IntellectualHumility2Pre) %>%
+    mutate(IntellectualHumility2Post = 8-IntellectualHumility2Post) %>%
+    mutate(IntellectualHumility2FollowUp = 8-IntellectualHumility2FollowUp)  %>%
     dplyr::mutate(IntellectualHumilityPre = (IntellectualHumility1Pre+IntellectualHumility2Pre+IntellectualHumility3Pre+CIHS_LIO3Pre)/4) %>%
     dplyr::mutate(IntellectualHumilityPost = (IntellectualHumility1Post+IntellectualHumility2Post+IntellectualHumility3Post+CIHS_LIO3Post)/4) %>%
     dplyr::mutate(IntellectualHumilityFollowUp = (IntellectualHumility1FollowUp+IntellectualHumility2FollowUp+IntellectualHumility3FollowUp+CIHS_LIO3FollowUp)/4)
