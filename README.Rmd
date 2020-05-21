@@ -11,16 +11,22 @@ output: github_document
 
 Install package like this:
 
-```{r setup, eval=FALSE}
+```{r setup, eval=FALSEE}
 devtools::install_github("openmindplatform/openmindR")
+
+
 ```
+
+
+
+
 
 ```{r, echo=F}
 knitr::opts_chunk$set(message = F, 
                       warning = F, 
                       eval = F)
 
-key <- readr::read_lines("../../Keys/airtabler.txt")
+# key <- readr::read_lines("../../Keys/airtabler.txt")
 
 
 ups <- c("GrowthMindset", "CIHS_LIO",
@@ -71,21 +77,21 @@ This code merges Assessment data with Participant Progress and Access Codes tabl
 pacman::p_load(tidyverse, openmindR)
 
 
-assessmentv6 <- om_download_at(key, tables = "AssessmentV6",
+assessmentv6 <- om_download_at(tables = "AssessmentV6",
                                clean = T, v6.1 = T)
 
 ## ParticipantProgress1
-pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+pp1 <- om_download_at(tables = "ParticipantProgress") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished)
 
 ## ParticipantProgress2
-pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+pp2 <- om_download_at(tables = "ParticipantProgress2") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished)
 
 ## AccessCodes
-acs <- om_download_at(key, tables = "AccessCodes") %>%
+acs <- om_download_at(tables = "AccessCodes") %>%
   select(AccessCode, UserType, GroupName)
 
 ## bring it all together
@@ -116,16 +122,16 @@ pacman::p_load(tidyverse, openmindR)
 
   # AssessmentV7 <- airtabler::airtable(om_base, "AssessmentV7Copy")$AssessmentV7Copy$select_all() %>% 
   # janitor::remove_empty()
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
-assessmentv7 <- om_download_at(key, tables = "AssessmentV7",
+
+assessmentv7 <- om_download_at(tables = "AssessmentV7",
                                clean = T, v6.1 = T) %>% 
   janitor::remove_empty()
   # mutate(DateStarted = lubridate::as_date(DateStarted)) %>% 
   # mutate(DateFinished = lubridate::as_date(DateFinished))
 
 ## ParticipantProgress1
-pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+pp1 <- om_download_at(tables = "ParticipantProgress") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished, StepsComplete, StepScores) %>%
   mutate(ModsCompleteN = str_count(StepsComplete, "1")) %>% 
@@ -141,7 +147,7 @@ pp1 <- om_download_at(key, tables = "ParticipantProgress") %>%
   select(-StepsComplete, -StepScores)
 
 ## ParticipantProgress2
-pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+pp2 <- om_download_at(tables = "ParticipantProgress2") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished, ModsComplete, ModScores) %>%
   mutate(ModsCompleteN = str_count(ModsComplete, ",") + 1) %>% 
@@ -163,7 +169,7 @@ str_split(pp2$ModScores, ",") %>%
   map(unlist)
 
 ## AccessCodes
-acs <- om_download_at(key, tables = "AccessCodes") %>%
+acs <- om_download_at(tables = "AccessCodes") %>%
   select(AccessCode, UserType, GroupName)
 
 ## bring it all together
@@ -297,9 +303,9 @@ Here is a code example that will download Assessment V6, clean it, save it into 
 
 
 ```{r, eval=F}
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
 
-assessmentv6 <- om_download_at(key, 
+
+assessmentv6 <- om_download_at(
                             tables = "AssessmentV6", 
                             clean = TRUE, 
                             file = "../../../Data/assessmentv6.1.csv",
@@ -312,7 +318,7 @@ Here is another example code for downloading a clean version of Assessment v7:
 
 ```{r, eval=T}
 
-assessmentv7 <- om_download_at(key, 
+assessmentv7 <- om_download_at(
                             tables = "AssessmentV7", 
                             clean = TRUE)
 
@@ -455,7 +461,7 @@ This function parses and cleans the list variables that contain the lifehack dat
 key <- read_lines("../../Keys/airtabler.txt")
 
 ## download participant progress data
-pp_dat <- om_download_at(key, tables = "ParticipantProgress")
+pp_dat <- om_download_at(tables = "ParticipantProgress")
 
 
 ## this parses all Lifehack data so far
@@ -486,11 +492,9 @@ This function merges assessment v4, v5 and v6 data and only keeps common variabl
 v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv") 
 v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv") 
 
-## get key
-key <- readr::read_lines("../../Keys/airtabler.txt")
 
 ## get (clean) assessment v6 data
-v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+v6 <- om_download_at(tables = "AssessmentV6", clean = T)
 
 
 ## merge all three datasets and only keep common variables
@@ -535,7 +539,7 @@ First we download v7 data:
 ```{r, eval = F}
 
 ## Get Key (may differ in your code)
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
 
 ## get v7 data
 assessmentv7 <- om_download_at(key,

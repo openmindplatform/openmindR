@@ -36,20 +36,55 @@
 #'                               tables = "AssessmentV7",
 #'                               clean = TRUE)
 #' @export
-om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F) {
+om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F, omkey_path = NULL) {
 
   if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7"))) {
-    stop("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
+    warning("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
   }
 
   if (any(tables %in% c("AssessmentV4","AssessmentV5","AssessmentV6DiD", "DiDProgress", "AssessmentV6DiD", "DiDProgress"))) {
     stop("A Table you specified does not live in AirTable anymore!\n")
   }
 
+  cat("Seting up OM key\n")
+
+
+  if (is.null(omkey_path)){
+    if (Sys.getenv("OMKEY") != "") {
+      message("No key specified but found environment variable: OMKEY.")
+      omkey_path <- Sys.getenv("OMKEY")
+    }
+    if (Sys.getenv("OMKEY") == "") {
+      message("No key specified and did not find environment variable: OMKEY. Please provide path to omkey.\n")
+      omkey_path <- file.choose()
+      message("Thanks! Setting environment variable OMKEY now.")
+      Sys.setenv(OMKEY = omkey_path)
+    }
+  }
+
+  omkey <- readRDS(omkey_path)
+
   cat("Seting up key\n")
 
+  if (is.null(key)){
+    if (Sys.getenv("AIRTABLE_API_KEY") != "") {
+      message("No key specified but found environment variable: AIRTABLE_API_KEY.")
+      raw_key <- Sys.getenv("AIRTABLE_API_KEY")
+    }
+    if (Sys.getenv("AIRTABLE_API_KEY") == "") {
+      message("No key specified and did not find environment variable: AIRTABLE_API_KEY.")
+      raw_key <- rstudioapi::askForPassword(prompt = "Please enter the encrypted API key")
+      # message("Setting API key as AIRTABLE_API_KEY environment variable.")
+      # Sys.setenv(AIRTABLE_API_KEY = key)
+    }
+  }
+
+  decipher <- sodium::hex2bin(raw_key)
+
+  key <- unserialize(sodium::data_decrypt(bin = decipher, key = omkey, nonce = public_nonce))
+
+  # message("Setting API key as AIRTABLE_API_KEY environment variable.")
   Sys.setenv(AIRTABLE_API_KEY = key)
-  AIRTABLE_API_KEY = key
 
 
   dat.ass.1 <- airtabler::airtable(
@@ -164,6 +199,8 @@ om_download_at <- function(key, tables = c("AccessCodes","ParticipantProgress","
   }
 
   if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()
+
+  Sys.setenv(AIRTABLE_API_KEY = raw_key)
 
   return(final_list)
 

@@ -16,6 +16,7 @@ Imports:
     forcats,
     sjPlot,
     rlist,
+    sodium,
     sjmisc,
     lme4,
     scales,
