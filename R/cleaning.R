@@ -46,7 +46,7 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
     stop("A Table you specified does not live in AirTable anymore!\n")
   }
 
-  cat("Seting up OM key\n")
+  cat("Setting up OM key\n")
 
 
   if (is.null(omkey_path)){
@@ -64,7 +64,7 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   omkey <- readRDS(omkey_path)
 
-  cat("Seting up AIRTABLE API key\n")
+  cat("Setting up AIRTABLE API key\n")
 
   if (is.null(key)){
     if (Sys.getenv("AIRTABLE_API_KEY") != "") {
