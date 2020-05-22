@@ -29,7 +29,6 @@ Imports:
     tidyr,
     insight,
     modelbased,
-    report,
     magrittr,
     lazyeval,
     lubridate,

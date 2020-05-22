@@ -32,21 +32,21 @@ Codes tables (to add UserType, OpenMindVersion and other variables).
 pacman::p_load(tidyverse, openmindR)
 
 
-assessmentv6 <- om_download_at(key, tables = "AssessmentV6",
+assessmentv6 <- om_download_at(tables = "AssessmentV6",
                                clean = T, v6.1 = T)
 
 ## ParticipantProgress1
-pp1 <- om_download_at(key, tables = "ParticipantProgress") %>% 
+pp1 <- om_download_at(tables = "ParticipantProgress") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished)
 
 ## ParticipantProgress2
-pp2 <- om_download_at(key, tables = "ParticipantProgress2") %>% 
+pp2 <- om_download_at(tables = "ParticipantProgress2") %>% 
   select(OMID, AccessCode, OpenMindVersion, Country, 
          Research, DateStarted, DateFinished)
 
 ## AccessCodes
-acs <- om_download_at(key, tables = "AccessCodes") %>%
+acs <- om_download_at(tables = "AccessCodes") %>%
   select(AccessCode, UserType, GroupName)
 
 ## bring it all together
@@ -106,9 +106,7 @@ it into a folder called “Data” under Research and filter down to only
 include V6.1 data.
 
 ``` r
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
-
-assessmentv6 <- om_download_at(key, 
+assessmentv6 <- om_download_at(
                             tables = "AssessmentV6", 
                             clean = TRUE, 
                             file = "../../../Data/assessmentv6.1.csv",
@@ -119,14 +117,15 @@ Here is another example code for downloading a clean version of
 Assessment v7:
 
 ``` r
-assessmentv7 <- om_download_at(key, 
+assessmentv7 <- om_download_at(
                             tables = "AssessmentV7", 
                             clean = TRUE)
 ```
 
+    ## Seting up OM key
     ## Seting up key
     ## Download AssessmentV7 Data
-    ## Done. AssessmentV7 Data has 1322 rows
+    ## Done. AssessmentV7 Data has 1585 rows
 
 ## `om_filter_data`
 
@@ -287,7 +286,7 @@ variables (so 20 in total):
 key <- read_lines("../../Keys/airtabler.txt")
 
 ## download participant progress data
-pp_dat <- om_download_at(key, tables = "ParticipantProgress")
+pp_dat <- om_download_at(tables = "ParticipantProgress")
 
 
 ## this parses all Lifehack data so far
@@ -318,11 +317,9 @@ variables.
 v4 <- read.csv("../../../Data/2019-10-29_assessmentv4.csv") 
 v5 <- read.csv("../../../Data/2019-10-29_assessmentv5.csv") 
 
-## get key
-key <- readr::read_lines("../../Keys/airtabler.txt")
 
 ## get (clean) assessment v6 data
-v6 <- om_download_at(key = key, tables = "AssessmentV6", clean = T)
+v6 <- om_download_at(tables = "AssessmentV6", clean = T)
 
 
 ## merge all three datasets and only keep common variables
@@ -369,7 +366,7 @@ First we download v7 data:
 
 ``` r
 ## Get Key (may differ in your code)
-key <- readr::read_lines("../../Research/Projects/Keys/airtabler.txt")
+
 
 ## get v7 data
 assessmentv7 <- om_download_at(key,
@@ -505,9 +502,9 @@ results$model
     ## 
     ## Coefficients:
     ##                        (Intercept)               ppol_catConservatives  
-    ##                            1.70714                             0.09286  
+    ##                            1.74286                             0.05360  
     ##                       genderFemale  ppol_catConservatives:genderFemale  
-    ##                            0.08371                            -0.17121
+    ##                            0.06101                            -0.17747
 
 ### Show a regression table
 
@@ -519,19 +516,19 @@ results$table
     ## ==============================================
     ##                                     Model 1   
     ## ----------------------------------------------
-    ## (Intercept)                           1.71 ***
+    ## (Intercept)                           1.74 ***
+    ##                                      (0.05)   
+    ## ppol_catConservatives                 0.05    
+    ##                                      (0.08)   
+    ## genderFemale                          0.06    
     ##                                      (0.06)   
-    ## ppol_catConservatives                 0.09    
-    ##                                      (0.09)   
-    ## genderFemale                          0.08    
-    ##                                      (0.07)   
-    ## ppol_catConservatives:genderFemale   -0.17    
-    ##                                      (0.12)   
+    ## ppol_catConservatives:genderFemale   -0.18    
+    ##                                      (0.11)   
     ## ----------------------------------------------
     ## R^2                                   0.00    
-    ## Adj. R^2                             -0.00    
-    ## Num. obs.                           626       
-    ## RMSE                                  0.68    
+    ## Adj. R^2                              0.00    
+    ## Num. obs.                           750       
+    ## RMSE                                  0.69    
     ## ==============================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
@@ -549,20 +546,20 @@ standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.
 
 The model explains a not significant and very weak proportion of
-variance (R2 = 0.00, F(3, 622) = 0.74, p = 0.528, adj. R2 = 0.00). The
+variance (R2 = 0.00, F(3, 746) = 1.01, p = 0.388, adj. R2 = 0.00). The
 model’s intercept, corresponding to ppol\_extreme = 0, ppol\_cat =
-Progressives and gender = Male, is at 1.71 (SE = 0.06, 95% CI \[1.59,
-1.82\], p \< .001). Within this model:
+Progressives and gender = Male, is at 1.74 (SE = 0.05, 95% CI \[1.64,
+1.84\], p \< .001). Within this model:
 
   - The effect of ppol\_catConservatives is positive and can be
-    considered as very small and not significant (beta = 0.09, SE =
-    0.09, 95% CI \[-0.08, 0.27\], std. beta = 0.14, p = 0.294).
-  - The effect of genderFemale is positive and can be considered as very
-    small and not significant (beta = 0.08, SE = 0.07, 95% CI \[-0.05,
-    0.22\], std. beta = 0.12, p = 0.225).
+    considered as tiny and not significant (beta = 0.05, SE = 0.08, 95%
+    CI \[-0.11, 0.22\], std. beta = 0.08, p = 0.518).
+  - The effect of genderFemale is positive and can be considered as tiny
+    and not significant (beta = 0.06, SE = 0.06, 95% CI \[-0.06, 0.19\],
+    std. beta = 0.09, p = 0.335).
   - The effect of ppol\_catConservatives:genderFemale is negative and
-    can be considered as small and not significant (beta = -0.17, SE =
-    0.12, 95% CI \[-0.41, 0.07\], std. beta = -0.25, p = 0.163).
+    can be considered as small and not significant (beta = -0.18, SE =
+    0.11, 95% CI \[-0.40, 0.05\], std. beta = -0.26, p = 0.119).
 
 ### Show estimated means
 
@@ -573,10 +570,10 @@ results$estimated_means %>%
 
 | gender | ppol\_cat     |     Mean |        SE |  CI\_low | CI\_high |
 | :----- | :------------ | -------: | --------: | -------: | -------: |
-| Male   | Progressives  | 1.707143 | 0.0571079 | 1.594995 | 1.819290 |
-| Male   | Conservatives | 1.800000 | 0.0675709 | 1.667305 | 1.932695 |
-| Female | Progressives  | 1.790850 | 0.0386277 | 1.714993 | 1.866706 |
-| Female | Conservatives | 1.712500 | 0.0755466 | 1.564143 | 1.860857 |
+| Male   | Progressives  | 1.742857 | 0.0519687 | 1.640835 | 1.844879 |
+| Male   | Conservatives | 1.796460 | 0.0646727 | 1.669498 | 1.923422 |
+| Female | Progressives  | 1.803867 | 0.0361332 | 1.732933 | 1.874802 |
+| Female | Conservatives | 1.680000 | 0.0687481 | 1.545037 | 1.814963 |
 
 ### Show a plot of the means
 
@@ -678,13 +675,6 @@ results <- om_lmer(mixed,
                    type = "int")
 ```
 
-    ## Error: Confidence intervals could not be computed.
-    ## * Reason: "non-conformable arguments"
-    ## * Source: mm %*% vcm
-    ## Error: Confidence intervals could not be computed.
-    ## * Reason: "non-conformable arguments"
-    ## * Source: mm %*% vcm
-
 ### Show the model
 
 ``` r
@@ -694,19 +684,19 @@ results$model
     ## Linear mixed model fit by REML ['lmerMod']
     ## Formula: Response ~ Time * gender + (1 | OMID)
     ##    Data: cleaned_dat_long
-    ## REML criterion at convergence: 7103.671
+    ## REML criterion at convergence: 8643.785
     ## Random effects:
     ##  Groups   Name        Std.Dev.
-    ##  OMID     (Intercept) 24.14   
-    ##  Residual             13.38   
-    ## Number of obs: 779, groups:  OMID, 492
+    ##  OMID     (Intercept) 24.79   
+    ##  Residual             13.57   
+    ## Number of obs: 945, groups:  OMID, 586
     ## Fixed Effects:
-    ##           (Intercept)               TimePost           TimeFollowUp  
-    ##                24.797                 -5.385                 -3.355  
-    ##          genderFemale  TimePost:genderFemale  
-    ##                11.816                 -6.128  
-    ## fit warnings:
-    ## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+    ##               (Intercept)                   TimePost  
+    ##                    25.642                     -3.873  
+    ##              TimeFollowUp               genderFemale  
+    ##                   -14.608                     10.507  
+    ##     TimePost:genderFemale  TimeFollowUp:genderFemale  
+    ##                    -6.358                     11.857
 
 ### Show a regression table
 
@@ -715,28 +705,30 @@ results$table
 ```
 
     ## 
-    ## ===================================
-    ##                        Model 1     
-    ## -----------------------------------
-    ## (Intercept)               24.80 ***
-    ##                           (1.97)   
-    ## TimePost                  -5.39 ** 
-    ##                           (1.78)   
-    ## TimeFollowUp              -3.36    
-    ##                          (11.35)   
-    ## genderFemale              11.82 ***
-    ##                           (2.54)   
-    ## TimePost:genderFemale     -6.13 ** 
-    ##                           (2.26)   
-    ## -----------------------------------
-    ## AIC                     7117.67    
-    ## BIC                     7150.28    
-    ## Log Likelihood         -3551.84    
-    ## Num. obs.                779       
-    ## Num. groups: OMID        492       
-    ## Var: OMID (Intercept)    582.52    
-    ## Var: Residual            178.99    
-    ## ===================================
+    ## =======================================
+    ##                            Model 1     
+    ## ---------------------------------------
+    ## (Intercept)                   25.64 ***
+    ##                               (1.83)   
+    ## TimePost                      -3.87 *  
+    ##                               (1.66)   
+    ## TimeFollowUp                 -14.61    
+    ##                              (16.27)   
+    ## genderFemale                  10.51 ***
+    ##                               (2.38)   
+    ## TimePost:genderFemale         -6.36 ** 
+    ##                               (2.07)   
+    ## TimeFollowUp:genderFemale     11.86    
+    ##                              (19.93)   
+    ## ---------------------------------------
+    ## AIC                         8659.79    
+    ## BIC                         8698.59    
+    ## Log Likelihood             -4321.89    
+    ## Num. obs.                    945       
+    ## Num. groups: OMID            586       
+    ## Var: OMID (Intercept)        614.79    
+    ## Var: Residual                184.03    
+    ## =======================================
     ## *** p < 0.001, ** p < 0.01, * p < 0.05
 
 ### Show an interpretation of the model
@@ -753,23 +745,26 @@ optimizer) to predict Response with Time and gender (formula = Response
 on a standardized version of the dataset. Effect sizes were labelled
 following Funder’s (2019) recommendations.The model’s total explanatory
 power is substantial (conditional R2 = 0.78) and the part related to the
-fixed effects alone (marginal R2) is of 0.05. The model’s intercept,
+fixed effects alone (marginal R2) is of 0.04. The model’s intercept,
 corresponding to Response = 0, Time = Pre, gender = Male and OMID =
-1002059522913, is at 24.80 (SE = 1.97, 95% CI \[20.94, 28.65\], p \<
+1002059522913, is at 25.64 (SE = 1.83, 95% CI \[22.05, 29.23\], p \<
 .001). Within this model:
 
   - The effect of TimePost is negative and can be considered as very
-    small and significant (beta = -5.39, SE = 1.78, 95% CI \[-8.87,
-    -1.90\], std. beta = -0.19, p \< .01).
-  - The effect of TimeFollowUp is negative and can be considered as very
-    small and not significant (beta = -3.36, SE = 11.35, 95% CI
-    \[-25.60, 18.89\], std. beta = -0.12, p = 0.767).
+    small and significant (beta = -3.87, SE = 1.66, 95% CI \[-7.12,
+    -0.63\], std. beta = -0.13, p \< .05).
+  - The effect of TimeFollowUp is negative and can be considered as
+    medium and not significant (beta = -14.61, SE = 16.27, 95% CI
+    \[-46.50, 17.28\], std. beta = -0.51, p = 0.369).
   - The effect of genderFemale is positive and can be considered as
-    medium and significant (beta = 11.82, SE = 2.54, 95% CI \[6.84,
-    16.79\], std. beta = 0.42, p \< .001).
+    small and significant (beta = 10.51, SE = 2.38, 95% CI \[5.85,
+    15.17\], std. beta = 0.36, p \< .001).
   - The effect of TimePost:genderFemale is negative and can be
-    considered as small and significant (beta = -6.13, SE = 2.26, 95% CI
-    \[-10.55, -1.71\], std. beta = -0.22, p \< .01).
+    considered as small and significant (beta = -6.36, SE = 2.07, 95% CI
+    \[-10.42, -2.30\], std. beta = -0.22, p \< .01).
+  - The effect of TimeFollowUp:genderFemale is positive and can be
+    considered as medium and not significant (beta = 11.86, SE = 19.93,
+    95% CI \[-27.20, 50.92\], std. beta = 0.41, p = 0.552).
 
 ### Show estimated means
 
@@ -778,14 +773,14 @@ results$estimated_means %>%
   knitr::kable()
 ```
 
-| Time | predicted | group  | group\_col |
-| ---: | --------: | :----- | :--------- |
-|    1 |  24.79708 | Male   | Male       |
-|    1 |  36.61356 | Female | Female     |
-|    2 |  19.41176 | Male   | Male       |
-|    2 |  25.09980 | Female | Female     |
-|    3 |  21.44186 | Male   | Male       |
-|    3 |  33.25834 | Female | Female     |
+| Time | predicted | std.error |   conf.low | conf.high | group  | group\_col |
+| ---: | --------: | --------: | ---------: | --------: | :----- | :--------- |
+|    1 |  25.64231 |  1.831546 |   22.05254 |  29.23207 | Male   | Male       |
+|    1 |  36.14943 |  1.515080 |   33.17992 |  39.11893 | Female | Female     |
+|    2 |  21.76919 |  2.133368 |   17.58786 |  25.95051 | Male   | Male       |
+|    2 |  25.91874 |  1.669731 |   22.64613 |  29.19136 | Female | Female     |
+|    3 |  11.03439 | 16.326028 | \-20.96403 |  43.03282 | Male   | Male       |
+|    3 |  33.39802 | 11.561290 |   10.73831 |  56.05773 | Female | Female     |
 
 ### Show a plot of the means
 

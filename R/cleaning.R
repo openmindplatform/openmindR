@@ -51,7 +51,7 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   if (is.null(omkey_path)){
     if (Sys.getenv("OMKEY") != "") {
-      message("No key specified but found environment variable: OMKEY.")
+      message("No OM key specified but found environment variable: OMKEY.")
       omkey_path <- Sys.getenv("OMKEY")
     }
     if (Sys.getenv("OMKEY") == "") {
@@ -64,7 +64,7 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   omkey <- readRDS(omkey_path)
 
-  cat("Seting up key\n")
+  cat("Seting up AIRTABLE API key\n")
 
   if (is.null(key)){
     if (Sys.getenv("AIRTABLE_API_KEY") != "") {

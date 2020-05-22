@@ -11,7 +11,7 @@ output: github_document
 
 Install package like this:
 
-```{r setup, eval=FALSEE}
+```{r setup, eval=FALSE}
 devtools::install_github("openmindplatform/openmindR")
 
 
