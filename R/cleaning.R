@@ -1577,5 +1577,20 @@ om_dummy_individ <- function(assessment) {
   return(assessment)
 }
 
+#' @export
+set_AT_key <- function(api_key, omkey_path, return_key = F) {
 
+  if(api_key != Sys.getenv("AIRTABLE_API_KEY")) stop("AirTable API Key already set.")
+
+  omkey <- readRDS(omkey_path)
+
+  decipher <- sodium::hex2bin(api_key)
+
+  key <- unserialize(sodium::data_decrypt(bin = decipher, key = omkey, nonce = public_nonce))
+
+  # message("Setting API key as AIRTABLE_API_KEY environment variable.")
+  Sys.setenv(AIRTABLE_API_KEY = key)
+
+  if(return_key) return(key)
+}
 
