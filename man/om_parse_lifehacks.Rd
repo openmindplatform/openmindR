@@ -4,7 +4,7 @@
 \alias{om_parse_lifehacks}
 \title{Parse LifeHacks}
 \usage{
-om_parse_lifehacks(cleaned_dat)
+om_parse_lifehacks(cleaned_dat, OpenMindVersion = "Before 4.0")
 }
 \arguments{
 \item{cleaned_dat}{a dataset which includes LifeHacks to be parsed and checked}

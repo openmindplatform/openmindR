@@ -4,7 +4,7 @@
 \alias{om_textscore}
 \title{Use various text analysis tools}
 \usage{
-om_textscore(.data, method, text)
+om_textscore(.data, method, text, verbose = T)
 }
 \arguments{
 \item{.data}{dataset including text and a personal identifier (must be named `OMID`)}

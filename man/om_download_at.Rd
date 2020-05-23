@@ -5,12 +5,13 @@
 \title{Download AirTable data}
 \usage{
 om_download_at(
-  key,
+  key = NULL,
   tables = c("AccessCodes", "ParticipantProgress", "InstructorSurveyV2",
     "TechnicalInquiries"),
   clean = F,
   file = NULL,
-  v6.1 = F
+  v6.1 = F,
+  omkey_path = NULL
 )
 }
 \arguments{
