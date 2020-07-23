@@ -1314,7 +1314,11 @@ om_ttest <- function(gathered_dat, comparison) {
           percentimproved = perc_improved(Response[Time == "Pre"],
                                           Response[Time == T2],
                                           (df+1),
-                                          .data$var_code[1])
+                                          .data$var_code[1]),
+          percentworse = perc_improved(Response[Time == "Pre"],
+                                          Response[Time == T2],
+                                          (df+1),
+                                          .data$var_code[1], reverse = T)
 
 
         )
@@ -1345,7 +1349,7 @@ om_ttest <- function(gathered_dat, comparison) {
 #' @param total N
 #' @param variable_code variable code
 #' @export
-perc_improved <- function(all_pre, all_post, total, variable_code){
+perc_improved <- function(all_pre, all_post, total, variable_code, reverse = F){
 
   ups <- c("GrowthMindset", "CIHS_LIO",
            "OutgroupLiking", "OutgroupMotivation",
@@ -1363,13 +1367,28 @@ perc_improved <- function(all_pre, all_post, total, variable_code){
     return(NA)
   }
 
-  if (variable_code %in% ups) {
-    p_improv <- sum((all_pre < all_post)==TRUE)/total
+
+  if(!reverse){
+    if (variable_code %in% ups) {
+      p_improv <- sum((all_pre < all_post)==TRUE)/total
+    }
+
+    if (variable_code %in% downs) {
+      p_improv <- sum((all_pre > all_post)==TRUE)/total
+    }
   }
 
-  if (variable_code %in% downs) {
-    p_improv <- sum((all_pre > all_post)==TRUE)/total
+
+  if(reverse){
+    if (variable_code %in% ups) {
+      p_improv <- sum((all_pre > all_post)==TRUE)/total
+    }
+
+    if (variable_code %in% downs) {
+      p_improv <- sum((all_pre < all_post)==TRUE)/total
+    }
   }
+
 
   return(p_improv)
 }

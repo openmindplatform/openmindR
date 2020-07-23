@@ -4,7 +4,7 @@
 \alias{perc_improved}
 \title{Helper function to calculate percent of people who improved}
 \usage{
-perc_improved(all_pre, all_post, total, variable_code)
+perc_improved(all_pre, all_post, total, variable_code, reverse = F)
 }
 \arguments{
 \item{all_pre}{Pre Data}
