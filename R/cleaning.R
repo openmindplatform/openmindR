@@ -48,7 +48,6 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   cat("Setting up OM key\n")
 
-
   if (is.null(omkey_path)){
     if (Sys.getenv("OMKEY") != "") {
       message("No OM key specified but found environment variable: OMKEY.")
@@ -122,7 +121,6 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
     if (clean) {
 
       final_list$dat.ass6 <- final_list$dat.ass6 %>% clean_assessment6()
-
 
     }
 
