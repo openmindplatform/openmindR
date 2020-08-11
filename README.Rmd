@@ -117,6 +117,8 @@ cleaned_dat <- pp1  %>%
 
 ```
 
+
+
 ```{r, eval = F, echo = F}
 pacman::p_load(tidyverse, openmindR)
 
@@ -125,7 +127,7 @@ pacman::p_load(tidyverse, openmindR)
 
 
 assessmentv7 <- om_download_at(tables = "AssessmentV7",
-                               clean = T, v6.1 = T) %>% 
+                               clean = T) %>% 
   janitor::remove_empty()
   # mutate(DateStarted = lubridate::as_date(DateStarted)) %>% 
   # mutate(DateFinished = lubridate::as_date(DateFinished))
@@ -162,11 +164,6 @@ pp2 <- om_download_at(tables = "ParticipantProgress2") %>%
     )) %>% 
   select(-ModsComplete, -ModScores)
 
-
-
-
-str_split(pp2$ModScores, ",") %>% 
-  map(unlist)
 
 ## AccessCodes
 acs <- om_download_at(tables = "AccessCodes") %>%
@@ -233,6 +230,41 @@ The following functions are meant to turn AirTable data into a single clean file
 + [om_parse_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
 + [merge_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
 
+```{r}
+pacman::p_load(tidyverse, openmindR)
+
+assessmentv7 <- om_download_at(tables = "AssessmentV7",
+                               clean = T)  %>% 
+  select( -DateFinished, -DateStarted, -OpenMindVersion, -WithinADay, -Research, -Country, -AccessCode)
+## ParticipantProgress1
+pp1 <- om_download_at(tables = "ParticipantProgress") %>%
+  select(OMID, AccessCode, OpenMindVersion, Country,
+         Research, DateStarted, DateFinished)
+## ParticipantProgress2
+pp2 <- om_download_at(tables = "ParticipantProgress2") %>%
+  select(OMID, AccessCode, OpenMindVersion, Country,
+         Research, DateStarted, DateFinished)
+## AccessCodes
+acs <- om_download_at(tables = "AccessCodes") %>%
+  select(AccessCode, UserType, GroupName)
+## bring it all together
+cleaned_dat <- pp1  %>%
+  bind_rows(pp2) %>%
+  ## turn dates into date format
+  mutate(DateFinished = lubridate::as_date(DateFinished)) %>%
+  mutate(DateStarted = lubridate::as_date(DateStarted)) %>%
+  ## compute WithinADay
+  mutate(WithinADay = as.numeric(DateStarted==DateFinished)) %>%
+  ## join in Assessment data
+  right_join(assessmentv7) %>%
+  ## join in Access Code Data
+  left_join(acs %>% select(-UserType)) %>%
+  ## if AccessCode is IndividualUser, then UserType is IndividualUser
+  mutate(UserType = ifelse(AccessCode == "IndividualUser",
+                           "IndividualUser", UserType)) %>%
+  drop_na(UserType) %>%
+  drop_na(DateStarted)
+```
 
 
 ```{r, echo = F, eval=T}
@@ -917,3 +949,106 @@ titanic_dat %>%
 
 
 In case your pandoc is having problems check out this very neat fix:  https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806
+
+```{r}
+fabio <- "not cute"
+vivi <- "cute"
+
+calculate_cuteness <- function(person) {
+ if(person == "not cute"){
+   
+  print("Fabio is not cute.")
+  cutest_girl <- "Vivi"
+  cat(paste("Instead", cutest_girl, "is the cutest\n"))
+  
+ } 
+ if(person == "cute"){
+   
+  cutest_girl <- "Vivi"
+  print(paste(cutest_girl, "is the cutest"))
+  
+  } 
+}
+
+calculate_cuteness(fabio)
+
+```
+```{r}
+
+calculate_cuteness(vivi)
+
+
+library(pwr)
+
+n_per_cohort <- NULL # what we want to know
+effect_size <- 0.3
+p_value <- 0.05
+power <- 0.8
+type <- "two.sample"  # default value
+alternative <- "two.sided"# default value
+
+## given any three you can estimate the fourth
+
+(estimate <- pwr.t.test(d = effect_size, 
+                      sig.level = p_value,
+                      power = power,
+                      type = type,
+                      alternative = alternative))
+
+plot(estimate)
+
+
+```
+
+```{r}
+library(tidyverse)
+
+
+
+calc_n <- function(effect_size) {
+  estimate <- pwr.t.test(d = effect_size, 
+                      sig.level = p_value,
+                      power = power,
+                      type = type,
+                      alternative = alternative)$n
+  
+  tibble(effect_size, n = estimate)
+}
+
+seq(0.1, 0.3, by = 0.01) %>% 
+  purrr::map_dfr(calc_n) %>% 
+  ggplot(aes(effect_size, n)) +
+  geom_line() +
+  geom_point(color = "red") +
+  ggrepel::geom_text_repel(aes(label = round(n)), direction = "y")
+
+
+estimate$n
+```
+
+```{r}
+library(tidyverse)
+
+
+
+calc_n <- function(effect_size) {
+  estimate <- pwr.chisq.test(w = effect_size, 
+                      sig.level = p_value,
+                      power = power, df = 1)$N
+  
+  tibble(effect_size, n = estimate)
+}
+
+seq(0.1, 0.3, by = 0.01) %>% 
+  purrr::map_dfr(calc_n) %>% 
+  ggplot(aes(effect_size, n)) +
+  geom_line() +
+  geom_point(color = "red") +
+  ggrepel::geom_text_repel(aes(label = round(n)), direction = "y")
+
+pwr::pwr.chisq.test(0.2, sig.level = 0.05, power = 0.8, df = 1) %>% plot()
+
+estimate$N
+```
+
+(R-1)(C-1) where R is the number of rows and C is the number of columns

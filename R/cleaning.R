@@ -38,7 +38,7 @@
 #' @export
 om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F, omkey_path = NULL) {
 
-  if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7"))) {
+  if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7", "FeedbackAnswers", "FeedbackAnswers2"))) {
     warning("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
   }
 
@@ -194,6 +194,26 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
     cat("Download Participant Progress 2 Data\n")
     final_list$dat.par2 <- dat.ass.1$ParticipantProgress2$select_all() %>% tibble::as_tibble()
     cat(paste0("Done. Participant Progress Data 2 has ", nrow(final_list$dat.par2), " rows\n"))
+  }
+
+  if ("FeedbackAnswers" %in% tables | "FeedbackAnswers2" %in% tables) {
+     fa_data <- airtabler::airtable(
+       base = "appFLoV9LA53SONd3",
+       tables = c("FeedbackAnswers", "FeedbackAnswers2")
+     )
+
+     if ("FeedbackAnswers" %in% tables) {
+       cat("Download FeedbackAnswers Data\n")
+       final_list$dat.fa <- fa_data$FeedbackAnswers$select_all() %>% tibble::as_tibble()
+       cat(paste0("Done. FeedbackAnswers Data has ", nrow(final_list$dat.fa), " rows\n"))
+     }
+
+     if ("FeedbackAnswers2" %in% tables) {
+       cat("Download FeedbackAnswers2 Data\n")
+       final_list$dat.fa2 <- fa_data$FeedbackAnswers2$select_all() %>% tibble::as_tibble()
+       cat(paste0("Done. FeedbackAnswers Data 2 has ", nrow(final_list$dat.fa2), " rows\n"))
+     }
+
   }
 
   if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()
