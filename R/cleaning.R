@@ -38,9 +38,11 @@
 #' @export
 om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProgress","InstructorSurveyV2", "TechnicalInquiries"), clean = F, file = NULL, v6.1 = F, omkey_path = NULL) {
 
-  if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7", "FeedbackAnswers", "FeedbackAnswers2"))) {
-    warning("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
-  }
+  # if (any(tables %nin% c("AccessCodes","ParticipantProgress","ParticipantProgress2","InstructorSurveyV2", "TechnicalInquiries", "AssessmentV6", "AssessmentV7", "FeedbackAnswers", "FeedbackAnswers2"))) {
+  #   warning("Warning: Should be one of the following: AccessCodes, ParticipantProgress, ParticipantProgress2, InstructorSurveyV2, TechnicalInquiries, AssessmentV6, AssessmentV7\n")
+  # }
+
+
 
   if (any(tables %in% c("AssessmentV4","AssessmentV5","AssessmentV6DiD", "DiDProgress", "AssessmentV6DiD", "DiDProgress"))) {
     stop("A Table you specified does not live in AirTable anymore!\n")
@@ -86,12 +88,18 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
   Sys.setenv(AIRTABLE_API_KEY = key)
 
 
-  dat.ass.1 <- airtabler::airtable(
-    base = "appjU7KUyybZ4rGvT",
-    tables = tables
-  )
+
+
 
   final_list <- list()
+
+
+  try({
+
+    dat.ass.1 <- airtabler::airtable(
+      base = "appjU7KUyybZ4rGvT",
+      tables = tables
+    )
 
   ## downloads full data table
   if ("AssessmentV4" %in% tables) {
@@ -196,6 +204,19 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
     cat(paste0("Done. Participant Progress Data 2 has ", nrow(final_list$dat.par2), " rows\n"))
   }
 
+  if ("P2P" %in% tables) {
+    cat("Download P2P Data\n")
+    final_list$p2p <- dat.ass.1$P2P$select_all() %>% tibble::as_tibble()
+    cat(paste0("Done. P2P has ", nrow(final_list$p2p), " rows\n"))
+
+    if (clean) {
+
+      final_list$p2p <- final_list$p2p %>% clean_p2p()
+
+    }
+
+  }
+
   if ("FeedbackAnswers" %in% tables | "FeedbackAnswers2" %in% tables) {
      fa_data <- airtabler::airtable(
        base = "appFLoV9LA53SONd3",
@@ -217,6 +238,9 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
   }
 
   if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()
+
+
+  })
 
   Sys.setenv(AIRTABLE_API_KEY = raw_key)
 
@@ -1018,13 +1042,46 @@ get_assessmentv6.1 <- function(assessment) {
 
 }
 
+#' Clean P2P dat
+#'
+#'
+#' @export
+clean_p2p <- function(p2p) {
+  final <- p2p %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(minor)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Opt Out)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked yet)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not asked)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(not met)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Prefer not to say)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, "(Blank)"), NA_character_, .x)) %>%
+    dplyr::mutate_all(~ifelse(magrittr::equals(.x, ""), NA_character_, .x)) %>%
+    dplyr::mutate_at(dplyr::vars(
+      dplyr::contains("Date"),
+      dplyr::contains("Time")
+    ), ~lubridate::as_datetime(.x)) %>%
+    dplyr::select(-createdTime, -id)
+
+
+  return(final)
+}
+
 #' Get Assessment V7
 #'
 #'
 #' @export
 clean_assessment7 <- function(assessment) {
 
-  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3", "TEST2020")
+  # Contempt1
+  # Contempt2
+  # IHIssueStrength
+  # IHTextResponse
+  # ChosenArticles
+  # WillingnessToEngage
+
+  version <- assessment %>% slice(1) %>% pull(AssessmentVersion)
+
+  test_acs <- c("TESTcollege", "TESTcorp", "TESTorgadult", "TESTorgstudent", "TESThighschool", "TESTcollegeFUM", "TESTcollegeOMV3", "TEST2020", "OM2020TwoPointO")
 
   assessment7 <- assessment %>%
     dplyr::filter(AccessCode != "Admin") %>%
@@ -1062,6 +1119,7 @@ clean_assessment7 <- function(assessment) {
       dplyr::contains("Date"),
       dplyr::contains("Time")
     ), ~lubridate::as_datetime(.x)) %>%
+    dplyr::mutate(WillingnessToEngage = ifelse(WillingnessToEngage == "Yes", 1, 0)) %>%
     dplyr::mutate_at(dplyr::vars(AssessmentVersion,
                                  AssessmentsDone,
                                  D1,
@@ -1071,7 +1129,18 @@ clean_assessment7 <- function(assessment) {
                                  dplyr::contains("Motivation"),
                                  dplyr::contains("GBSS"),
                                  dplyr::contains("Temp"),
-                                 dplyr::contains("IH"),
+                                 dplyr::starts_with("IH1"),
+                                 dplyr::starts_with("IH2"),
+                                 dplyr::starts_with("IH3"),
+                                 dplyr::starts_with("IH4"),
+                                 dplyr::starts_with("IH5"),
+                                 dplyr::starts_with("IH6"),
+                                 dplyr::starts_with("IHCulture1"),
+                                 dplyr::starts_with("IHCulture2"),
+                                 dplyr::starts_with("IHCulture3"),
+                                 dplyr::starts_with("IHCulture4"),
+                                 dplyr::starts_with("IHCulture5"),
+                                 dplyr::starts_with("IHCulture6"),
                                  dplyr::contains("IntAnx"),
                                  dplyr::contains("Avoidance"),
                                  dplyr::contains("Tolerance"),
@@ -1086,6 +1155,7 @@ clean_assessment7 <- function(assessment) {
                                  dplyr::contains("NQuestions"),
                                  dplyr::contains("SocialMediaUse")
     ), ~as.character(.x) %>% readr::parse_number()) %>%
+    dplyr::mutate(WillingnessToEngage = ifelse(WillingnessToEngage == 1, "Yes", "No")) %>%
     dplyr::mutate(Issue = readr::parse_number(Issue)) %>%
     # mutate(SocialMediaUse = 7-SocialMediaUse) %>%
     ## Temperature Questions
@@ -1176,9 +1246,28 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate(GMPost = ((8-GM1Post)+(8-GM2Post)+GM3Post)/3) %>%
     dplyr::mutate(GMFollowUp = ((8-GM1FollowUp)+(8-GM2FollowUp)+GM3FollowUp)/3) %>%
     # Belonging
-    dplyr::mutate(BelongPre = ((8-Belong1Pre)+(8-Belong2Pre)+Belong3Pre)/3) %>%
-    dplyr::mutate(BelongPost = ((8-Belong1Post)+(8-Belong2Post)+Belong3Post)/3) %>%
-    dplyr::mutate(BelongFollowUp = ((8-Belong1FollowUp)+(8-Belong2FollowUp)+Belong3FollowUp)/3) %>%
+    do_if(.data = .,
+          condition = version == "7.2",
+          call = ~{
+            .x %>%
+              dplyr::mutate(BelongPre = ((8-Belong1Pre)+(8-Belong2Pre))/2) %>%
+              dplyr::mutate(BelongPost = ((8-Belong1Post)+(8-Belong2Post))/2) %>%
+              dplyr::mutate(BelongFollowUp = ((8-Belong1FollowUp)+(8-Belong2FollowUp))/2)
+          }
+    ) %>%
+    do_if(.data = .,
+          condition = version != "7.2",
+          call = ~{
+            .x %>%
+              dplyr::mutate(BelongPre = ((8-Belong1Pre)+(8-Belong2Pre)+Belong3Pre)/3) %>%
+              dplyr::mutate(BelongPost = ((8-Belong1Post)+(8-Belong2Post)+Belong3Post)/3) %>%
+              dplyr::mutate(BelongFollowUp = ((8-Belong1FollowUp)+(8-Belong2FollowUp)+Belong3FollowUp)/3)
+          }
+    ) %>%
+    # Contempt
+    dplyr::mutate(ContemptPre = ((8-Contempt1Pre)+(Contempt2Pre))/2) %>%
+    dplyr::mutate(ContemptPost = ((8-Contempt1Post)+(Contempt2Post))/2) %>%
+    dplyr::mutate(ContemptFollowUp = ((8-Contempt1FollowUp)+(Contempt2FollowUp))/2) %>%
     # SE
     dplyr::mutate(SEPre = ((8-SE1Pre)+SE2Pre+(8-SE3Pre)+SE4Pre)/4) %>%
     dplyr::mutate(SEPost = ((8-SE1Post)+SE2Post+(8-SE3Post)+SE4Post)/4) %>%
@@ -1188,9 +1277,24 @@ clean_assessment7 <- function(assessment) {
     dplyr::mutate(AnxietyPost = ((Anxiety1Post+Anxiety2Post+Anxiety3Post+Anxiety4Post)/4) %>% magrittr::subtract(6, .)) %>%
     dplyr::mutate(AnxietyFollowUp = ((Anxiety1FollowUp+Anxiety2FollowUp+Anxiety3FollowUp+Anxiety4FollowUp)/4) %>% magrittr::subtract(6, .)) %>%
     # Dissent
-    dplyr::mutate(DissentPre = ((Dissent1Pre+Dissent2Pre+Dissent3Pre+Dissent4Pre+(8-Dissent5Pre))/5) %>% magrittr::subtract(8, .)) %>%
-    dplyr::mutate(DissentPost = ((Dissent1Post+Dissent2Post+Dissent3Post+Dissent4Post+(8-Dissent5Post))/5) %>% magrittr::subtract(8, .))  %>%
-    dplyr::mutate(DissentFollowUp = ((Dissent1FollowUp+Dissent2FollowUp+Dissent3FollowUp+Dissent4FollowUp+(8-Dissent5FollowUp))/5) %>% magrittr::subtract(8, .))  %>%
+    do_if(.data = .,
+          condition = version == "7.2",
+          call = ~{
+            .x %>%
+              dplyr::mutate(DissentPre = ((Dissent1Pre+Dissent2Pre)/2) %>% magrittr::subtract(8, .)) %>%
+              dplyr::mutate(DissentPost = ((Dissent1Post+Dissent2Post)/2) %>% magrittr::subtract(8, .)) %>%
+              dplyr::mutate(DissentFollowUp = ((Dissent1FollowUp+Dissent2FollowUp)/2) %>% magrittr::subtract(8, .))
+          }
+    ) %>%
+    do_if(.data = .,
+          condition = version != "7.2",
+          call = ~{
+            .x %>%
+              dplyr::mutate(DissentPre = ((Dissent1Pre+Dissent2Pre+Dissent3Pre+Dissent4Pre+(8-Dissent5Pre))/5) %>% magrittr::subtract(8, .)) %>%
+              dplyr::mutate(DissentPost = ((Dissent1Post+Dissent2Post+Dissent3Post+Dissent4Post+(8-Dissent5Post))/5) %>% magrittr::subtract(8, .))  %>%
+              dplyr::mutate(DissentFollowUp = ((Dissent1FollowUp+Dissent2FollowUp+Dissent3FollowUp+Dissent4FollowUp+(8-Dissent5FollowUp))/5) %>% magrittr::subtract(8, .))
+          }
+    ) %>%
     ## IHCulture - Subscale 1
     dplyr::mutate(IHCultureSub1Pre = ((IHCulture1Pre+IHCulture2Pre)/2) %>% magrittr::subtract(8, .)) %>%
     dplyr::mutate(IHCultureSub1Post = ((IHCulture1Post+IHCulture2Post)/2) %>% magrittr::subtract(8, .)) %>%
@@ -1207,6 +1311,7 @@ clean_assessment7 <- function(assessment) {
   return(assessment7)
 
 }
+
 
 #' Get Assessment V6
 #'

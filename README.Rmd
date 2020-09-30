@@ -5,9 +5,9 @@ output: github_document
 
 **Overview**
 
-+ [openmindR Cleaning Functions](https://github.com/openmindplatform/openmindR#openmindr-cleaning-functions)
-+ [openmindR Analysis Functions](https://github.com/openmindplatform/openmindR#openmindr-analysis-functions)
-+ [openmindR ggplot2 theme](https://github.com/openmindplatform/openmindR#openmindr-ggplot2-theme)
+-   [openmindR Cleaning Functions](https://github.com/openmindplatform/openmindR#openmindr-cleaning-functions)
+-   [openmindR Analysis Functions](https://github.com/openmindplatform/openmindR#openmindr-analysis-functions)
+-   [openmindR ggplot2 theme](https://github.com/openmindplatform/openmindR#openmindr-ggplot2-theme)
 
 Install package like this:
 
@@ -16,10 +16,6 @@ devtools::install_github("openmindplatform/openmindR")
 
 
 ```
-
-
-
-
 
 ```{r, echo=F}
 knitr::opts_chunk$set(message = F, 
@@ -59,7 +55,6 @@ downs <- c("AffPol1", "AffPol2",
 # 
 # usethis::use_data(v6_var_strings, overwrite = T)
 ```
-
 
 Load package(s):
 
@@ -116,8 +111,6 @@ cleaned_dat <- pp1  %>%
 
 
 ```
-
-
 
 ```{r, eval = F, echo = F}
 pacman::p_load(tidyverse, openmindR)
@@ -215,20 +208,25 @@ assessmentv7 %>%
   filter(is.na(OpenMindVersion))
 ```
 
-
 # openmindR Cleaning Functions
 
 The following functions are meant to turn AirTable data into a single clean file that can be analyzed.
 
-+ [om_download_at](https://github.com/openmindplatform/openmindR#om_download_at)
+-   [om\_download\_at](https://github.com/openmindplatform/openmindR#om_download_at)
 
-+ [om_filter_data](https://github.com/openmindplatform/openmindR#om_filter_data)
-+ [om_clean_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
-+ [om_dummy_nonwhite](https://github.com/openmindplatform/openmindR#om_dummy_nonwhite)
-+ [om_dummy_nonstraight](https://github.com/openmindplatform/openmindR#om_dummy_nonstraight)
-+ [om_gather](https://github.com/openmindplatform/openmindR#om_gather)
-+ [om_parse_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
-+ [merge_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
+-   [om\_filter\_data](https://github.com/openmindplatform/openmindR#om_filter_data)
+
+-   [om\_clean\_ppol](https://github.com/openmindplatform/openmindR#om_clean_ppol)
+
+-   [om\_dummy\_nonwhite](https://github.com/openmindplatform/openmindR#om_dummy_nonwhite)
+
+-   [om\_dummy\_nonstraight](https://github.com/openmindplatform/openmindR#om_dummy_nonstraight)
+
+-   [om\_gather](https://github.com/openmindplatform/openmindR#om_gather)
+
+-   [om\_parse\_lifehacks](https://github.com/openmindplatform/openmindR#om_parse_lifehacks)
+
+-   [merge\_assessments](https://github.com/openmindplatform/openmindR#merge_assessments)
 
 ```{r}
 pacman::p_load(tidyverse, openmindR)
@@ -265,7 +263,6 @@ cleaned_dat <- pp1  %>%
   drop_na(UserType) %>%
   drop_na(DateStarted)
 ```
-
 
 ```{r, echo = F, eval=T}
 
@@ -325,14 +322,13 @@ db_get_data <- function(tbl_dat) {
 
 ## `om_download_at`
 
-`openmindR` can download and clean data directly from Airtable. 
+`openmindR` can download and clean data directly from Airtable.
 
-+ `clean`: Whether to return "clean" data (i.e. numeric data is numeric and minors or opt-outs are `NA`. Also constructs measures and computes dummy variables. (`TRUE`/`FALSE`)
-+ `file`: give a file path to where the downloaded data should be stored
-+ `v6.1`: filter down the dataset to only include Assessment V6.1 (`TRUE/FALSE`)
+-   `clean`: Whether to return "clean" data (i.e. numeric data is numeric and minors or opt-outs are `NA`. Also constructs measures and computes dummy variables. (`TRUE`/`FALSE`)
+-   `file`: give a file path to where the downloaded data should be stored
+-   `v6.1`: filter down the dataset to only include Assessment V6.1 (`TRUE/FALSE`)
 
 Here is a code example that will download Assessment V6, clean it, save it into a folder called "Data" under Research and filter down to only include V6.1 data.
-
 
 ```{r, eval=F}
 
@@ -349,13 +345,35 @@ assessmentv6 <- om_download_at(
 Here is another example code for downloading a clean version of Assessment v7:
 
 ```{r, eval=T}
-
+# debugonce(clean_assessment7)
 assessmentv7 <- om_download_at(
                             tables = "AssessmentV7", 
                             clean = TRUE)
 
 
 ```
+## Get Assessment V7.2 data and merge it with P2P data
+
+```{r}
+assessmentv72 <- assessmentv7 %>% 
+  dplyr::filter(AssessmentVersion == 7.2) %>%
+  dplyr::select_if(~!all(is.na(.))) 
+
+assessmentv72 %>% 
+  select(Contempt1Pre, Contempt2Pre) %>% 
+  mutate(Contempt1Pre = 8-Contempt1Pre) %>% 
+  ggplot(aes(Contempt1Pre, Contempt2Pre)) +
+  geom_jitter() +
+  geom_smooth()
+
+p2p_dat <- om_download_at(tables = "P2P", 
+                          clean = TRUE)
+
+
+assessmentv72 %>% 
+  left_join(p2p_dat)
+```
+
 
 ## `om_filter_data`
 
@@ -400,21 +418,16 @@ assessmentv7 %>%
   )
 ```
 
-
-
-
-
 ## `om_clean_ppol`
 
 Creates the following measures of Political Orientation
 
-+ **ppol_raw:** a variable that has all political orientation variables across all Assessment Versions (corresponds to `D4`)
-+ **ppol:** a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
-+ **ppol_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
-+ **ppol_extreme:** numeric variable ranging from 0 "Moderate/Middle-of-the-road" to 3 "Very Conservative/right" or "Very Progressive/left"
-+ **ppol_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
-+ **ppol_catmod:** a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
-
+-   **ppol\_raw:** a variable that has all political orientation variables across all Assessment Versions (corresponds to `D4`)
+-   **ppol:** a factor variable ordered from "Very Progressive/left" to "Very Conservative/right". Excludes all other categories as NA (classical liberal etc.)
+-   **ppol\_num:** numeric variable ranging from 1 "Very Progressive/left" to 7 "Very Conservative/right"
+-   **ppol\_extreme:** numeric variable ranging from 0 "Moderate/Middle-of-the-road" to 3 "Very Conservative/right" or "Very Progressive/left"
+-   **ppol\_cat:** a factor variable which has two categories "Progressive" and "Conservative". The rest is NA.
+-   **ppol\_catmod:** a factor variable which has three categories "Progressive", "Conservative" and "Moderates". The rest is NA.
 
 ```{r, eval = F}
 assessmentv7 %>% 
@@ -443,33 +456,30 @@ assessmentv7 %>%
 
 This function creates the dummy variables from UserType
 
-+ `ut_college_individ`: College student (0) v. individual user (1)
-+ `ut_corp_individ`: Corp (0) v. individual user (1)
-+ `ut_college_corp`: College student (0) v. corp (1)
-
+-   `ut_college_individ`: College student (0) v. individual user (1)
+-   `ut_corp_individ`: Corp (0) v. individual user (1)
+-   `ut_college_corp`: College student (0) v. corp (1)
 
 ```{r, eval = F}
 assessmentv7 %>% 
   om_dummy_ut()
 ```
 
-
 ## `om_gather`
 
 This function will turn Assessment data into long format.
- 
+
 Creates the following variables:
 
-+ **Question:** Q1Pre, Q2Pre, Q3Pre etc.
-+ **Type:** Pre, Post, or FollowUp
-+ **Response:** Values of the Question
-+ **variable_code:** Q1, Q2, Q3 etc.
- 
+-   **Question:** Q1Pre, Q2Pre, Q3Pre etc.
+-   **Type:** Pre, Post, or FollowUp
+-   **Response:** Values of the Question
+-   **variable\_code:** Q1, Q2, Q3 etc.
+
 Takes the following arguments:
 
-+ **.data** Assessment data
-+ **which_strings** a string indicating which variables should be parsed out (`v7_var_strings` has all variables for v7). The format looks as follows: "AffPol1|AffPol2|GM1" (so each variable without the "Pre", "Post" or "FollowUp" suffix)
-
+-   **.data** Assessment data
+-   **which\_strings** a string indicating which variables should be parsed out (`v7_var_strings` has all variables for v7). The format looks as follows: "AffPol1\|AffPol2\|GM1" (so each variable without the "Pre", "Post" or "FollowUp" suffix)
 
 ```{r, eval = F}
 assessmentv7 %>% 
@@ -480,13 +490,12 @@ assessmentv7 %>%
 
 ## `om_parse_lifehacks`
 
-
 This function parses and cleans the list variables that contain the lifehack data. The input dataset needs to have the four following columns: `LifeHacksChosen`, `LifeHacksComplete`, `LifeHacksUseful` and `LifeHacksReason`. You can find them in the ParticipantProgress table in Airtable. The function will parse these four columns into 4 x 5 Steps variables (so 20 in total):
 
-+ `LifeHack1` - `LifeHack5`: Which Lifehack was chosen
-+ `LifeHacksComplete1` - `LifeHacksComplete5`: Did the user complete the lifehack
-+ `LifeHacksUseful1` - `LifeHacksUseful5`: Did the user find completing the lifehack useful
-+ `LifeHacksReason1` - `LifeHacksReason5`: Why didn't the user complete the lifehack
+-   `LifeHack1` - `LifeHack5`: Which Lifehack was chosen
+-   `LifeHacksComplete1` - `LifeHacksComplete5`: Did the user complete the lifehack
+-   `LifeHacksUseful1` - `LifeHacksUseful5`: Did the user find completing the lifehack useful
+-   `LifeHacksReason1` - `LifeHacksReason5`: Why didn't the user complete the lifehack
 
 ```{r, eval = F}
 ## get key
@@ -514,10 +523,9 @@ parsed_lh %>%
   select(OMID, LifeHack1:LifeHacksReason5)
 ```
 
-
 ## `merge_assessments`
 
-This function merges assessment v4, v5 and v6 data and only keeps common variables. 
+This function merges assessment v4, v5 and v6 data and only keeps common variables.
 
 ```{r, eval= F}
 ## get previous assessment dat
@@ -534,7 +542,6 @@ merge_assessments(v4, v5, v6)
 
 ```
 
-
 ## `om_reverse_code`
 
 Reverse codes items and adds them at the end of the dataset with a "`*_Rev`" at the end.
@@ -544,16 +551,14 @@ assessmentv7 %>%
   om_reverse_code()
 ```
 
-
 # openmindR Analysis Functions
 
 This section introduces the openmindR analysis functions.
 
-+ [om_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
-+ [om_lm](https://github.com/openmindplatform/openmindR#om_lm)
-+ [om_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
-+ [om_textscore](https://github.com/openmindplatform/openmindR#om_textscore)
-
+-   [om\_ttest](https://github.com/openmindplatform/openmindR#om_ttest)
+-   [om\_lm](https://github.com/openmindplatform/openmindR#om_lm)
+-   [om\_lmer](https://github.com/openmindplatform/openmindR#om_lmer)
+-   [om\_textscore](https://github.com/openmindplatform/openmindR#om_textscore)
 
 ## `om_ttest`
 
@@ -561,11 +566,11 @@ This function performs paired t-tests on long format Pre-Post-FollowUp data and 
 
 `om_ttest` takes two arguments:
 
-+ `gathered_dat` OpenMind data in long format (must be created with [om_gather](https://github.com/openmindplatform/openmindR#om_gather))
-+ `comparison` Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
+-   `gathered_dat` OpenMind data in long format (must be created with [om\_gather](https://github.com/openmindplatform/openmindR#om_gather))
+-   `comparison` Three possible comparisons "PrePost", "PreFollowUpT1T2" or "PreFollowUpT1T3"
 
-PreFollowUpT1T2 performs Pre-Post comparison only for people who completed the FollowUp. PreFollowUpT1T3 is the same sample of people (only those who completed the FollowUp) but compares them Pre-FollowUp. 
-    
+PreFollowUpT1T2 performs Pre-Post comparison only for people who completed the FollowUp. PreFollowUpT1T3 is the same sample of people (only those who completed the FollowUp) but compares them Pre-FollowUp.
+
 First we download v7 data:
 
 ```{r, eval = F}
@@ -574,13 +579,20 @@ First we download v7 data:
 
 
 ## get v7 data
-assessmentv7 <- om_download_at(key,
+assessmentv7 <- om_download_at(#key, 
                             tables = "AssessmentV7",
                             clean = TRUE)
 
 ```
 
-You can perform t-tests on a single variable by *only* gathering one variable and specifying the comparison (here: `"PrePost"`).  
+Here is a way to filter it down to v7.2 data
+
+```{r}
+assessmentv7 %>% 
+  select_if(~!all(is.na(.))) 
+```
+
+You can perform t-tests on a single variable by *only* gathering one variable and specifying the comparison (here: `"PrePost"`).
 
 ```{r}
 ## Perform t-test on a single variable
@@ -589,7 +601,7 @@ assessmentv7 %>%
   om_ttest(comparison = "PrePost")
 ```
 
-However, this is not how `om_ttest` is intended to work. Rather it should be used on a dataset in long format with all variables that you want to perform analysis on. The next lines of code show that process. 
+However, this is not how `om_ttest` is intended to work. Rather it should be used on a dataset in long format with all variables that you want to perform analysis on. The next lines of code show that process.
 
 ```{r}
 ## get results for all variables
@@ -656,13 +668,13 @@ This function performs linear regression and gives back some neat info
 
 Four inputs:
 
-+ *.data* data that was used to fit the model
+-   *.data* data that was used to fit the model
 
-+ *lin_mod* a fitted model
+-   *lin\_mod* a fitted model
 
-+ *type* what kind of model (currently only accepts `"int"` for interactions)
+-   *type* what kind of model (currently only accepts `"int"` for interactions)
 
-+ *switch* logical. Switch variables in interaction plot. Default is `FALSE`
+-   *switch* logical. Switch variables in interaction plot. Default is `FALSE`
 
 ```{r, eval = T}
 mod1 <- lm(ppol_extreme ~ ppol_cat*gender, 
@@ -686,7 +698,6 @@ results$estimated_means
 results$plot
 results$report
 ```
-
 
 ### Show the model
 
@@ -767,39 +778,25 @@ This function performs a mixed model and gives back some neat info
 
 Three inputs:
 
+-   *mod* a fitted model
 
-+ *mod* a fitted model
+-   *type* what kind of model (currently only accepts `"int"` for interactions)
 
-+ *type* what kind of model (currently only accepts `"int"` for interactions)
+-   *mod\_transform* Indicates which values of the moderator variable should be used when plotting interaction terms (i.e. `type = "int"`).
 
-+ *mod_transform* Indicates which values of the moderator variable should be used when plotting interaction terms (i.e. `type = "int"`). 
-   + `"minmax"` (default) minimum and maximum values (lower and
-   upper bounds) of the moderator are used to plot the interaction between
-   independent variable and moderator(s).} 
-   + `"meansd"` uses the mean value of the moderator as well as one standard deviation below and
-   above mean value to plot the effect of the moderator on the independent
-   variable (following the convention suggested by Cohen and Cohen and
-   popularized by Aiken and West (1991), i.e. using the mean, the value one
-   standard deviation above, and the value one standard deviation below the
-   mean as values of the moderator.
-   + `"zeromax"`  is similar to the `"minmax"` option, however,
-   `0` is always used as minimum value for the moderator. This may be
-   useful for predictors that don't have an empirical zero-value, but absence
-   of moderation should be simulated by using 0 as minimum.
-   `"quart"` calculates and uses the quartiles (lower, median and
-   upper) of the moderator value.
-   + `"all"` uses all values of the moderator variable.
-   
-   
+    -   `"minmax"` (default) minimum and maximum values (lower and upper bounds) of the moderator are used to plot the interaction between independent variable and moderator(s).}
+    -   `"meansd"` uses the mean value of the moderator as well as one standard deviation below and above mean value to plot the effect of the moderator on the independent variable (following the convention suggested by Cohen and Cohen and popularized by Aiken and West (1991), i.e. using the mean, the value one standard deviation above, and the value one standard deviation below the mean as values of the moderator.
+    -   `"zeromax"` is similar to the `"minmax"` option, however, `0` is always used as minimum value for the moderator. This may be useful for predictors that don't have an empirical zero-value, but absence of moderation should be simulated by using 0 as minimum. `"quart"` calculates and uses the quartiles (lower, median and upper) of the moderator value.
+    -   `"all"` uses all values of the moderator variable.
+
 First you need to fit to bring the data into long format and fit the model.
-   
+
 ```{r, eval = T}
 cleaned_dat_long <- openmindR::om_gather(assessmentv7, which_strings = "AffPol1")
 
 mixed <- lme4::lmer(Response~Time * gender + (1|OMID), data = cleaned_dat_long)
 ```
-  
-  
+
 Next you can use `om_lmer`.
 
 ```{r, eval = T}
@@ -807,8 +804,6 @@ results <- om_lmer(mixed,
                    type = "int")
 
 ```
-
-
 
 ### Show the model
 
@@ -856,9 +851,9 @@ Note: `openmindR` will not automatically install all the packages necessary for 
 
 Arguments:
 
-+ **`.data`** dataset including text and a personal identifier (must be named `OMID`)
-+ **`method`** which method(s) should be applied? Currently supports: `"nrc"`, `"bing"`, `"afinn"`, `"textblob"`, `"vader"`, `"sentiment_stanford"`, `"sentimentr_polarity"`, `"affect3d"`, `"receptiveness"`, and `"toxicity"`.
-+ **`text`** specify the text variable which should be scored
+-   **`.data`** dataset including text and a personal identifier (must be named `OMID`)
+-   **`method`** which method(s) should be applied? Currently supports: `"nrc"`, `"bing"`, `"afinn"`, `"textblob"`, `"vader"`, `"sentiment_stanford"`, `"sentimentr_polarity"`, `"affect3d"`, `"receptiveness"`, and `"toxicity"`.
+-   **`text`** specify the text variable which should be scored
 
 Here an example code that scores the free text from v7 with `bing`, `nrc` and `afinn` sentiment dictionaries.
 
@@ -868,14 +863,13 @@ assessmentv7 %>%
               text = IssueFreeTextPre) 
 ```
 
-
 # openmindR ggplot2 theme
 
 There are three functions for the ggplot2 theme:
 
-+ `theme_om`
-+ `scale_fill_om`
-+ `scale_color_om`
+-   `theme_om`
+-   `scale_fill_om`
+-   `scale_color_om`
 
 Make sure you have the Poppins font installed!
 
@@ -883,12 +877,10 @@ Make sure you have the Poppins font installed!
 extrafont::font_import()
 ```
 
-
 ```{r}
 windowsFonts(`Poppins` = windowsFont("Poppins"))
 
 ```
-
 
 [Good tutorial on how to install custom fonts in R](https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/)
 
@@ -912,11 +904,11 @@ titanic_dat %>%
 
 **Adapt `theme_om`**
 
-+ `legend_position`
-+ `axis_text_size`
-+ `axis_title_size`
-+ `legend_text_size`
-+ `title_size`
+-   `legend_position`
+-   `axis_text_size`
+-   `axis_title_size`
+-   `legend_text_size`
+-   `title_size`
 
 ```{r fig.width=8, fig.height=5, message=F, eval=T}
 titanic_dat %>% 
@@ -934,7 +926,7 @@ titanic_dat %>%
 
 Or all text sizes at once
 
-+ `overall_text_size`
+-   `overall_text_size`
 
 ```{r fig.width=8, fig.height=5, message=F, eval=T}
 titanic_dat %>% 
@@ -947,37 +939,9 @@ titanic_dat %>%
   labs(title = "Titanic Survival by Class") 
 ```
 
-
-In case your pandoc is having problems check out this very neat fix:  https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806
+In case your pandoc is having problems check out this very neat fix: <https://github.com/rstudio/rstudio/issues/3661#issuecomment-475705806>
 
 ```{r}
-fabio <- "not cute"
-vivi <- "cute"
-
-calculate_cuteness <- function(person) {
- if(person == "not cute"){
-   
-  print("Fabio is not cute.")
-  cutest_girl <- "Vivi"
-  cat(paste("Instead", cutest_girl, "is the cutest\n"))
-  
- } 
- if(person == "cute"){
-   
-  cutest_girl <- "Vivi"
-  print(paste(cutest_girl, "is the cutest"))
-  
-  } 
-}
-
-calculate_cuteness(fabio)
-
-```
-```{r}
-
-calculate_cuteness(vivi)
-
-
 library(pwr)
 
 n_per_cohort <- NULL # what we want to know

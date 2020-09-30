@@ -127,6 +127,28 @@ assessmentv7 <- om_download_at(
     ## Download AssessmentV7 Data
     ## Done. AssessmentV7 Data has 1585 rows
 
+## Get Assessment V7.2 data and merge it with P2P data
+
+``` r
+assessmentv72 <- assessmentv7 %>% 
+  dplyr::filter(AssessmentVersion == 7.2) %>%
+  dplyr::select_if(~!all(is.na(.))) 
+
+assessmentv72 %>% 
+  select(Contempt1Pre, Contempt2Pre) %>% 
+  mutate(Contempt1Pre = 8-Contempt1Pre) %>% 
+  ggplot(aes(Contempt1Pre, Contempt2Pre)) +
+  geom_jitter() +
+  geom_smooth()
+
+p2p_dat <- om_download_at(tables = "P2P", 
+                          clean = TRUE)
+
+
+assessmentv72 %>% 
+  left_join(p2p_dat)
+```
+
 ## `om_filter_data`
 
 Filter down Assessment data from AirTable by `AssessmentsDone`,
