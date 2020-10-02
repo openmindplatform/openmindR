@@ -136,10 +136,11 @@ assessmentv72 <- assessmentv7 %>%
   ## remove all columns that are empty (those are from older verrsions)
   dplyr::select_if(~!all(is.na(.))) 
 
+## download p2p dat
 p2p_dat <- om_download_at(tables = "P2P", 
                           clean = TRUE)
 
-
+## merge v7.2 with p2p dat
 p2p_assessment <- assessmentv72 %>% 
   left_join(p2p_dat)
 ```
