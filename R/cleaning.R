@@ -237,6 +237,28 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   }
 
+  if ("OMUsers" %in% tables | "OMAdmins" %in% tables) {
+      users_data <- airtabler::airtable(
+        base = "apptuyMaHvb7lFJGp",
+        tables = c("OMUsers", "OMAdmins")
+      )
+
+      if ("OMUsers" %in% tables) {
+        cat("Download OMUsers Data\n")
+        final_list$omusers <- users_data$OMUsers$select_all() %>% tibble::as_tibble()
+        cat(paste0("Done. OMUsers Data has ", nrow(final_list$omusers), " rows\n"))
+      }
+
+      if ("OMAdmins" %in% tables) {
+        cat("Download OMAdmins Data\n")
+        final_list$omadmins <- users_data$OMAdmins$select_all() %>% tibble::as_tibble()
+        cat(paste0("Done. OMAdmins Data has ", nrow(final_list$omadmins), " rows\n"))
+      }
+
+  }
+
+
+
   if (length(tables) == 1) final_list <- final_list %>% magrittr::extract2(1) %>% tibble::as_tibble()
 
 
