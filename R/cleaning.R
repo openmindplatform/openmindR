@@ -237,10 +237,10 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
 
   }
 
-  if ("OMUsers" %in% tables | "OMAdmins" %in% tables) {
+  if ("OMUsers" %in% tables | "OMAdmins" %in% tables | "SoftLaunchRoster" %in% tables) {
       users_data <- airtabler::airtable(
         base = "apptuyMaHvb7lFJGp",
-        tables = c("OMUsers", "OMAdmins")
+        tables = c("OMUsers", "OMAdmins", "SoftLaunchRoster")
       )
 
       if ("OMUsers" %in% tables) {
@@ -253,6 +253,12 @@ om_download_at <- function(key = NULL, tables = c("AccessCodes","ParticipantProg
         cat("Download OMAdmins Data\n")
         final_list$omadmins <- users_data$OMAdmins$select_all() %>% tibble::as_tibble()
         cat(paste0("Done. OMAdmins Data has ", nrow(final_list$omadmins), " rows\n"))
+      }
+
+      if ("SoftLaunchRoster" %in% tables) {
+        cat("Download SoftLaunchRoster Data\n")
+        final_list$softlaunchroster <- users_data$SoftLaunchRoster$select_all() %>% tibble::as_tibble()
+        cat(paste0("Done. SoftLaunchRoster Data has ", nrow(final_list$softlaunchroster), " rows\n"))
       }
 
   }
