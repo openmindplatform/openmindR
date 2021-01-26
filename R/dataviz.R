@@ -57,41 +57,6 @@ gg_plot_comparison <- function(results, variable_input, assessment_version, rang
     filter(Variant == assessment_version)
 
 
-  # if(comparison == "PreFollowUp"){
-  #
-  #   var <- results %>%
-  #     slice(1) %>%
-  #     pull(variable_code)
-  #
-  #   PrePostFollow <- c("Pre", "Post", "FollowUp")
-  #
-  #
-  #
-  #   results <- results  %>%
-  #     mutate(com_type = paste0(Comparison,Type))
-  #
-  #   if(var %in% c("C1", "C5", "C6")){
-  #
-  #     PrePostFollow <- c("Pre", "FollowUp")
-  #
-  #
-  #     results <- results %>%
-  #       mutate(Type = PrePostFollow) %>%
-  #       mutate(Type = fct_relevel(Type, PrePostFollow))
-  #   }
-  #
-  #   if(var %nin% c("C1", "C5", "C6")){
-  #
-  #     results <- results %>%
-  #       filter(com_type != "PreFollowUpT1T3Pre") %>%
-  #       select(-com_type) %>%
-  #       mutate(Type = PrePostFollow) %>%
-  #       mutate(Type = fct_relevel(Type, PrePostFollow))
-  #
-  #   }
-  #
-  #
-  # }
 
 
   cohend <- results %>% pull(cohend) %>% round(2)
@@ -101,27 +66,6 @@ gg_plot_comparison <- function(results, variable_input, assessment_version, rang
     mutate(tlab = glue::glue("t({round(df, 2)}) = {round(tstat, 2)}, {pval}")) %>%
     pull(tlab)
 
-  # if(comparison == "PreFollowUp"){
-  #   gg <- results %>%
-  #     ggplot(aes(Type, Response, fill = Type)) +
-  #     geom_col() +
-  #     geom_errorbar(aes(ymin = Response - 1.96*SE, ymax = Response + 1.96*SE), width = 0.1, size = 0.5) +
-  #     scale_fill_manual(values = pal_om(5)[3:5]) +
-  #     theme_om(legend_position = "none") +
-  #     labs(x = "", caption = paste0("T1 vs. ", "T2",": " ,"Cohen's d = ", cohend[1], "; ", tlab[1], "\n",
-  #                                   "T1 vs. ", "T3",": " ,"Cohen's d = ", cohend[3], "; ", tlab[3], "\n")) +
-  #     ggtitle(paste0(variable_input," (Pre vs. Post vs. FollowUp)")) +
-  #     ylim(min_num, max_num) +
-  #     ggplot2::geom_text(aes(label = openmindR::specify_decimal(Response, 2)), size = 8, nudge_y = y_nudger) +
-  #     theme(panel.grid.major.x = element_blank())
-  #
-  #   if (var %in% c("C1", "C5", "C6")) {
-  #     gg <- gg + labs(x = "", caption = paste0("T1 vs. ", "T3",": " ,"Cohen's d = ", cohend[1], "; ", tlab[1], "\n")) +
-  #       ggtitle(paste0(variable_input," (Pre vs. FollowUp)"))
-  #   }
-  #
-  #   return(gg)
-  # }
 
   gg <- results %>%
     ggplot(aes(Type, Response, fill = Type)) +
