@@ -1,4 +1,5 @@
 summary_se <- function(data, measurevar, idvar, betweenvars) {
+
   require('dplyr')
   require('lazyeval')
 
@@ -1549,16 +1550,7 @@ om_textscore <- function(.data, method, text, verbose = T) {
     t1 <- Sys.time()
 
 
-
-
-
-
     sentiment_dat <- get_nrc(author_words, sentiment_dat)
-
-
-
-
-
 
     t2 <- Sys.time()
 
@@ -1636,8 +1628,6 @@ om_textscore <- function(.data, method, text, verbose = T) {
     t2 <- Sys.time()
     print(round(t2 - t1))
   }
-
-
 
   if("sentiment_stanford" %in% method){
     message("\nCalculating sentiment_stanford scores")
