@@ -44,30 +44,6 @@ gg_plot_comparison <- function(results, variable_input, assessment_version, rang
     max_num <- 1
     # y_nudger <- -0.05
 
-    # results <- results %>%
-    #   select(-SD:-Post, -FollowUp) %>%
-    #   rename_all(~str_remove(.x, "_01"))
-
-  }
-
-
-  # results <- results %>%
-  #   # filter(Outcome %nin% seveners) %>%
-  #   # dplyr::count(Outcome, sort = T)
-  #   mutate(Pre = case_when(
-  #     str_detect(variable_input, seveners) ~ Pre*7,
-  #     str_detect(variable_input, hundreders) ~ Pre*100
-  #   )) %>%# select(Pre)
-  #   mutate(Post = case_when(
-  #     str_detect(variable_input, seveners) ~ Post*7,
-  #     str_detect(variable_input, hundreders) ~ Post*100
-  #   )) %>%# select(Pre)
-  #   mutate(SE = case_when(
-  #     str_detect(variable_input, seveners) ~ SE*7,
-  #     str_detect(variable_input, hundreders) ~ SE*100
-  #   ))
-  # }
-
   results <- results  %>%
     tidyr::gather(Question, Response, dplyr::matches("Pre|Post")) %>%
     dplyr::mutate(Type = dplyr::case_when(
