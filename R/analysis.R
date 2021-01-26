@@ -1783,3 +1783,6 @@ om_textscore <- function(.data, method, text, verbose = T) {
 
   return(sentiment_dat)
 }
+
+
+
