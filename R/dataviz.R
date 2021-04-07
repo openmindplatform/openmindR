@@ -44,6 +44,7 @@ gg_plot_comparison <- function(results, variable_input, assessment_version, rang
     max_num <- 1
     # y_nudger <- -0.05
 
+  }
   results <- results  %>%
     tidyr::gather(Question, Response, dplyr::matches("Pre|Post")) %>%
     dplyr::mutate(Type = dplyr::case_when(
@@ -55,7 +56,6 @@ gg_plot_comparison <- function(results, variable_input, assessment_version, rang
     dplyr::mutate(Type = as.factor(Type)) %>%
     filter(variable_code == variable_input) %>%
     filter(Variant == assessment_version)
-
 
 
 
