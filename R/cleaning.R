@@ -1,3 +1,261 @@
+#' Download DynamoDB data
+#'
+#' This function downloads current AirTable data
+#'
+#' @md
+#' @section Currently allowed input:
+#' + `"AssessmentV6"`
+#' + `"AssessmentV7"`
+#' + `"AccessCodes"`
+#' + `"ParticipantProgress"`
+#' + `"ParticipantProgress2"`
+#' + `"InstructorSurveyV2"`
+#' + `"OMUsers"`
+#'
+#'@param tables specify which tables you want to download
+#'@param clean clean dataset and construct measures (only works for Assessment V6 and V7)
+#'@param file specify path to download to (only works for Assessment V6 and V7)
+#'@return a list with (several) dataframe(s)
+#' @export
+om_get_ddb <- function(tables = NULL, clean = F, file = NULL, v6.1 = F, ...) {
+
+
+  message("Checking environment variables..")
+
+  if(Sys.getenv("AWS_ACCESS_KEY_ID") == ""){
+    stop("AWS_ACCESS_KEY_ID not found. Please set environment variable.")
+  } else if(Sys.getenv("AWS_SECRET_ACCESS_KEY") == ""){
+    stop("AWS_SECRET_ACCESS_KEY not found. Please set environment variable.")
+  } else if(Sys.getenv("AWS_REGION") == ""){
+    stop("AWS_REGION not found. Please set environment variable.")
+  }
+
+  message("Everything set up correctly.")
+
+  dynamo <- paws::dynamodb()
+
+
+  ## keep function parameters
+  scan_params <- list(...)
+
+  tbls_list <- tables %>%
+    map(~om_scan_ddb(dynamo, .x, scan_params)) %>%
+    set_names(tables)
+
+
+    if ("AssessmentV6" %in% tables) {
+
+      if (v6.1) {
+        tbls_list$AssessmentV6 <- get_assessmentv6.1(tbls_list$AssessmentV6) %>%
+          dplyr::filter(AssessmentVersion == "6.1")
+      }
+
+
+      if (clean) {
+
+        tbls_list$AssessmentV6 <- tbls_list$AssessmentV6 %>% clean_assessment6()
+
+      }
+
+
+      if (!is.null(file)) {
+
+        readr::write_csv(x = tbls_list$AssessmentV6, path = file)
+
+      }
+
+    }
+
+
+    if ("AssessmentV7" %in% tables) {
+      if (clean) {
+        tbls_list$AssessmentV7 <- clean_assessment7(tbls_list$AssessmentV7)
+      }
+
+
+      if (!is.null(file)) {
+
+        readr::write_csv(x = tbls_list$AssessmentV7, path = file)
+
+      }
+
+    }
+
+
+    if ("P2P" %in% tables) {
+      P2P
+      if (clean) {
+
+        tbls_list$P2P <- tbls_list$P2P  %>% clean_p2p()
+
+      }
+
+    }
+
+
+  return(tbls_list)
+
+}
+
+
+om_scan_ddb <- function(dynamo, table, scan_params,
+                       FilterExpression = NULL,
+                       ExpressionAttributeValues = NULL) {
+
+  if(!length(scan_params)==0){
+    FilterExpression <- scan_params$FilterExpression
+    ExpressionAttributeValues <- scan_params$ExpressionAttributeValues
+  }
+
+  cat(paste0("Download ", table, " Data\n"))
+
+  scanned_ddb <- dynamo$scan(table,
+                            FilterExpression = FilterExpression,
+                            ExpressionAttributeValues = ExpressionAttributeValues)
+
+
+
+  if(!length(scanned_ddb$LastEvaluatedKey)==0){
+    while(!length(scanned_ddb$LastEvaluatedKey)==0){
+
+
+      if(!exists("final_ddb")){
+        final_ddb <- scanned_ddb %>%
+          extract_ddb()
+      }
+
+      scanned_ddb <- dynamo$scan(table,
+                                ExclusiveStartKey = scanned_ddb$LastEvaluatedKey,
+                                FilterExpression = FilterExpression,
+                                ExpressionAttributeValues = ExpressionAttributeValues)
+
+      final_ddb <- scanned_ddb %>%
+        extract_ddb() %>%
+        bind_rows(final_ddb)
+
+      Sys.sleep(5)
+    }
+  } else {
+
+    final_ddb <- scanned_ddb %>%
+      extract_ddb()
+
+  }
+
+  cat(paste0("Done. ", table, " Data has ", nrow(final_ddb), " rows\n"))
+
+
+  return(final_ddb)
+
+}
+
+
+extract_ddb <- function(dynamo) {
+  db <- dynamo %>%
+    pluck("Items") %>%
+    map_dfr(unlist) %>%
+    rename_all(~str_extract(.x, "^.*(?=(\\.))"))
+
+  return(db)
+}
+
+#' @export
+om_query_ddb_ac <- function(table, ac,
+                        IndexName = "AccessCode-index",
+                        KeyConditionExpression = "AccessCode = :ac"
+                        ) {
+
+  message("Checking environment variables..")
+
+  if(Sys.getenv("AWS_ACCESS_KEY_ID") == ""){
+    stop("AWS_ACCESS_KEY_ID not found. Please set environment variable.")
+  } else if(Sys.getenv("AWS_SECRET_ACCESS_KEY") == ""){
+    stop("AWS_SECRET_ACCESS_KEY not found. Please set environment variable.")
+  } else if(Sys.getenv("AWS_REGION") == ""){
+    stop("AWS_REGION not found. Please set environment variable.")
+  }
+
+  message("Everything set up correctly.")
+
+  dynamo <- paws::dynamodb()
+
+  cat(paste0("Download ", table, " Data\n"))
+
+  if(table == "AccessCodes"){
+    queried_ddb <- dynamo$query(table,
+                                KeyConditionExpression = KeyConditionExpression,
+                                ExpressionAttributeValues = list(
+                                  `:ac` = list(
+                                    S = ac
+                                  )
+                                ))
+  } else {
+    queried_ddb <- dynamo$query(table,
+                                IndexName = IndexName,
+                                KeyConditionExpression = KeyConditionExpression,
+                                ExpressionAttributeValues = list(
+                                  `:ac` = list(
+                                    S = ac
+                                  )
+                                ))
+  }
+
+
+
+
+
+  if(!length(queried_ddb$LastEvaluatedKey)==0){
+    while(!length(queried_ddb$LastEvaluatedKey)==0){
+
+
+      if(!exists("final_ddb")){
+        final_ddb <- queried_ddb %>%
+          extract_ddb()
+      }
+
+      if(table == "AccessCodes"){
+
+        queried_ddb <- dynamo$query(table,
+                                   ExclusiveStartKey = queried_ddb$LastEvaluatedKey,
+                                   KeyConditionExpression = KeyConditionExpression,
+                                   ExpressionAttributeValues = list(
+                                     `:ac` = list(
+                                       S = ac
+                                     )
+                                   ))
+      } else {
+        queried_ddb <- dynamo$query(table,
+                                    IndexName = IndexName,
+                                    ExclusiveStartKey = queried_ddb$LastEvaluatedKey,
+                                    KeyConditionExpression = KeyConditionExpression,
+                                    ExpressionAttributeValues = list(
+                                      `:ac` = list(
+                                        S = ac
+                                      )
+                                    ))
+      }
+
+
+      final_ddb <- queried_ddb %>%
+        extract_ddb() %>%
+        bind_rows(final_ddb)
+
+      Sys.sleep(5)
+    }
+  } else {
+
+    final_ddb <- queried_ddb %>%
+      extract_ddb()
+
+  }
+
+  cat(paste0("Done. ", table, " Data has ", nrow(final_ddb), " rows\n"))
+
+
+  return(final_ddb)
+
+}
+
 #' Download AirTable data
 #'
 #' This function downloads current AirTable data

@@ -1016,3 +1016,162 @@ estimate$N
 ```
 
 (R-1)(C-1) where R is the number of rows and C is the number of columns
+
+
+```{r}
+
+
+om_get_db <- function(tables, ...) {
+  
+  dynamo <- paws::dynamodb()
+  
+  tbls_list <- tables %>% 
+    map(~om_scan_db(dynamo, .x)) %>% 
+    set_names(tables)
+  
+  return(tbls_list)
+
+}
+
+om_scan_db <- function(dynamo, table, ...) {
+  
+    scanned_db <- dynamo$scan(table, ...)
+    
+    if(!length(scanned_db$LastEvaluatedKey)==0){
+      while(!length(scanned_db$LastEvaluatedKey)==0){
+        
+        if(!exists("final_db")){
+          final_db <- tibble()
+        }
+        
+        scanned_db <- dynamo$scan(table, ExclusiveStartKey = scanned_db$LastEvaluatedKey, ...)
+
+        
+        final_db <- scanned_db %>% 
+          extract_ddb() %>% 
+          bind_rows(final_db)
+      }
+    } else {
+      
+      final_db <- scanned_db %>% 
+          extract_ddb()
+      
+    }
+    
+    return(final_db)
+
+}
+
+library(tidyverse)
+
+debugonce(om_scan_ddb)
+
+ww <- om_get_ddb(c("ParticipantProgress2", "AssessmentV7"), FilterExpression = "AccessCode = :ac",
+    ExpressionAttributeValues = list(
+    `:ac` = list(
+      S = "TomlinsonWestVirginiaUF20"
+    )
+  ))
+
+
+we <- dynamo$query("ParticipantProgress2", KeyConditionExpression = "AccessCode = :ac",
+    ExpressionAttributeValues = list(
+    `:ac` = list(
+      S = "TomlinsonWestVirginiaUF20"
+    )
+  ))
+
+dynamo$query("AccessCodes", KeyConditionExpression = "AccessCode = :ac",
+    ExpressionAttributeValues = list(
+    `:ac` = list(
+      S = "TomlinsonWestVirginiaUF20"
+    )
+  )) %>% 
+  extract_ddb()
+```
+```{r}
+dynamo$query("ParticipantProgress2", 
+             IndexName = "AccessCode-index",
+             KeyConditionExpression = "AccessCode = :ac",
+    ExpressionAttributeValues = list(
+    `:ac` = list(
+      S = "TomlinsonWestVirginiaUF20"
+    )
+  )) %>% 
+  extract_ddb()
+
+debugonce(om_query_ddb_ac)
+
+om_query_ddb_ac("ParticipantProgress2", ac = "TomlinsonWestVirginiaUF20")
+```
+
+
+```{r}
+rwe <- om_get_ddb("ParticipantProgress2")
+
+pp3 <- dynamo$scan("TEKsystems", ExclusiveStartKey = pp2$LastEvaluatedKey)
+
+pp3 <- dynamo$query("TEKsystems")
+
+pp2$ConsumedCapacity
+
+library(tidyverse)
+
+vals <- pp_dat2 %>% 
+  # purrr::flatten() %>% 
+  purrr::flatten() %>% 
+  .[1:2] %>% 
+  flatten() %>% 
+  map(compact) 
+
+extract_ddb <- function(dynamo) {
+  db <- dynamo %>% 
+    pluck("Items") %>% 
+    map_dfr(unlist) %>% 
+    rename_all(~str_extract(.x, "^.*(?=(\\.))"))  
+  
+  return(db)
+}
+
+extract_ddb(pp3)
+
+
+vals %>% 
+  map(~{
+    
+    val_names <- .x %>% names()
+    .x %>%  
+      map(compact) %>% 
+      flatten() #%>% 
+      # split()
+      # map2(~set_names(.x, y = val_names))
+    
+  })
+
+flatten(vals) %>% 
+  set_names(names(vals)) %>% 
+  as_tibble()
+
+  map(~.x %>% set_names(names(.x)))
+  imap(.f = ~)
+  names()
+  flatten()
+  ()
+  map_dfr()
+  
+  
+l <- list(1:3, "foo", character(0), integer(0))
+library(purrr)
+compact(l)
+```
+
+
+```{r}
+pp2$LastEvaluatedKey
+
+length(pp2$LastEvaluatedKey)==0
+
+```
+
+
+
